@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional, List, Set
+from typing import List, Optional, Set
 
 
 class OutOfStock(Exception):
@@ -10,13 +12,11 @@ class OutOfStock(Exception):
 
 def allocate(line: OrderLine, batches: List[Batch]) -> str:
     try:
-        batch = next(
-            b for b in sorted(batches) if b.can_allocate(line)
-        )
+        batch = next(b for b in sorted(batches) if b.can_allocate(line))
         batch.allocate(line)
         return batch.reference
     except StopIteration:
-        raise OutOfStock(f'Brak na stanie sku {line.sku}')
+        raise OutOfStock(f"Brak na stanie sku {line.sku}")
 
 
 @dataclass(frozen=True)
@@ -27,9 +27,7 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(
-        self, ref: str, sku: str, qty: int, eta: Optional[date]
-    ):
+    def __init__(self, ref: str, sku: str, qty: int, eta: Optional[date]):
         self.reference = ref
         self.sku = sku
         self.eta = eta
@@ -37,7 +35,7 @@ class Batch:
         self._allocations = set()  # type: Set[OrderLine]
 
     def __repr__(self):
-        return f'<Batch {self.reference}>'
+        return f"<Batch {self.reference}>"
 
     def __eq__(self, other):
         if not isinstance(other, Batch):
@@ -72,4 +70,3 @@ class Batch:
 
     def can_allocate(self, line: OrderLine) -> bool:
         return self.sku == line.sku and self.available_quantity >= line.qty
-
