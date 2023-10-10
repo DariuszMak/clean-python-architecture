@@ -4,7 +4,7 @@ build:
 up:
 	docker-compose up -d app
 
-test:
+tests:
 	pytest . --cov=.
 
 logs:
@@ -13,4 +13,4 @@ logs:
 down:
 	docker-compose down
 
-all: down build up test
+all: down build up tests
