@@ -105,6 +105,15 @@ pre-commit install-hooks
 git commit -n -m "commit message"
 ```
 
+
+## Running Docker container service
+
+Use ```Makefile``` commands to invoke selected commands, or use all of them:
+
+```commandline
+make all
+```
+
 ## Setup entire project from scratch (Windows)
 
 Make sure, that everything is committed or stashed and (optionally):
