@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 import pytest
+
 import model
 import repository
 import services
 
 
 class FakeRepository(repository.AbstractRepository):
-
     def __init__(self, batches):
         self._batches = set(batches)
 
@@ -19,7 +20,7 @@ class FakeRepository(repository.AbstractRepository):
         return list(self._batches)
 
 
-class FakeSession():
+class FakeSession:
     committed = False
 
     def commit(self):
@@ -45,8 +46,8 @@ def test_error_for_invalid_sku():
 
 
 def test_commits():
-    line = model.OrderLine('o1', 'OMINOUS-MIRROR', 10)
-    batch = model.Batch('b1', 'OMINOUS-MIRROR', 100, eta=None)
+    line = model.OrderLine("o1", "OMINOUS-MIRROR", 10)
+    batch = model.Batch("b1", "OMINOUS-MIRROR", 100, eta=None)
     repo = FakeRepository([batch])
     session = FakeSession()
 
