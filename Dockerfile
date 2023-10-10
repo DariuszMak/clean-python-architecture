@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.10-alpine
 
 RUN apk add --no-cache --virtual .build-deps gcc postgresql-dev musl-dev python3-dev
 RUN apk add libpq

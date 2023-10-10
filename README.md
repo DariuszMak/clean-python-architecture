@@ -116,5 +116,5 @@ git reset --hard HEAD ; git clean -x -d -f
 then
 
 ```commandline
-.\setup_local_project_from_scratch.bat
+.\setup_docker_from_scratch.bat ; .\setup_local_project_from_scratch.bat
 ```
