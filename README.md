@@ -1,5 +1,5 @@
-
 ### Local configuration:
+
 ```commandline
 python -m pip install --upgrade pip
 python -m pip install virtualenv
@@ -23,6 +23,7 @@ Run tests:
 ```commandline
 pytest
 ```
+
 Run tests with coverage report:
 
 ```commandline
@@ -84,6 +85,7 @@ This should automatically detect and install all dependencies required by ```.pr
 pre-commit will run automatically on every ```git commit```!
 
 - unistall pre-commit:
+
 ```commandline
 pre-commit uninstall
 ```
@@ -93,6 +95,7 @@ pre-commit uninstall
 ```commandline
 pre-commit run --all-files
 ```
+
 - update hooks:
 
 ```commandline
@@ -104,7 +107,6 @@ pre-commit install-hooks
 ```commandline
 git commit -n -m "commit message"
 ```
-
 
 ## Running Docker container service
 
@@ -126,4 +128,10 @@ then
 
 ```commandline
 .\setup_docker_from_scratch.bat ; .\setup_local_project_from_scratch.bat
+```
+
+or on Linux:
+
+```commandline
+./setup_docker_from_scratch.sh ; ./setup_local_project_from_scratch.sh
 ```
