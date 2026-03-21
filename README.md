@@ -1,9 +1,9 @@
 ### Local configuration:
 
 ```commandline
-python -m pip install --upgrade pip
-python -m pip install virtualenv
-python -m virtualenv venv
+python3 -m pip install --upgrade pip
+python3 -m pip install virtualenv
+python3 -m virtualenv venv
 ```
 
 - On Unix or macOS, using the bash shell: `source venv/bin/activate`
@@ -69,7 +69,7 @@ phase. In order to keep the pipeline happy ;) (and also to make sure we conform 
 standard) every developer should install the pre-commit-hooks in their local environment to ensure that every commit
 that is pushed to the remote repository passes the checks.
 
-- first, install pre-commit library into your python environment:
+- first, install pre-commit library into your python3 environment:
 
 ```commandline
 pip install pre-commit
