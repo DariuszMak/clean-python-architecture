@@ -113,7 +113,7 @@ git commit -n -m "commit message"
 Use ```Makefile``` commands to invoke selected commands, or use all of them:
 
 ```commandline
-make all
+make all ; 
 ```
 
 ## Setup entire project from scratch (Windows)
