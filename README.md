@@ -127,11 +127,16 @@ git reset --hard HEAD ; git clean -x -d -f
 then
 
 ```commandline
-.\setup_docker_from_scratch.bat ; .\setup_local_project_from_scratch.bat
+.\setup_docker_from_scratch.bat ; 
+.\setup_local_project_from_scratch.bat ; 
 ```
 
 or on Linux:
 
 ```commandline
-./setup_docker_from_scratch.sh ; ./setup_local_project_from_scratch.sh
+dos2unix setup_docker_from_scratch.sh ; 
+./setup_docker_from_scratch.sh ; 
+
+dos2unix setup_local_project_from_scratch.sh ; 
+./setup_local_project_from_scratch.sh ; 
 ```
