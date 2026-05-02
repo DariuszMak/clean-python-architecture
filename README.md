@@ -27,6 +27,12 @@ python3 -m virtualenv venv
 venv\Scripts\Activate.ps1
 
 python3 -m pip install -r requirements.txt
+
+mypy --strict .
+isort .
+black .
+
+pytest . --cov=.
 ```
 
 ### Docker container
