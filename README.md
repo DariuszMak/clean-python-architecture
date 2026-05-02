@@ -41,7 +41,7 @@ pre-commit run --all-files ; mypy --strict .
 Mypy
 
 ```commandline
- mypy .
+mypy --strict .
 ```
 
 Isort
