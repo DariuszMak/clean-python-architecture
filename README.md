@@ -32,7 +32,7 @@ mypy --strict .
 isort .
 black .
 
-pytest . --cov=.
+# pytest . --cov=.
 ```
 
 ### Docker container
