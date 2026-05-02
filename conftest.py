@@ -73,7 +73,8 @@ def add_stock(postgres_session):
         for ref, sku, qty, eta in lines:
             postgres_session.execute(
                 text(
-                    "INSERT INTO batches (reference, sku, _purchased_quantity, eta)" " VALUES (:ref, :sku, :qty, :eta)"
+                    "INSERT INTO batches (reference, sku, _purchased_quantity, eta)"
+                    " VALUES (:ref, :sku, :qty, :eta)"
                 ),
                 dict(ref=ref, sku=sku, qty=qty, eta=eta),
             )
