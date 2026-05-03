@@ -1,4 +1,5 @@
 #pylint: disable=unused-argument
+from sqlalchemy import text
 from __future__ import annotations
 from dataclasses import asdict
 from typing import List, Dict, Callable, Type, TYPE_CHECKING
@@ -77,8 +78,10 @@ def add_allocation_to_read_model(
 ):
     with uow:
         uow.session.execute(
-            'INSERT INTO allocations_view (orderid, sku, batchref)'
-            ' VALUES (:orderid, :sku, :batchref)',
+            text(
+                'INSERT INTO allocations_view (orderid, sku, batchref)'
+                ' VALUES (:orderid, :sku, :batchref)'
+            ),
             dict(orderid=event.orderid, sku=event.sku, batchref=event.batchref)
         )
         uow.commit()
@@ -89,8 +92,10 @@ def remove_allocation_from_read_model(
 ):
     with uow:
         uow.session.execute(
-            'DELETE FROM allocations_view '
-            ' WHERE orderid = :orderid AND sku = :sku',
+            text(
+                'DELETE FROM allocations_view '
+                ' WHERE orderid = :orderid AND sku = :sku'
+            ),
             dict(orderid=event.orderid, sku=event.sku)
         )
         uow.commit()

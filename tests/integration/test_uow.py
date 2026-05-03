@@ -1,4 +1,5 @@
 # pylint: disable=broad-except, too-many-arguments
+from sqlalchemy import text
 import threading
 import time
 import traceback
@@ -14,28 +15,31 @@ pytestmark = pytest.mark.usefixtures('mappers')
 
 def insert_batch(session, ref, sku, qty, eta, product_version=1):
     session.execute(
-        'INSERT INTO products (sku, version_number) VALUES (:sku, :version)',
+        text('INSERT INTO products (sku, version_number) VALUES (:sku, :version)'),
         dict(sku=sku, version=product_version),
     )
     session.execute(
-        'INSERT INTO batches (reference, sku, _purchased_quantity, eta)'
-        ' VALUES (:ref, :sku, :qty, :eta)',
+        text(
+            'INSERT INTO batches (reference, sku, _purchased_quantity, eta)'
+            ' VALUES (:ref, :sku, :qty, :eta)'
+        ),
         dict(ref=ref, sku=sku, qty=qty, eta=eta)
     )
 
 
 def get_allocated_batch_ref(session, orderid, sku):
     [[orderlineid]] = session.execute(
-        'SELECT id FROM order_lines WHERE orderid=:orderid AND sku=:sku',
+        text('SELECT id FROM order_lines WHERE orderid=:orderid AND sku=:sku'),
         dict(orderid=orderid, sku=sku)
     )
     [[batchref]] = session.execute(
-        'SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id'
-        ' WHERE orderline_id=:orderlineid',
+        text(
+            'SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id'
+            ' WHERE orderline_id=:orderlineid'
+        ),
         dict(orderlineid=orderlineid)
     )
     return batchref
-
 
 def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory):
     session = sqlite_session_factory()
@@ -113,7 +117,7 @@ def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory)
     thread2.join()
 
     [[version]] = session.execute(
-        "SELECT version_number FROM products WHERE sku=:sku",
+        text("SELECT version_number FROM products WHERE sku=:sku"),
         dict(sku=sku),
     )
     assert version == 2
@@ -121,10 +125,12 @@ def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory)
     assert 'could not serialize access due to concurrent update' in str(exception)
 
     orders = list(session.execute(
-        "SELECT orderid FROM allocations"
-        " JOIN batches ON allocations.batch_id = batches.id"
-        " JOIN order_lines ON allocations.orderline_id = order_lines.id"
-        " WHERE order_lines.sku=:sku",
+        text(
+            "SELECT orderid FROM allocations"
+            " JOIN batches ON allocations.batch_id = batches.id"
+            " JOIN order_lines ON allocations.orderline_id = order_lines.id"
+            " WHERE order_lines.sku=:sku"
+        ),
         dict(sku=sku),
     ))
     assert len(orders) == 1
