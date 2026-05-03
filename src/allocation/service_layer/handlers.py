@@ -1,6 +1,6 @@
 #pylint: disable=unused-argument
-from sqlalchemy import text
 from __future__ import annotations
+from sqlalchemy import text
 from dataclasses import asdict
 from typing import List, Dict, Callable, Type, TYPE_CHECKING
 from allocation.domain import commands, events, model
