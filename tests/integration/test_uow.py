@@ -63,7 +63,7 @@ def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory):
         insert_batch(uow.session, 'batch1', 'MEDIUM-PLINTH', 100, None)
 
     new_session = sqlite_session_factory()
-    rows = list(new_session.execute('SELECT * FROM "batches"'))
+    rows = list(new_session.execute(text('SELECT * FROM "batches"')))
     assert rows == []
 
 
@@ -78,7 +78,8 @@ def test_rolls_back_on_error(sqlite_session_factory):
             raise MyException()
 
     new_session = sqlite_session_factory()
-    rows = list(new_session.execute('SELECT * FROM "batches"'))
+    rows = list(new_session.execute(text('SELECT * FROM "batches"')))
+
     assert rows == []
 
 
@@ -135,4 +136,4 @@ def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory)
     ))
     assert len(orders) == 1
     with unit_of_work.SqlAlchemyUnitOfWork(postgres_session_factory) as uow:
-        uow.session.execute('select 1')
+        uow.session.execute(text('select 1'))
