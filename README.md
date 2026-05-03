@@ -1,4 +1,4 @@
-# Clean Python Architecture
+# EDA template - Python
 
 ## Setup entire project from scratch
 
