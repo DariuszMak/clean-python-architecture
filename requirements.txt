@@ -1,11 +1,13 @@
-black==23.7.0
-Flask==3.0.0
-isort==3.8.1
-mypy==1.5.1
-pre-commit==3.4.0
-psycopg2==2.9.9
+# app
+sqlalchemy
+flask
+psycopg2-binary
 
-pytest==7.4.2
-pytest-cov==4.1.0
-requests==2.31.0
-SQLAlchemy==2.0.21
+# dev/tests
+pytest
+pytest-icdiff
+mypy
+pylint
+requests
+redis
+tenacity
