@@ -1,9 +1,7 @@
 # pylint: disable=broad-except, attribute-defined-outside-init
 from __future__ import annotations
-
 import logging
-from typing import TYPE_CHECKING, Callable, Dict, List, Type, Union
-
+from typing import Callable, Dict, List, Union, Type, TYPE_CHECKING
 from allocation.domain import commands, events
 
 if TYPE_CHECKING:
@@ -15,6 +13,7 @@ Message = Union[commands.Command, events.Event]
 
 
 class MessageBus:
+
     def __init__(
         self,
         uow: unit_of_work.AbstractUnitOfWork,
@@ -34,24 +33,26 @@ class MessageBus:
             elif isinstance(message, commands.Command):
                 self.handle_command(message)
             else:
-                raise Exception(f"{message} was not an Event or Command")
+                raise Exception(f'{message} was not an Event or Command')
+
 
     def handle_event(self, event: events.Event):
         for handler in self.event_handlers[type(event)]:
             try:
-                logger.debug("Obsługa zdarzenia %s with handler %s", event, handler)
+                logger.debug('Obsługa zdarzenia %s with handler %s', event, handler)
                 handler(event)
                 self.queue.extend(self.uow.collect_new_events())
             except Exception:
-                logger.exception("Wyjątek obsługi zdarzenia %s", event)
+                logger.exception('Wyjątek obsługi zdarzenia %s', event)
                 continue
 
+
     def handle_command(self, command: commands.Command):
-        logger.debug("Obsługa polecenia %s", command)
+        logger.debug('Obsługa polecenia %s', command)
         try:
             handler = self.command_handlers[type(command)]
             handler(command)
             self.queue.extend(self.uow.collect_new_events())
         except Exception:
-            logger.exception("Wyjątek obsługi polecenia %s", command)
+            logger.exception('Wyjątek obsługi polecenia %s', command)
             raise
