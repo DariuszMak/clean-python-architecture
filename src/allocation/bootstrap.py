@@ -1,9 +1,8 @@
 import inspect
 from typing import Callable
+
 from allocation.adapters import orm, redis_eventpublisher
-from allocation.adapters.notifications import (
-    AbstractNotifications, EmailNotifications
-)
+from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
 from allocation.service_layer import handlers, messagebus, unit_of_work
 
 
@@ -13,18 +12,16 @@ def bootstrap(
     notifications: AbstractNotifications = None,
     publish: Callable = redis_eventpublisher.publish,
 ) -> messagebus.MessageBus:
-
     if notifications is None:
         notifications = EmailNotifications()
 
     if start_orm:
         orm.start_mappers()
 
-    dependencies = {'uow': uow, 'notifications': notifications, 'publish': publish}
+    dependencies = {"uow": uow, "notifications": notifications, "publish": publish}
     injected_event_handlers = {
         event_type: [
-            inject_dependencies(handler, dependencies)
-            for handler in event_handlers
+            inject_dependencies(handler, dependencies) for handler in event_handlers
         ]
         for event_type, event_handlers in handlers.EVENT_HANDLERS.items()
     }
@@ -43,8 +40,6 @@ def bootstrap(
 def inject_dependencies(handler, dependencies):
     params = inspect.signature(handler).parameters
     deps = {
-        name: dependency
-        for name, dependency in dependencies.items()
-        if name in params
+        name: dependency for name, dependency in dependencies.items() if name in params
     }
     return lambda message: handler(message, **deps)

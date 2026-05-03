@@ -1,4 +1,5 @@
 import json
+
 import redis
 
 from allocation import config
@@ -10,7 +11,7 @@ def subscribe_to(channel):
     pubsub = r.pubsub()
     pubsub.subscribe(channel)
     confirmation = pubsub.get_message(timeout=3)
-    assert confirmation['type'] == 'subscribe'
+    assert confirmation["type"] == "subscribe"
     return pubsub
 
 
