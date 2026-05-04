@@ -17,22 +17,23 @@ docker rm -f $(docker ps -a -q) ;
 docker system prune --volumes -a -f ; 
 docker system df ; 
 
+uv self update ; 
+uv cache clean ; 
+
 git reset --hard HEAD ; 
 git clean -x -d -f ; 
 
-python3 -m pip install --upgrade pip
-python3 -m pip install virtualenv
-python3 -m virtualenv venv
+uv python install 3.14 ; 
+uv python pin 3.14 ; 
+uv sync --dev --no-cache ; 
+uv lock ; 
 
-venv\Scripts\Activate.ps1
+.venv\Scripts\Activate.ps1 ; 
+$env:UV_ENV_FILE = ".dev.env" ; 
 
-python3 -m pip install -r requirements.txt
+.\scripts\format_and_lint.ps1 ; 
 
-mypy --strict .
-isort .
-black .
-
-# pytest . --cov=.
+# uv run pytest tests/ --cov=src -vv ; 
 ```
 
 ### Docker container
