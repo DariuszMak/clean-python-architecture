@@ -10,7 +10,7 @@ COPY tests/ /tests/
 COPY pyproject.toml /src/
 
 WORKDIR /src
-RUN uv sync --no-dev
+RUN uv sync --dev
 RUN uv pip install -e /src --system
 
 RUN apk del --no-cache .build-deps
