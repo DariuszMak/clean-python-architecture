@@ -33,7 +33,8 @@ $env:UV_ENV_FILE = ".dev.env" ;
 
 .\scripts\format_and_lint.ps1 ; 
 
-# uv run pytest tests/ -vv ; 
+make down build up ; 
+uv run pytest tests/ -vv ; 
 ```
 
 ### Docker container
