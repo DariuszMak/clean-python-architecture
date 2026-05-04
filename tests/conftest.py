@@ -9,7 +9,7 @@ import redis
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import clear_mappers, sessionmaker
-from tenacity import retry, stop_after_delay
+from tenacity import retry, stop_after_delay, wait_fixed
 
 from allocation import config
 from allocation.adapters.orm import metadata, start_mappers
@@ -26,7 +26,7 @@ def in_memory_sqlite_db():
 
 @pytest.fixture
 def sqlite_session_factory(in_memory_sqlite_db):
-    return sessionmaker(bind=in_memory_sqlite_db)
+    yield sessionmaker(bind=in_memory_sqlite_db)
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def wait_for_postgres_to_come_up(engine):
     return engine.connect()
 
 
-@retry(stop=stop_after_delay(10))
+@retry(stop=stop_after_delay(30), wait=wait_fixed(0.5))
 def wait_for_webapp_to_come_up():
     return requests.get(config.get_api_url())
 
@@ -62,7 +62,7 @@ def postgres_db():
 
 @pytest.fixture
 def postgres_session_factory(postgres_db):
-    return sessionmaker(bind=postgres_db)
+    yield sessionmaker(bind=postgres_db)
 
 
 @pytest.fixture
@@ -73,7 +73,7 @@ def postgres_session(postgres_session_factory):
 @pytest.fixture
 def restart_api():
     (Path(__file__).parent / "../src/allocation/entrypoints/flask_app.py").touch()
-    time.sleep(0.5)
+    time.sleep(2)
     wait_for_webapp_to_come_up()
 
 
