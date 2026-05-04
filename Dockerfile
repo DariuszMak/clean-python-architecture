@@ -9,10 +9,8 @@ COPY pyproject.toml uv.lock* /src/
 COPY src/ /src/
 
 WORKDIR /src
-RUN uv sync --no-install-project --group dev
+RUN uv pip install --system --group dev -e .
 
 RUN apk del --no-cache .build-deps
-
-RUN uv pip install -e .
 
 COPY tests/ /tests/
