@@ -28,7 +28,7 @@ def get_email_from_mailhog(sku):
     return next(m for m in all_emails["items"] if sku in str(m))
 
 
-def test_out_of_stock_email(bus):
+def test_out_of_stock_email(bus) -> None:
     sku = random_sku()
     bus.handle(commands.CreateBatch("batch1", sku, 9, None))
     bus.handle(commands.Allocate("order1", sku, 10))

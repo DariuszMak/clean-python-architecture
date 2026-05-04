@@ -8,7 +8,7 @@ tomorrow = today + timedelta(days=1)
 later = tomorrow + timedelta(days=10)
 
 
-def test_prefers_warehouse_batches_to_shipments():
+def test_prefers_warehouse_batches_to_shipments() -> None:
     in_stock_batch = Batch("in-stock-batch", "RETRO-CLOCK", 100, eta=None)
     shipment_batch = Batch("shipment-batch", "RETRO-CLOCK", 100, eta=tomorrow)
     product = Product(sku="RETRO-CLOCK", batches=[in_stock_batch, shipment_batch])
@@ -20,7 +20,7 @@ def test_prefers_warehouse_batches_to_shipments():
     assert shipment_batch.available_quantity == 100
 
 
-def test_prefers_earlier_batches():
+def test_prefers_earlier_batches() -> None:
     earliest = Batch("speedy-batch", "MINIMALIST-SPOON", 100, eta=today)
     medium = Batch("normal-batch", "MINIMALIST-SPOON", 100, eta=tomorrow)
     latest = Batch("slow-batch", "MINIMALIST-SPOON", 100, eta=later)
@@ -34,7 +34,7 @@ def test_prefers_earlier_batches():
     assert latest.available_quantity == 100
 
 
-def test_returns_allocated_batch_ref():
+def test_returns_allocated_batch_ref() -> None:
     in_stock_batch = Batch("in-stock-batch-ref", "HIGHBROW-POSTER", 100, eta=None)
     shipment_batch = Batch("shipment-batch-ref", "HIGHBROW-POSTER", 100, eta=tomorrow)
     line = OrderLine("oref", "HIGHBROW-POSTER", 10)
@@ -43,7 +43,7 @@ def test_returns_allocated_batch_ref():
     assert allocation == in_stock_batch.reference
 
 
-def test_outputs_allocated_event():
+def test_outputs_allocated_event() -> None:
     batch = Batch("batchref", "RETRO-LAMPSHADE", 100, eta=None)
     line = OrderLine("oref", "RETRO-LAMPSHADE", 10)
     product = Product(sku="RETRO-LAMPSHADE", batches=[batch])
@@ -52,7 +52,7 @@ def test_outputs_allocated_event():
     assert product.events[-1] == expected
 
 
-def test_records_out_of_stock_event_if_cannot_allocate():
+def test_records_out_of_stock_event_if_cannot_allocate() -> None:
     batch = Batch("batch1", "SMALL-FORK", 10, eta=today)
     product = Product(sku="SMALL-FORK", batches=[batch])
     product.allocate(OrderLine("order1", "SMALL-FORK", 10))
@@ -62,7 +62,7 @@ def test_records_out_of_stock_event_if_cannot_allocate():
     assert allocation is None
 
 
-def test_increments_version_number():
+def test_increments_version_number() -> None:
     line = OrderLine("oref", "SCANDI-PEN", 10)
     product = Product(sku="SCANDI-PEN", batches=[Batch("b1", "SCANDI-PEN", 100, eta=None)])
     product.version_number = 7

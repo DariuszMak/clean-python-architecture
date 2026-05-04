@@ -23,7 +23,7 @@ def sqlite_bus(sqlite_session_factory):
     clear_mappers()
 
 
-def test_allocations_view(sqlite_bus):
+def test_allocations_view(sqlite_bus) -> None:
     sqlite_bus.handle(commands.CreateBatch("sku1batch", "sku1", 50, None))
     sqlite_bus.handle(commands.CreateBatch("sku2batch", "sku2", 50, today))
     sqlite_bus.handle(commands.Allocate("order1", "sku1", 20))
@@ -39,7 +39,7 @@ def test_allocations_view(sqlite_bus):
     ]
 
 
-def test_deallocation(sqlite_bus):
+def test_deallocation(sqlite_bus) -> None:
     sqlite_bus.handle(commands.CreateBatch("b1", "sku1", 50, None))
     sqlite_bus.handle(commands.CreateBatch("b2", "sku1", 50, today))
     sqlite_bus.handle(commands.Allocate("o1", "sku1", 40))

@@ -38,7 +38,7 @@ def get_allocated_batch_ref(session, orderid, sku):
     return batchref
 
 
-def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory):
+def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory) -> None:
     session = sqlite_session_factory()
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
     session.commit()
@@ -54,7 +54,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory):
     assert batchref == "batch1"
 
 
-def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory):
+def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory) -> None:
     uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
         insert_batch(uow.session, "batch1", "MEDIUM-PLINTH", 100, None)
@@ -64,7 +64,7 @@ def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory):
     assert rows == []
 
 
-def test_rolls_back_on_error(sqlite_session_factory):
+def test_rolls_back_on_error(sqlite_session_factory) -> None:
     class MyException(Exception):
         pass
 
@@ -91,7 +91,7 @@ def try_to_allocate(orderid, sku, exceptions, session_factory):
         exceptions.append(e)
 
 
-def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory):
+def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory) -> None:
     sku, batch = random_sku(), random_batchref()
     session = postgres_session_factory()
     insert_batch(session, batch, sku, 100, eta=None, product_version=1)

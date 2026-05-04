@@ -60,13 +60,13 @@ def bootstrap_test_app():
 
 
 class TestAddBatch:
-    def test_for_new_product(self):
+    def test_for_new_product(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "CRUNCHY-ARMCHAIR", 100, None))
         assert bus.uow.products.get("CRUNCHY-ARMCHAIR") is not None
         assert bus.uow.committed
 
-    def test_for_existing_product(self):
+    def test_for_existing_product(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "GARISH-RUG", 100, None))
         bus.handle(commands.CreateBatch("b2", "GARISH-RUG", 99, None))
@@ -74,27 +74,27 @@ class TestAddBatch:
 
 
 class TestAllocate:
-    def test_allocates(self):
+    def test_allocates(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("batch1", "COMPLICATED-LAMP", 100, None))
         bus.handle(commands.Allocate("o1", "COMPLICATED-LAMP", 10))
         [batch] = bus.uow.products.get("COMPLICATED-LAMP").batches
         assert batch.available_quantity == 90
 
-    def test_errors_for_invalid_sku(self):
+    def test_errors_for_invalid_sku(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "AREALSKU", 100, None))
 
         with pytest.raises(handlers.InvalidSku, match="Invalid sku NONEXISTENTSKU"):
             bus.handle(commands.Allocate("o1", "NONEXISTENTSKU", 10))
 
-    def test_commits(self):
+    def test_commits(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None))
         bus.handle(commands.Allocate("o1", "OMINOUS-MIRROR", 10))
         assert bus.uow.committed
 
-    def test_sends_email_on_out_of_stock_error(self):
+    def test_sends_email_on_out_of_stock_error(self) -> None:
         fake_notifs = FakeNotifications()
         bus = bootstrap.bootstrap(
             start_orm=False,
@@ -110,7 +110,7 @@ class TestAllocate:
 
 
 class TestChangeBatchQuantity:
-    def test_changes_available_quantity(self):
+    def test_changes_available_quantity(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("batch1", "ADORABLE-SETTEE", 100, None))
         [batch] = bus.uow.products.get(sku="ADORABLE-SETTEE").batches
@@ -119,7 +119,7 @@ class TestChangeBatchQuantity:
         bus.handle(commands.ChangeBatchQuantity("batch1", 50))
         assert batch.available_quantity == 50
 
-    def test_reallocates_if_necessary(self):
+    def test_reallocates_if_necessary(self) -> None:
         bus = bootstrap_test_app()
         history = [
             commands.CreateBatch("batch1", "INDIFFERENT-TABLE", 50, None),
