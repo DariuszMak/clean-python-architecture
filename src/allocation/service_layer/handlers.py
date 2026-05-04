@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import TYPE_CHECKING, Callable, Dict, List, Type
+from typing import TYPE_CHECKING
 
 from sqlalchemy import text
 
@@ -10,6 +10,8 @@ from allocation.domain import commands, events, model
 from allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from allocation.adapters import notifications
 
     from . import unit_of_work
@@ -43,9 +45,7 @@ def reallocate(event: events.Deallocated, uow: unit_of_work.AbstractUnitOfWork):
     allocate(commands.Allocate(**asdict(event)), uow=uow)
 
 
-def change_batch_quantity(
-    cmd: commands.ChangeBatchQuantity, uow: unit_of_work.AbstractUnitOfWork
-):
+def change_batch_quantity(cmd: commands.ChangeBatchQuantity, uow: unit_of_work.AbstractUnitOfWork):
     with uow:
         product = uow.products.get_by_batchref(batchref=cmd.ref)
         product.change_batch_quantity(ref=cmd.ref, qty=cmd.qty)
@@ -78,11 +78,8 @@ def add_allocation_to_read_model(
 ):
     with uow:
         uow.session.execute(
-            text(
-                "INSERT INTO allocations_view (orderid, sku, batchref)"
-                " VALUES (:orderid, :sku, :batchref)"
-            ),
-            dict(orderid=event.orderid, sku=event.sku, batchref=event.batchref),
+            text("INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"),
+            {"orderid": event.orderid, "sku": event.sku, "batchref": event.batchref},
         )
         uow.commit()
 
@@ -93,11 +90,8 @@ def remove_allocation_from_read_model(
 ):
     with uow:
         uow.session.execute(
-            text(
-                "DELETE FROM allocations_view "
-                " WHERE orderid = :orderid AND sku = :sku"
-            ),
-            dict(orderid=event.orderid, sku=event.sku),
+            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"),
+            {"orderid": event.orderid, "sku": event.sku},
         )
         uow.commit()
 

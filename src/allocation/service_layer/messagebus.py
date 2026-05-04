@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Callable, Dict, List, Type, Union
+from typing import TYPE_CHECKING, Union
 
 from allocation.domain import commands, events
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from . import unit_of_work
 
 logger = logging.getLogger(__name__)
@@ -18,8 +20,8 @@ class MessageBus:
     def __init__(
         self,
         uow: unit_of_work.AbstractUnitOfWork,
-        event_handlers: Dict[Type[events.Event], List[Callable]],
-        command_handlers: Dict[Type[commands.Command], Callable],
+        event_handlers: dict[type[events.Event], list[Callable]],
+        command_handlers: dict[type[commands.Command], Callable],
     ):
         self.uow = uow
         self.event_handlers = event_handlers

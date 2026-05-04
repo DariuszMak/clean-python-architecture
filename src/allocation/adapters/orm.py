@@ -69,9 +69,7 @@ def start_mappers():
             )
         },
     )
-    mapper_registry.map_imperatively(
-        model.Product, products, properties={"batches": relationship(batches_mapper)}
-    )
+    mapper_registry.map_imperatively(model.Product, products, properties={"batches": relationship(batches_mapper)})
 
 
 @event.listens_for(model.Product, "load")

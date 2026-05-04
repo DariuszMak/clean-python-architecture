@@ -26,7 +26,7 @@ def in_memory_sqlite_db():
 
 @pytest.fixture
 def sqlite_session_factory(in_memory_sqlite_db):
-    yield sessionmaker(bind=in_memory_sqlite_db)
+    return sessionmaker(bind=in_memory_sqlite_db)
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def postgres_db():
 
 @pytest.fixture
 def postgres_session_factory(postgres_db):
-    yield sessionmaker(bind=postgres_db)
+    return sessionmaker(bind=postgres_db)
 
 
 @pytest.fixture
@@ -81,7 +81,6 @@ def restart_api():
 def restart_redis_pubsub():
     wait_for_redis_to_come_up()
     if not shutil.which("docker-compose"):
-        print("Pomijanie restartu, założenie działania w kontenerze.")
         return
     subprocess.run(
         ["docker-compose", "restart", "-t", "0", "redis_pubsub"],

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import date
-from typing import Dict, List
 
 import pytest
 
@@ -106,7 +105,7 @@ class TestAllocate:
         bus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None))
         bus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10))
         assert fake_notifs.sent["stock@made.com"] == [
-            f"Out of stock for POPULAR-CURTAINS",
+            "Out of stock for POPULAR-CURTAINS",
         ]
 
 

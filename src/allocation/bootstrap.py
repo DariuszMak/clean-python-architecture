@@ -1,9 +1,12 @@
 import inspect
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from allocation.adapters import orm, redis_eventpublisher
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
 from allocation.service_layer import handlers, messagebus, unit_of_work
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def bootstrap(
@@ -20,9 +23,7 @@ def bootstrap(
 
     dependencies = {"uow": uow, "notifications": notifications, "publish": publish}
     injected_event_handlers = {
-        event_type: [
-            inject_dependencies(handler, dependencies) for handler in event_handlers
-        ]
+        event_type: [inject_dependencies(handler, dependencies) for handler in event_handlers]
         for event_type, event_handlers in handlers.EVENT_HANDLERS.items()
     }
     injected_command_handlers = {
@@ -39,7 +40,5 @@ def bootstrap(
 
 def inject_dependencies(handler, dependencies):
     params = inspect.signature(handler).parameters
-    deps = {
-        name: dependency for name, dependency in dependencies.items() if name in params
-    }
+    deps = {name: dependency for name, dependency in dependencies.items() if name in params}
     return lambda message: handler(message, **deps)

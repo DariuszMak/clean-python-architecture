@@ -1,11 +1,14 @@
 import json
 import logging
 from dataclasses import asdict
+from typing import TYPE_CHECKING
 
 import redis
 
 from allocation import config
-from allocation.domain import events
+
+if TYPE_CHECKING:
+    from allocation.domain import events
 
 logger = logging.getLogger(__name__)
 

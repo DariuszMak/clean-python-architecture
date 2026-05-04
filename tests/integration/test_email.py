@@ -13,13 +13,12 @@ from ..random_refs import random_sku
 
 @pytest.fixture
 def bus(sqlite_session_factory):
-    bus = bootstrap.bootstrap(
+    yield bootstrap.bootstrap(
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=notifications.EmailNotifications(),
         publish=lambda *args: None,
     )
-    yield bus
     clear_mappers()
 
 

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
-from typing import List, Optional, Set
+from typing import TYPE_CHECKING
 
-from . import commands, events
+from . import events
+
+if TYPE_CHECKING:
+    from datetime import date
 
 
 class Product:
-    def __init__(self, sku: str, batches: List[Batch], version_number: int = 0):
+    def __init__(self, sku: str, batches: list[Batch], version_number: int = 0):
         self.sku = sku
         self.batches = batches
         self.version_number = version_number
@@ -48,7 +50,7 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, qty: int, eta: Optional[date]):
+    def __init__(self, ref: str, sku: str, qty: int, eta: date | None):
         self.reference = ref
         self.sku = sku
         self.eta = eta

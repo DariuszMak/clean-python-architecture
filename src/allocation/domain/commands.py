@@ -1,7 +1,9 @@
 # pylint: disable=too-few-public-methods
 from dataclasses import dataclass
-from datetime import date
-from typing import Optional
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import date
 
 
 class Command:
@@ -20,7 +22,7 @@ class CreateBatch(Command):
     ref: str
     sku: str
     qty: int
-    eta: Optional[date] = None
+    eta: date | None = None
 
 
 @dataclass
