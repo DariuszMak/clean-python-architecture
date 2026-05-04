@@ -21,8 +21,6 @@ RUN uv sync --dev
 COPY src/ /app/src/
 COPY tests/ /app/tests/
 
-RUN uv pip install -e .
-
 FROM python:3.14-alpine
 
 RUN apk add --no-cache libpq
