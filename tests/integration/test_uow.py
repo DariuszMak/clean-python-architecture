@@ -1,4 +1,3 @@
-
 import threading
 import time
 
@@ -87,7 +86,7 @@ def try_to_allocate(orderid, sku, exceptions, session_factory):
             product.allocate(line)
             time.sleep(0.2)
             uow.commit()
-    except Exception as e:  
+    except Exception as e:
         exceptions.append(e)
 
 
@@ -98,7 +97,7 @@ def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory)
     session.commit()
 
     order1, order2 = random_orderid(1), random_orderid(2)
-    exceptions = []  
+    exceptions = []
 
     def try_to_allocate_order1():
         return try_to_allocate(order1, sku, exceptions, postgres_session_factory)

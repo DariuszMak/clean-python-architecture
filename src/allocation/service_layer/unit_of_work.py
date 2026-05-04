@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import abc
@@ -49,7 +48,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session_factory = session_factory
 
     def __enter__(self):
-        self.session = self.session_factory()  
+        self.session = self.session_factory()
         self.products = repository.SqlAlchemyRepository(self.session)
         return super().__enter__()
 

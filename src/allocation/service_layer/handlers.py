@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -52,9 +51,6 @@ def change_batch_quantity(cmd: commands.ChangeBatchQuantity, uow: unit_of_work.A
         uow.commit()
 
 
-
-
-
 def send_out_of_stock_notification(
     event: events.OutOfStock,
     notifications: notifications.AbstractNotifications,
@@ -100,10 +96,10 @@ EVENT_HANDLERS = {
     events.Allocated: [publish_allocated_event, add_allocation_to_read_model],
     events.Deallocated: [remove_allocation_from_read_model, reallocate],
     events.OutOfStock: [send_out_of_stock_notification],
-}  
+}
 
 COMMAND_HANDLERS = {
     commands.Allocate: allocate,
     commands.CreateBatch: add_batch,
     commands.ChangeBatchQuantity: change_batch_quantity,
-}  
+}

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from collections import defaultdict
@@ -44,7 +43,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 
 class FakeNotifications(notifications.AbstractNotifications):
     def __init__(self):
-        self.sent = defaultdict(list)  
+        self.sent = defaultdict(list)
 
     def send(self, destination, message):
         self.sent[destination].append(message)
@@ -135,7 +134,6 @@ class TestChangeBatchQuantity:
 
         bus.handle(commands.ChangeBatchQuantity("batch1", 25))
 
-        
         assert batch1.available_quantity == 5
-        
+
         assert batch2.available_quantity == 30
