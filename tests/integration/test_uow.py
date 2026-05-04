@@ -1,4 +1,4 @@
-# pylint: disable=broad-except, too-many-arguments
+
 import threading
 import time
 
@@ -87,7 +87,7 @@ def try_to_allocate(orderid, sku, exceptions, session_factory):
             product.allocate(line)
             time.sleep(0.2)
             uow.commit()
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception as e:  
         exceptions.append(e)
 
 

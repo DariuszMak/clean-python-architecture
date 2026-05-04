@@ -1,4 +1,4 @@
-# pylint: disable=too-few-public-methods
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 

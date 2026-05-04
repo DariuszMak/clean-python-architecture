@@ -1,4 +1,4 @@
-# pylint: disable=redefined-outer-name
+
 from datetime import date
 from unittest import mock
 

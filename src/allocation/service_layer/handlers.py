@@ -1,4 +1,4 @@
-# pylint: disable=unused-argument
+
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -52,7 +52,7 @@ def change_batch_quantity(cmd: commands.ChangeBatchQuantity, uow: unit_of_work.A
         uow.commit()
 
 
-# pylint: disable=unused-argument
+
 
 
 def send_out_of_stock_notification(
