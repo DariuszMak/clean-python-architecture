@@ -31,9 +31,9 @@ uv lock ;
 .venv\Scripts\Activate.ps1 ; 
 $env:UV_ENV_FILE = ".dev.env" ; 
 
-.\scripts\format_and_lint.ps1 ; 
+# .\scripts\format_and_lint.ps1 ; 
 
-# uv run pytest tests/ --cov=src -vv ; 
+uv run pytest tests/ --cov=src -vv ; 
 ```
 
 ### Docker container
