@@ -21,6 +21,8 @@ services:
       - ./src:/src
       - ./tests:/tests
     entrypoint:
+      - uv
+      - run
       - python
       - /src/allocation/entrypoints/redis_eventconsumer.py
 
@@ -43,6 +45,8 @@ services:
       - ./src:/src
       - ./tests:/tests
     entrypoint:
+      - uv
+      - run
       - flask
       - run
       - --host=0.0.0.0
