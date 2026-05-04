@@ -1,18 +1,39 @@
-FROM python:3.14-alpine
+FROM python:3.14-alpine AS builder
 
-RUN apk add --no-cache --virtual .build-deps gcc postgresql-dev musl-dev python3-dev
-RUN apk add libpq
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    postgresql-dev \
+    python3-dev
+
+RUN apk add --no-cache libpq
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 
-RUN mkdir -p /src
-COPY src/ /src/
-COPY tests/ /tests/
-COPY pyproject.toml /src/
+WORKDIR /app
 
-WORKDIR /src
+COPY pyproject.toml /app/
+
 RUN uv sync --dev
-RUN uv pip install -e /src --system
 
-RUN apk del --no-cache .build-deps
+COPY src/ /app/src/
+COPY tests/ /app/tests/
+
+FROM python:3.14-alpine
+
+RUN apk add --no-cache libpq
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+
+COPY src/ /app/src/
+COPY tests/ /app/tests/
+
