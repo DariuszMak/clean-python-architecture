@@ -8,7 +8,7 @@ RUN apk add libpq
 COPY pyproject.toml uv.lock* /tmp/app/
 WORKDIR /tmp/app
 
-RUN uv sync --frozen --no-install-project --no-dev
+RUN uv sync --no-dev
 
 RUN apk del --no-cache .build-deps
 
