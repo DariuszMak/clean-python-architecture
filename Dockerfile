@@ -17,7 +17,6 @@ WORKDIR /app
 COPY pyproject.toml /app/
 
 RUN uv sync --dev
-RUN uv pip install -e .
 
 COPY src/ /app/src/
 COPY tests/ /app/tests/
@@ -37,4 +36,6 @@ COPY --from=builder /opt/venv /opt/venv
 
 COPY src/ /app/src/
 COPY tests/ /app/tests/
+
+RUN uv pip install -e .
 
