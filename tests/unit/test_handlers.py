@@ -44,7 +44,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 
 class FakeNotifications(notifications.AbstractNotifications):
     def __init__(self):
-        self.sent = defaultdict(list)  # typ: Dict[str, List[str]]
+        self.sent = defaultdict(list)  
 
     def send(self, destination, message):
         self.sent[destination].append(message)
@@ -135,7 +135,7 @@ class TestChangeBatchQuantity:
 
         bus.handle(commands.ChangeBatchQuantity("batch1", 25))
 
-        # order1 lub order2 zostanie dezalokowane, więc będziemy mieć 25 - 20
+        
         assert batch1.available_quantity == 5
-        # i 20 zostanie alokowane do następnej partii
+        
         assert batch2.available_quantity == 30

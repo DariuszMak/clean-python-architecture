@@ -14,7 +14,7 @@ class Product:
         self.sku = sku
         self.batches = batches
         self.version_number = version_number
-        self.events = []  # type: List[events.Event]
+        self.events = []  
 
     def allocate(self, line: OrderLine) -> str:
         try:
@@ -55,7 +55,7 @@ class Batch:
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = qty
-        self._allocations = set()  # type: Set[OrderLine]
+        self._allocations = set()  
 
     def __repr__(self):
         return f"<Batch {self.reference}>"

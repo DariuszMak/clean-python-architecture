@@ -28,7 +28,7 @@ def test_allocations_view(sqlite_bus) -> None:
     sqlite_bus.handle(commands.CreateBatch("sku2batch", "sku2", 50, today))
     sqlite_bus.handle(commands.Allocate("order1", "sku1", 20))
     sqlite_bus.handle(commands.Allocate("order1", "sku2", 20))
-    # add a spurious batch and order to make sure we're getting the right ones
+    
     sqlite_bus.handle(commands.CreateBatch("sku1batch-later", "sku1", 50, today))
     sqlite_bus.handle(commands.Allocate("otherorder", "sku1", 30))
     sqlite_bus.handle(commands.Allocate("otherorder", "sku2", 10))

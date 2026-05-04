@@ -100,10 +100,10 @@ EVENT_HANDLERS = {
     events.Allocated: [publish_allocated_event, add_allocation_to_read_model],
     events.Deallocated: [remove_allocation_from_read_model, reallocate],
     events.OutOfStock: [send_out_of_stock_notification],
-}  # type: Dict[Type[events.Event], List[Callable]]
+}  
 
 COMMAND_HANDLERS = {
     commands.Allocate: allocate,
     commands.CreateBatch: add_batch,
     commands.ChangeBatchQuantity: change_batch_quantity,
-}  # type: Dict[Type[commands.Command], Callable]
+}  
