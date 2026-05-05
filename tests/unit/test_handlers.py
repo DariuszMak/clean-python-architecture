@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -12,19 +13,22 @@ from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatc
 from allocation.service_layer.handlers import InvalidSkuError
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 class FakeRepository(AbstractRepository):
-    def __init__(self, products):
+    def __init__(self, products: Iterable[Any]) -> None:
         super().__init__()
         self._products = set(products)
 
-    def _add(self, product):
+    def _add(self, product: Any) -> None:
         self._products.add(product)
 
-    def _get(self, sku):
+    def _get(self, sku: str) -> Any:
         return next((p for p in self._products if p.sku == sku), None)
 
-    def _get_by_batchref(self, batchref):
+    def _get_by_batchref(self, batchref: str) -> Any:
         return next(
             (p for p in self._products for b in p.batches if b.reference == batchref),
             None,
@@ -32,26 +36,26 @@ class FakeRepository(AbstractRepository):
 
 
 class FakeUnitOfWork(AbstractUnitOfWork):
-    def __init__(self):
-        self.products = FakeRepository([])
-        self.committed = False
+    def __init__(self) -> None:
+        self.products: FakeRepository = FakeRepository([])
+        self.committed: bool = False
 
-    def _commit(self):
+    def _commit(self) -> None:
         self.committed = True
 
-    def rollback(self):
+    def rollback(self) -> None:
         pass
 
 
 class FakeNotifications(AbstractNotifications):
-    def __init__(self):
-        self.sent = defaultdict(list)
+    def __init__(self) -> None:
+        self.sent: dict[str, list[str]] = defaultdict(list)
 
-    def send(self, destination, message):
+    def send(self, destination: str, message: str) -> None:
         self.sent[destination].append(message)
 
 
-def bootstrap_test_app():
+def bootstrap_test_app() -> Any:
     return bootstrap(
         start_orm=False,
         uow=FakeUnitOfWork(),
@@ -137,5 +141,4 @@ class TestChangeBatchQuantity:
         bus.handle(ChangeBatchQuantity("batch1", 25))
 
         assert batch1.available_quantity == 5
-
         assert batch2.available_quantity == 30
