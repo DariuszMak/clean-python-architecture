@@ -3,8 +3,8 @@ import json
 import pytest
 from tenacity import Retrying, stop_after_delay
 
-from ..random_refs import random_batchref, random_orderid, random_sku
-from . import api_client, redis_client
+from tests.e2e import api_client, redis_client
+from tests.random_refs import random_batchref, random_orderid, random_sku
 
 
 @pytest.mark.usefixtures("postgres_db")

@@ -6,8 +6,7 @@ from sqlalchemy import text
 
 from allocation.domain import model
 from allocation.service_layer import unit_of_work
-
-from ..random_refs import random_batchref, random_orderid, random_sku
+from tests.random_refs import random_batchref, random_orderid, random_sku
 
 pytestmark = pytest.mark.usefixtures("mappers")
 
