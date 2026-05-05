@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
 from allocation import views
 from allocation.bootstrap import bootstrap
-from allocation.domain import commands
+from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
 from allocation.service_layer.handlers import SqlAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -28,14 +28,14 @@ def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> MessageBus:
 
 
 def test_allocations_view(sqlite_bus: MessageBus) -> None:
-    sqlite_bus.handle(commands.CreateBatch("sku1batch", "sku1", 50, None))
-    sqlite_bus.handle(commands.CreateBatch("sku2batch", "sku2", 50, today))
-    sqlite_bus.handle(commands.Allocate("order1", "sku1", 20))
-    sqlite_bus.handle(commands.Allocate("order1", "sku2", 20))
+    sqlite_bus.handle(CreateBatch("sku1batch", "sku1", 50, None))
+    sqlite_bus.handle(CreateBatch("sku2batch", "sku2", 50, today))
+    sqlite_bus.handle(Allocate("order1", "sku1", 20))
+    sqlite_bus.handle(Allocate("order1", "sku2", 20))
 
-    sqlite_bus.handle(commands.CreateBatch("sku1batch-later", "sku1", 50, today))
-    sqlite_bus.handle(commands.Allocate("otherorder", "sku1", 30))
-    sqlite_bus.handle(commands.Allocate("otherorder", "sku2", 10))
+    sqlite_bus.handle(CreateBatch("sku1batch-later", "sku1", 50, today))
+    sqlite_bus.handle(Allocate("otherorder", "sku1", 30))
+    sqlite_bus.handle(Allocate("otherorder", "sku2", 10))
 
     assert views.allocations("order1", sqlite_bus.uow) == [
         {"sku": "sku1", "batchref": "sku1batch"},
@@ -44,10 +44,10 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
 
 
 def test_deallocation(sqlite_bus: MessageBus) -> None:
-    sqlite_bus.handle(commands.CreateBatch("b1", "sku1", 50, None))
-    sqlite_bus.handle(commands.CreateBatch("b2", "sku1", 50, today))
-    sqlite_bus.handle(commands.Allocate("o1", "sku1", 40))
-    sqlite_bus.handle(commands.ChangeBatchQuantity("b1", 10))
+    sqlite_bus.handle(CreateBatch("b1", "sku1", 50, None))
+    sqlite_bus.handle(CreateBatch("b2", "sku1", 50, today))
+    sqlite_bus.handle(Allocate("o1", "sku1", 40))
+    sqlite_bus.handle(ChangeBatchQuantity("b1", 10))
 
     assert views.allocations("o1", sqlite_bus.uow) == [
         {"sku": "sku1", "batchref": "b2"},
