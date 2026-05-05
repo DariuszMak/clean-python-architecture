@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 from allocation.domain import commands, events
 
@@ -10,23 +10,34 @@ if TYPE_CHECKING:
 
     from . import unit_of_work
 
+
 logger = logging.getLogger(__name__)
 
 Message = commands.Command | events.Event
 
 
+class AbstractUnitOfWork(Protocol):
+    def collect_new_events(self) -> list[events.Event]:
+        ...
+
+
+EventHandler = Callable[[events.Event], None]
+CommandHandler = Callable[[commands.Command], None]
+
+
 class MessageBus:
     def __init__(
         self,
-        uow: unit_of_work.AbstractUnitOfWork,
-        event_handlers: dict[type[events.Event], list[Callable]],
-        command_handlers: dict[type[commands.Command], Callable],
+        uow: AbstractUnitOfWork,
+        event_handlers: dict[type[events.Event], list[EventHandler]],
+        command_handlers: dict[type[commands.Command], CommandHandler],
     ):
         self.uow = uow
         self.event_handlers = event_handlers
         self.command_handlers = command_handlers
+        self.queue: list[Message] = []
 
-    def handle(self, message: Message):
+    def handle(self, message: Message) -> None:
         self.queue = [message]
         while self.queue:
             message = self.queue.pop(0)
@@ -37,7 +48,7 @@ class MessageBus:
             else:
                 raise TypeError(f"{message} was not an Event or Command")
 
-    def handle_event(self, event: events.Event):
+    def handle_event(self, event: events.Event) -> None:
         for handler in self.event_handlers[type(event)]:
             try:
                 logger.debug("Event %s with handler %s", event, handler)
@@ -47,7 +58,7 @@ class MessageBus:
                 logger.exception("Event exception %s", event)
                 continue
 
-    def handle_command(self, command: commands.Command):
+    def handle_command(self, command: commands.Command) -> None:
         logger.debug("Command %s", command)
         try:
             handler = self.command_handlers[type(command)]
