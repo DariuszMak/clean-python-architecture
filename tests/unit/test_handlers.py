@@ -54,7 +54,7 @@ def bootstrap_test_app():
         start_orm=False,
         uow=FakeUnitOfWork(),
         notifications=FakeNotifications(),
-        publish=lambda *args: None,
+        publish=lambda *_: None,
     )
 
 
@@ -99,7 +99,7 @@ class TestAllocate:
             start_orm=False,
             uow=FakeUnitOfWork(),
             notifications=fake_notifs,
-            publish=lambda *args: None,
+            publish=lambda *_: None,
         )
         bus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None))
         bus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10))
