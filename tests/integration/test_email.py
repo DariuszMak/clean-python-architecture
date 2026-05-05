@@ -16,14 +16,17 @@ def bus(sqlite_session_factory):
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=notifications.EmailNotifications(),
-        publish=lambda *args: None,
+        publish=lambda *_: None,
     )
     clear_mappers()
 
 
 def get_email_from_mailhog(sku):
     host, port = map(config.get_email_host_and_port().get, ["host", "http_port"])
-    all_emails = requests.get(f"http://{host}:{port}/api/v2/messages").json()
+    all_emails = requests.get(
+        f"http://{host}:{port}/api/v2/messages",
+        timeout=5,
+    ).json()
     return next(m for m in all_emails["items"] if sku in str(m))
 
 
