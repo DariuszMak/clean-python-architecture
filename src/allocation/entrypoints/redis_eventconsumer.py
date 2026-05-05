@@ -1,11 +1,14 @@
 import json
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import redis
 
 from allocation import bootstrap, config
 from allocation.domain import commands
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +18,7 @@ RedisMessage = dict[str, Any]
 RedisHostPort = dict[str, Any]
 
 
-redis_settings: RedisHostPort = config.get_redis_host_and_port()
+redis_settings: Mapping[str, Any] = config.get_redis_host_and_port()
 r: redis.Redis = redis.Redis(**redis_settings)
 
 
