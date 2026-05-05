@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
@@ -53,7 +54,7 @@ allocations_view = Table(
 )
 
 
-def start_mappers():
+def start_mappers() -> None:
     if mapper_registry.mappers:
         return
     logger.info("Starting mappers")
@@ -69,9 +70,13 @@ def start_mappers():
             )
         },
     )
-    mapper_registry.map_imperatively(model.Product, products, properties={"batches": relationship(batches_mapper)})
+    mapper_registry.map_imperatively(
+        model.Product,
+        products,
+        properties={"batches": relationship(batches_mapper)},
+    )
 
 
 @event.listens_for(model.Product, "load")
-def receive_load(product, _):
+def receive_load(product: model.Product, _: Any) -> None:
     product.events = []
