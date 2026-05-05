@@ -10,8 +10,6 @@ from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
-
-
 if TYPE_CHECKING:
     from allocation.service_layer.messagebus import MessageBus
 
