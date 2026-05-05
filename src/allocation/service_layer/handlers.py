@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, Protocol
 
-from sqlalchemy.sql.elements import TextClause
 from sqlalchemy import text
 
 from allocation.domain import commands, events, model
@@ -11,6 +10,8 @@ from allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from sqlalchemy.sql.elements import TextClause
 
 
 class InvalidSkuError(Exception):
@@ -111,9 +112,7 @@ def remove_allocation_from_read_model(
     uow: SqlAlchemyUnitOfWork,
 ) -> None:
     with uow:
-        stmt: TextClause = text(
-            "DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"
-        )
+        stmt: TextClause = text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku")
         uow.session.execute(
             stmt,
             {"orderid": event.orderid, "sku": event.sku},
