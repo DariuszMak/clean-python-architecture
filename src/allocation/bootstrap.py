@@ -4,7 +4,8 @@ from typing import Any
 
 from allocation.adapters import orm, redis_eventpublisher
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
-from allocation.service_layer import handlers, messagebus
+from allocation.service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
+from allocation.service_layer.messagebus import MessageBus
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork, SqlAlchemyUnitOfWork
 
 PublishCallable = Callable[..., Any]
@@ -17,7 +18,7 @@ def bootstrap(
     uow: AbstractUnitOfWork | None = None,
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = redis_eventpublisher.publish,
-) -> messagebus.MessageBus:
+) -> MessageBus:
     if uow is None:
         uow = SqlAlchemyUnitOfWork()
 
@@ -35,17 +36,16 @@ def bootstrap(
 
     injected_event_handlers = {
         event_type: [inject_dependencies(handler, dependencies) for handler in event_handlers]
-        for event_type, event_handlers in handlers.EVENT_HANDLERS.items()
+        for event_type, event_handlers in EVENT_HANDLERS.items()
     }
 
     injected_command_handlers = {
-        command_type: inject_dependencies(handler, dependencies)
-        for command_type, handler in handlers.COMMAND_HANDLERS.items()
+        command_type: inject_dependencies(handler, dependencies) for command_type, handler in COMMAND_HANDLERS.items()
     }
 
     bus_uow: AbstractUnitOfWork = uow
 
-    return messagebus.MessageBus(
+    return MessageBus(
         uow=bus_uow,
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
