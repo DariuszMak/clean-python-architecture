@@ -35,7 +35,7 @@ class MessageBus:
             elif isinstance(message, commands.Command):
                 self.handle_command(message)
             else:
-                raise Exception(f"{message} was not an Event or Command")
+                raise TypeError(f"{message} was not an Event or Command")
 
     def handle_event(self, event: events.Event):
         for handler in self.event_handlers[type(event)]:
