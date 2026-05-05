@@ -5,15 +5,15 @@ from datetime import UTC, datetime
 
 import pytest
 
-from allocation.adapters import repository
 from allocation.adapters.notifications import AbstractNotifications
+from allocation.adapters.repository import AbstractRepository
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 
-class FakeRepository(repository.AbstractRepository):
+class FakeRepository(AbstractRepository):
     def __init__(self, products):
         super().__init__()
         self._products = set(products)

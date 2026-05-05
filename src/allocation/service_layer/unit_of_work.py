@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, Self
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from allocation.adapters.repository import SqlAlchemyRepository
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
@@ -57,7 +59,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self) -> Self:
         self.session = self.session_factory()
-        self.products = repository.SqlAlchemyRepository(self.session)
+        self.products = SqlAlchemyRepository(self.session)
         return super().__enter__()
 
     def __exit__(self, *args: Any) -> None:
