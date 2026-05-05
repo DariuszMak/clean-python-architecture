@@ -5,10 +5,10 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation import views
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+from allocation.views import allocations
 
 if TYPE_CHECKING:
     from allocation.service_layer.messagebus import MessageBus
@@ -37,7 +37,7 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(Allocate("otherorder", "sku1", 30))
     sqlite_bus.handle(Allocate("otherorder", "sku2", 10))
 
-    assert views.allocations("order1", sqlite_bus.uow) == [
+    assert allocations("order1", sqlite_bus.uow) == [
         {"sku": "sku1", "batchref": "sku1batch"},
         {"sku": "sku2", "batchref": "sku2batch"},
     ]
@@ -49,6 +49,6 @@ def test_deallocation(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(Allocate("o1", "sku1", 40))
     sqlite_bus.handle(ChangeBatchQuantity("b1", 10))
 
-    assert views.allocations("o1", sqlite_bus.uow) == [
+    assert allocations("o1", sqlite_bus.uow) == [
         {"sku": "sku1", "batchref": "b2"},
     ]

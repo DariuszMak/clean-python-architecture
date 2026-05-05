@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, cast
 
 from flask import Flask, Response, jsonify, request
 
-from allocation import views
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
+from allocation.views import allocations
 
 if TYPE_CHECKING:
     from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
@@ -50,7 +50,7 @@ def allocate_endpoint() -> tuple[Response, int]:
 
 @app.route("/allocations/<orderid>", methods=["GET"])
 def allocations_view_endpoint(orderid: str) -> tuple[Response, int]:
-    result = views.allocations(
+    result = allocations(
         orderid,
         cast("SqlAlchemyUnitOfWork", bus.uow),
     )
