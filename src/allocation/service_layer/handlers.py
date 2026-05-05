@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from sqlalchemy import text
 
-from allocation.domain import events, model
+from allocation.domain import events
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, Command, CreateBatch
-from allocation.domain.model import OrderLine
+from allocation.domain.model import Batch, OrderLine, Product
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -20,9 +20,9 @@ class InvalidSkuError(Exception):
 
 
 class ProductsRepository(Protocol):
-    def get(self, sku: str) -> model.Product | None: ...
-    def add(self, product: model.Product) -> None: ...
-    def get_by_batchref(self, batchref: str) -> model.Product: ...
+    def get(self, sku: str) -> Product | None: ...
+    def add(self, product: Product) -> None: ...
+    def get_by_batchref(self, batchref: str) -> Product: ...
 
 
 class AbstractUnitOfWork(Protocol):
@@ -49,9 +49,9 @@ def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
     with uow:
         product = uow.products.get(sku=cmd.sku)
         if product is None:
-            product = model.Product(cmd.sku, batches=[])
+            product = Product(cmd.sku, batches=[])
             uow.products.add(product)
-        product.batches.append(model.Batch(cmd.ref, cmd.sku, cmd.qty, cmd.eta))
+        product.batches.append(Batch(cmd.ref, cmd.sku, cmd.qty, cmd.eta))
         uow.commit()
 
 

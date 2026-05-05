@@ -2,39 +2,39 @@ import abc
 from typing import Any
 
 from allocation.adapters.orm import batches
-from allocation.domain import model
+from allocation.domain.model import Batch, Product
 
 
 class AbstractRepository(abc.ABC):
     def __init__(self) -> None:
-        self.seen: set[model.Product] = set()
+        self.seen: set[Product] = set()
 
-    def add(self, product: model.Product) -> None:
+    def add(self, product: Product) -> None:
         self._add(product)
         self.seen.add(product)
 
-    def get(self, sku: str) -> model.Product | None:
+    def get(self, sku: str) -> Product | None:
         product = self._get(sku)
         if product:
             self.seen.add(product)
         return product
 
-    def get_by_batchref(self, batchref: str) -> model.Product | None:
+    def get_by_batchref(self, batchref: str) -> Product | None:
         product = self._get_by_batchref(batchref)
         if product:
             self.seen.add(product)
         return product
 
     @abc.abstractmethod
-    def _add(self, product: model.Product) -> None:
+    def _add(self, product: Product) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get(self, sku: str) -> model.Product | None:
+    def _get(self, sku: str) -> Product | None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get_by_batchref(self, batchref: str) -> model.Product | None:
+    def _get_by_batchref(self, batchref: str) -> Product | None:
         raise NotImplementedError
 
 
@@ -43,11 +43,11 @@ class SqlAlchemyRepository(AbstractRepository):
         super().__init__()
         self.session = session
 
-    def _add(self, product: model.Product) -> None:
+    def _add(self, product: Product) -> None:
         self.session.add(product)
 
-    def _get(self, sku: str) -> model.Product | None:
-        return self.session.query(model.Product).filter_by(sku=sku).first()
+    def _get(self, sku: str) -> Product | None:
+        return self.session.query(Product).filter_by(sku=sku).first()
 
-    def _get_by_batchref(self, batchref: str) -> model.Product | None:
-        return self.session.query(model.Product).join(model.Batch).filter(batches.c.reference == batchref).first()
+    def _get_by_batchref(self, batchref: str) -> Product | None:
+        return self.session.query(Product).join(Batch).filter(batches.c.reference == batchref).first()

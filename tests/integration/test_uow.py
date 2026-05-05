@@ -4,7 +4,7 @@ import time
 import pytest
 from sqlalchemy import text
 
-from allocation.domain import model
+from allocation.domain.model import OrderLine
 from allocation.service_layer import unit_of_work
 from tests.random_refs import random_batchref, random_orderid, random_sku
 
@@ -44,7 +44,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory) -> 
     uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
         product = uow.products.get(sku="HIPSTER-WORKBENCH")
-        line = model.OrderLine("o1", "HIPSTER-WORKBENCH", 10)
+        line = OrderLine("o1", "HIPSTER-WORKBENCH", 10)
         product.allocate(line)
         uow.commit()
 
@@ -80,7 +80,7 @@ def test_rolls_back_on_error(sqlite_session_factory) -> None:
 
 
 def try_to_allocate(orderid, sku, exceptions, session_factory):
-    line = model.OrderLine(orderid, sku, 10)
+    line = OrderLine(orderid, sku, 10)
     try:
         with unit_of_work.SqlAlchemyUnitOfWork(session_factory) as uow:
             product = uow.products.get(sku=sku)
