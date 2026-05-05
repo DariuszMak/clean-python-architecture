@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from allocation.service_layer import unit_of_work
 
 
-def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
+def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork) -> list[dict[str, str]]:
     with uow:
         results = list(
             uow.session.execute(
