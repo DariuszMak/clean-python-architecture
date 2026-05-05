@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from allocation import views
 from allocation.bootstrap import bootstrap
 from allocation.domain import commands
-from allocation.service_layer import unit_of_work
+from allocation.service_layer.handlers import SqlAlchemyUnitOfWork
 
 if TYPE_CHECKING:
     from allocation.service_layer.messagebus import MessageBus
@@ -20,7 +20,7 @@ today = datetime.now(tz=UTC).date()
 def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> MessageBus:
     yield bootstrap(
         start_orm=True,
-        uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
+        uow=SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=mock.Mock(),
         publish=lambda *_: None,
     )
