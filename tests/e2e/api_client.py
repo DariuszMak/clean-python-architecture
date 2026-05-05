@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any
 
 import requests
 from requests import Response
@@ -9,7 +9,7 @@ TIMEOUT: int = 5
 
 
 def post_to_add_batch(ref: Any, sku: Any, qty: Any, eta: Any) -> None:
-    url: str = cast("str", config.get_api_url())
+    url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",
         json={"ref": ref, "sku": sku, "qty": qty, "eta": eta},
@@ -24,7 +24,7 @@ def post_to_allocate(
     qty: Any,
     expect_success: bool = True,
 ) -> Response:
-    url: str = cast("str", config.get_api_url())
+    url: str = config.get_api_url()
     r: Response = requests.post(
         f"{url}/allocate",
         json={
@@ -40,5 +40,5 @@ def post_to_allocate(
 
 
 def get_allocation(orderid: Any) -> Response:
-    url: str = cast("str", config.get_api_url())
+    url: str = config.get_api_url()
     return requests.get(f"{url}/allocations/{orderid}", timeout=TIMEOUT)
