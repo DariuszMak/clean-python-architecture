@@ -64,13 +64,15 @@ def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory) -> None:
 
 
 def test_rolls_back_on_error(sqlite_session_factory) -> None:
-    class MyException(Exception):
+    class MyError(Exception):
         pass
 
     uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
-    with pytest.raises(MyException), uow:
-        insert_batch(uow.session, "batch1", "LARGE-FORK", 100, None)
-        raise MyException
+
+    with uow:
+        with pytest.raises(MyError):
+            insert_batch(uow.session, "batch1", "LARGE-FORK", 100, None)
+            raise MyError
 
     new_session = sqlite_session_factory()
     rows = list(new_session.execute(text('SELECT * FROM "batches"')))
