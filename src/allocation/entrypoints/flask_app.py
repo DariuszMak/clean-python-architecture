@@ -8,7 +8,7 @@ from allocation.domain import commands
 from allocation.service_layer.handlers import InvalidSkuError
 
 if TYPE_CHECKING:
-    from allocation.adapters import SqlAlchemyUnitOfWork
+    from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = Flask(__name__)
 bus = bootstrap.bootstrap()

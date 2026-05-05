@@ -47,7 +47,6 @@ def bootstrap(
         for command_type, handler in handlers.COMMAND_HANDLERS.items()
     }
 
-    # 🔧 FIX: align the UoW type expected by MessageBus
     bus_uow = cast("BusAbstractUnitOfWork", uow)
 
     return messagebus.MessageBus(
