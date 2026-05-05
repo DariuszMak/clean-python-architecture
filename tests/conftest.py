@@ -2,7 +2,7 @@ import shutil
 import subprocess  # noqa: S404
 import time
 from pathlib import Path
-import shutil
+
 import pytest
 import redis
 import requests
