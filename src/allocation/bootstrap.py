@@ -11,10 +11,13 @@ if TYPE_CHECKING:
 
 def bootstrap(
     start_orm: bool = True,
-    uow: unit_of_work.AbstractUnitOfWork = unit_of_work.SqlAlchemyUnitOfWork(),
+    uow: unit_of_work.AbstractUnitOfWork = None,
     notifications: AbstractNotifications = None,
     publish: Callable = redis_eventpublisher.publish,
 ) -> messagebus.MessageBus:
+    if uow is None:
+        uow = unit_of_work.SqlAlchemyUnitOfWork()
+
     if notifications is None:
         notifications = EmailNotifications()
 
@@ -36,7 +39,6 @@ def bootstrap(
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )
-
 
 def inject_dependencies(handler, dependencies):
     params = inspect.signature(handler).parameters
