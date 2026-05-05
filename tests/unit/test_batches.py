@@ -1,10 +1,11 @@
 from datetime import date
 
 from allocation.domain.model import Batch, OrderLine
+from datetime import UTC, datetime, timedelta, timezone
 
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
-    batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=date.today())
+    batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=datetime.now(tz=UTC).date())
     line = OrderLine("order-ref", "SMALL-TABLE", 2)
 
     batch.allocate(line)
@@ -14,7 +15,7 @@ def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
 
 def make_batch_and_line(sku, batch_qty, line_qty):
     return (
-        Batch("batch-001", sku, batch_qty, eta=date.today()),
+        Batch("batch-001", sku, batch_qty, eta=datetime.now(tz=UTC).date()),
         OrderLine("order-123", sku, line_qty),
     )
 

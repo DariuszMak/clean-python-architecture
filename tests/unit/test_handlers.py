@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import UTC, datetime, timedelta, timezone
 
 from collections import defaultdict
 from datetime import date
@@ -122,7 +123,7 @@ class TestChangeBatchQuantity:
         bus = bootstrap_test_app()
         history = [
             commands.CreateBatch("batch1", "INDIFFERENT-TABLE", 50, None),
-            commands.CreateBatch("batch2", "INDIFFERENT-TABLE", 50, date.today()),
+            commands.CreateBatch("batch2", "INDIFFERENT-TABLE", 50, datetime.now(tz=UTC).date()),
             commands.Allocate("order1", "INDIFFERENT-TABLE", 20),
             commands.Allocate("order2", "INDIFFERENT-TABLE", 20),
         ]

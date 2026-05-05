@@ -2,8 +2,10 @@ from datetime import date, timedelta
 
 from allocation.domain import events
 from allocation.domain.model import Batch, OrderLine, Product
+from datetime import UTC, datetime, timedelta, timezone
 
-today = date.today()
+
+today = datetime.now(tz=UTC).date()
 tomorrow = today + timedelta(days=1)
 later = tomorrow + timedelta(days=10)
 
