@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import abc
 import importlib
-from typing import Any, Iterator, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 config = importlib.import_module("allocation.config")
 repository = importlib.import_module("allocation.adapters.repository")

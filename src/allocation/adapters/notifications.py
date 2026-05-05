@@ -1,6 +1,5 @@
 import abc
 import smtplib
-from typing import Any
 
 from allocation import config
 

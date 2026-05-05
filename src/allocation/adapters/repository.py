@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Set
+from typing import Any
 
 from allocation.adapters import orm
 from allocation.domain import model
@@ -7,7 +7,7 @@ from allocation.domain import model
 
 class AbstractRepository(abc.ABC):
     def __init__(self) -> None:
-        self.seen: Set[model.Product] = set()
+        self.seen: set[model.Product] = set()
 
     def add(self, product: model.Product) -> None:
         self._add(product)

@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import redis
 
@@ -9,10 +9,10 @@ from allocation.domain import commands
 
 logger = logging.getLogger(__name__)
 
-RedisMessage = Dict[str, Any]
+RedisMessage = dict[str, Any]
 
 
-RedisHostPort = Dict[str, Any]
+RedisHostPort = dict[str, Any]
 
 
 redis_settings: RedisHostPort = config.get_redis_host_and_port()
@@ -31,7 +31,7 @@ def main() -> None:
 
 def handle_change_batch_quantity(m: RedisMessage, bus: Any) -> None:
     logger.info("handling %s", m)
-    data: Dict[str, Any] = json.loads(m["data"])
+    data: dict[str, Any] = json.loads(m["data"])
     cmd: commands.ChangeBatchQuantity = commands.ChangeBatchQuantity(
         ref=data["batchref"],
         qty=data["qty"],

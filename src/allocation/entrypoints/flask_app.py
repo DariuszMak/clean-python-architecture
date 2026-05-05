@@ -1,19 +1,17 @@
 from datetime import datetime
-from typing import Tuple, Union
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, Response, jsonify, request
 
 from allocation import bootstrap, views
 from allocation.domain import commands
 from allocation.service_layer.handlers import InvalidSkuError
-from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 app = Flask(__name__)
 bus = bootstrap.bootstrap()
 
 
 @app.route("/add_batch", methods=["POST"])
-def add_batch() -> Tuple[str, int]:
+def add_batch() -> tuple[str, int]:
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -29,7 +27,7 @@ def add_batch() -> Tuple[str, int]:
 
 
 @app.route("/allocate", methods=["POST"])
-def allocate_endpoint() -> Union[Response, Tuple[str, int]]:
+def allocate_endpoint() -> Response | tuple[str, int]:
     try:
         cmd = commands.Allocate(
             request.json["orderid"],
@@ -44,7 +42,7 @@ def allocate_endpoint() -> Union[Response, Tuple[str, int]]:
 
 
 @app.route("/allocations/<orderid>", methods=["GET"])
-def allocations_view_endpoint(orderid: str) -> Union[Response, Tuple[str, int]]:
+def allocations_view_endpoint(orderid: str) -> Response | tuple[str, int]:
     result = views.allocations(orderid, bus.uow)
     if not result:
         return "not found", 404

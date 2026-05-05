@@ -2,18 +2,23 @@ import shutil
 import subprocess  # noqa: S404
 import time
 from pathlib import Path
-from typing import Any, Callable, Generator
+from typing import TYPE_CHECKING, Any
 
 import pytest
 import redis
 import requests
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from allocation import config
-from allocation.adapters.orm import metadata, start_mappers as start_mappers_untyped
+from allocation.adapters.orm import metadata
+from allocation.adapters.orm import start_mappers as start_mappers_untyped
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator
+
+    from sqlalchemy.engine import Engine
 
 pytest.register_assert_rewrite("tests.e2e.api_client")
 
@@ -40,7 +45,7 @@ def sqlite_session_factory(in_memory_sqlite_db: Engine):
 
 
 @pytest.fixture
-def mappers() -> Generator[None, None, None]:
+def mappers() -> Generator[None]:
     start_mappers_typed()
     yield
     clear_mappers()

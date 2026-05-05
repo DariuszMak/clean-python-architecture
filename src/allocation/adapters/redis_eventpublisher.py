@@ -12,9 +12,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-r = redis.Redis(**cast(dict[str, Any], config.get_redis_host_and_port()))
+r = redis.Redis(**cast("dict[str, Any]", config.get_redis_host_and_port()))
 
 
-def publish(channel: str, event: "events.Event") -> None:
+def publish(channel: str, event: events.Event) -> None:
     logging.info("publishing: channel=%s, event=%s", channel, event)
-    r.publish(channel, json.dumps(asdict(cast(Any, event))))
+    r.publish(channel, json.dumps(asdict(cast("Any", event))))

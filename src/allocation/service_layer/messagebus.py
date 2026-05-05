@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from typing import Protocol
 
 from allocation.domain import commands, events
-
-from collections.abc import Callable
-
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +12,7 @@ Message = commands.Command | events.Event
 
 
 class AbstractUnitOfWork(Protocol):
-    def collect_new_events(self) -> list[events.Event]:
-        ...
+    def collect_new_events(self) -> list[events.Event]: ...
 
 
 EventHandler = Callable[[events.Event], None]
