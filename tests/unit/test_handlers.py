@@ -1,8 +1,7 @@
 from __future__ import annotations
-from datetime import UTC, datetime, timedelta, timezone
 
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, datetime
 
 import pytest
 

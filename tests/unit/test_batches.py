@@ -1,7 +1,7 @@
-from datetime import date
+
+from datetime import UTC, datetime
 
 from allocation.domain.model import Batch, OrderLine
-from datetime import UTC, datetime, timedelta, timezone
 
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:

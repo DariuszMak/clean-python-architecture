@@ -1,7 +1,5 @@
-from datetime import date
+from datetime import UTC, datetime
 from unittest import mock
-from datetime import UTC, datetime, timedelta, timezone
-
 
 import pytest
 from sqlalchemy.orm import clear_mappers
@@ -11,7 +9,6 @@ from allocation.domain import commands
 from allocation.service_layer import unit_of_work
 
 today = datetime.now(tz=UTC).date()
-
 
 
 @pytest.fixture
