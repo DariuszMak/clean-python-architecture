@@ -4,8 +4,9 @@ import pytest
 import requests
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation import bootstrap, config
+from allocation import config
 from allocation.adapters import notifications
+from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer import unit_of_work
 from tests.random_refs import random_sku
@@ -13,7 +14,7 @@ from tests.random_refs import random_sku
 
 @pytest.fixture
 def bus(sqlite_session_factory: sessionmaker[Session]) -> Any:
-    yield bootstrap.bootstrap(
+    yield bootstrap(
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=notifications.EmailNotifications(),

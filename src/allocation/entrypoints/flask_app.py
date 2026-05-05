@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, cast
 
 from flask import Flask, Response, jsonify, request
 
-from allocation import bootstrap, views
+from allocation import views
+from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
 
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = Flask(__name__)
-bus = bootstrap.bootstrap()
+bus = bootstrap()
 
 
 @app.route("/add_batch", methods=["POST"])

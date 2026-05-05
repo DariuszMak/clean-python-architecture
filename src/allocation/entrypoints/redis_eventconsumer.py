@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Any
 
 import redis
 
-from allocation import bootstrap, config
+from allocation import config
+from allocation.bootstrap import bootstrap
 from allocation.domain.commands import ChangeBatchQuantity
 
 if TYPE_CHECKING:
@@ -24,7 +25,7 @@ r: redis.Redis[Any] = redis.Redis(**redis_settings)
 
 def main() -> None:
     logger.info("Redis pubsub starting")
-    bus: Any = bootstrap.bootstrap()
+    bus: Any = bootstrap()
     pubsub: Any = r.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe("change_batch_quantity")
 

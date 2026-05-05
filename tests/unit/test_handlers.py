@@ -5,9 +5,9 @@ from datetime import UTC, datetime
 
 import pytest
 
-from allocation import bootstrap
 from allocation.adapters import repository
 from allocation.adapters.notifications import AbstractNotifications
+from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
@@ -52,7 +52,7 @@ class FakeNotifications(AbstractNotifications):
 
 
 def bootstrap_test_app():
-    return bootstrap.bootstrap(
+    return bootstrap(
         start_orm=False,
         uow=FakeUnitOfWork(),
         notifications=FakeNotifications(),
@@ -97,7 +97,7 @@ class TestAllocate:
 
     def test_sends_email_on_out_of_stock_error(self) -> None:
         fake_notifs = FakeNotifications()
-        bus = bootstrap.bootstrap(
+        bus = bootstrap(
             start_orm=False,
             uow=FakeUnitOfWork(),
             notifications=fake_notifs,
