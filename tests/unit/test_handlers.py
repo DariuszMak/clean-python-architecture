@@ -6,9 +6,11 @@ from datetime import UTC, datetime
 import pytest
 
 from allocation import bootstrap
-from allocation.adapters import notifications, repository
+from allocation.adapters import repository
+from allocation.adapters.notifications import AbstractNotifications
 from allocation.domain import commands
-from allocation.service_layer import handlers, unit_of_work
+from allocation.service_layer.handlers import InvalidSkuError
+from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class FakeRepository(repository.AbstractRepository):
@@ -29,7 +31,7 @@ class FakeRepository(repository.AbstractRepository):
         )
 
 
-class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
+class FakeUnitOfWork(AbstractUnitOfWork):
     def __init__(self):
         self.products = FakeRepository([])
         self.committed = False
@@ -41,7 +43,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
         pass
 
 
-class FakeNotifications(notifications.AbstractNotifications):
+class FakeNotifications(AbstractNotifications):
     def __init__(self):
         self.sent = defaultdict(list)
 
@@ -84,7 +86,7 @@ class TestAllocate:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "AREALSKU", 100, None))
 
-        with pytest.raises(handlers.InvalidSkuError, match="Invalid sku NONEXISTENTSKU"):
+        with pytest.raises(InvalidSkuError, match="Invalid sku NONEXISTENTSKU"):
             bus.handle(commands.Allocate("o1", "NONEXISTENTSKU", 10))
 
     def test_commits(self) -> None:
