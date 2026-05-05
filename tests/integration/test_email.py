@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
 from allocation import bootstrap, config
 from allocation.adapters import notifications
-from allocation.domain import commands
+from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer import unit_of_work
 from tests.random_refs import random_sku
 
@@ -33,8 +33,8 @@ def get_email_from_mailhog(sku: str) -> dict[str, Any]:
 
 def test_out_of_stock_email(bus: Any) -> None:
     sku = random_sku()
-    bus.handle(commands.CreateBatch("batch1", sku, 9, None))
-    bus.handle(commands.Allocate("order1", sku, 10))
+    bus.handle(CreateBatch("batch1", sku, 9, None))
+    bus.handle(Allocate("order1", sku, 10))
     email = get_email_from_mailhog(sku)
     assert email["Raw"]["From"] == "allocations@example.com"
     assert email["Raw"]["To"] == ["stock@made.com"]

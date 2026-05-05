@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, cast
 from flask import Flask, Response, jsonify, request
 
 from allocation import bootstrap, views
-from allocation.domain import commands
+from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ def add_batch() -> tuple[Response, int]:
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
 
-    cmd = commands.CreateBatch(
+    cmd = CreateBatch(
         request.json["ref"],
         request.json["sku"],
         request.json["qty"],
@@ -34,7 +34,7 @@ def add_batch() -> tuple[Response, int]:
 @app.route("/allocate", methods=["POST"])
 def allocate_endpoint() -> tuple[Response, int]:
     try:
-        cmd = commands.Allocate(
+        cmd = Allocate(
             request.json["orderid"],
             request.json["sku"],
             request.json["qty"],

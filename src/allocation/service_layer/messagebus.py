@@ -4,11 +4,12 @@ import logging
 from collections.abc import Callable
 from typing import Protocol
 
-from allocation.domain import commands, events
+from allocation.domain import events
+from allocation.domain.commands import Command
 
 logger = logging.getLogger(__name__)
 
-Message = commands.Command | events.Event
+Message = Command | events.Event
 
 
 class AbstractUnitOfWork(Protocol):
@@ -16,7 +17,7 @@ class AbstractUnitOfWork(Protocol):
 
 
 EventHandler = Callable[[events.Event], None]
-CommandHandler = Callable[[commands.Command], None]
+CommandHandler = Callable[[Command], None]
 
 
 class MessageBus:
@@ -24,7 +25,7 @@ class MessageBus:
         self,
         uow: AbstractUnitOfWork,
         event_handlers: dict[type[events.Event], list[EventHandler]],
-        command_handlers: dict[type[commands.Command], CommandHandler],
+        command_handlers: dict[type[Command], CommandHandler],
     ):
         self.uow = uow
         self.event_handlers = event_handlers
@@ -37,7 +38,7 @@ class MessageBus:
             message = self.queue.pop(0)
             if isinstance(message, events.Event):
                 self.handle_event(message)
-            elif isinstance(message, commands.Command):
+            elif isinstance(message, Command):
                 self.handle_command(message)
             else:
                 raise TypeError(f"{message} was not an Event or Command")
@@ -52,7 +53,7 @@ class MessageBus:
                 logger.exception("Event exception %s", event)
                 continue
 
-    def handle_command(self, command: commands.Command) -> None:
+    def handle_command(self, command: Command) -> None:
         logger.debug("Command %s", command)
         try:
             handler = self.command_handlers[type(command)]

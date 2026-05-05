@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from sqlalchemy import text
 
-from allocation.domain import commands, events, model
+from allocation.domain import events, model
+from allocation.domain.commands import Allocate, ChangeBatchQuantity, Command, CreateBatch
 from allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
@@ -44,7 +45,7 @@ class AbstractNotifications(Protocol):
     def send(self, _: str, message: str) -> None: ...
 
 
-def add_batch(cmd: commands.CreateBatch, uow: AbstractUnitOfWork) -> None:
+def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
     with uow:
         product = uow.products.get(sku=cmd.sku)
         if product is None:
@@ -54,7 +55,7 @@ def add_batch(cmd: commands.CreateBatch, uow: AbstractUnitOfWork) -> None:
         uow.commit()
 
 
-def allocate(cmd: commands.Allocate, uow: AbstractUnitOfWork) -> None:
+def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
     line = OrderLine(cmd.orderid, cmd.sku, cmd.qty)
     with uow:
         product = uow.products.get(sku=line.sku)
@@ -65,10 +66,10 @@ def allocate(cmd: commands.Allocate, uow: AbstractUnitOfWork) -> None:
 
 
 def reallocate(event: events.Deallocated, uow: AbstractUnitOfWork) -> None:
-    allocate(commands.Allocate(**asdict(event)), uow=uow)
+    allocate(Allocate(**asdict(event)), uow=uow)
 
 
-def change_batch_quantity(cmd: commands.ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:
+def change_batch_quantity(cmd: ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:
     with uow:
         product = uow.products.get_by_batchref(batchref=cmd.ref)
         product.change_batch_quantity(ref=cmd.ref, qty=cmd.qty)
@@ -122,8 +123,8 @@ EVENT_HANDLERS: dict[type[events.Event], list[Callable[..., Any]]] = {
     events.OutOfStock: [send_out_of_stock_notification],
 }
 
-COMMAND_HANDLERS: dict[type[commands.Command], Callable[..., Any]] = {
-    commands.Allocate: allocate,
-    commands.CreateBatch: add_batch,
-    commands.ChangeBatchQuantity: change_batch_quantity,
+COMMAND_HANDLERS: dict[type[Command], Callable[..., Any]] = {
+    Allocate: allocate,
+    CreateBatch: add_batch,
+    ChangeBatchQuantity: change_batch_quantity,
 }

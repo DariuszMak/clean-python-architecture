@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import redis
 
 from allocation import bootstrap, config
-from allocation.domain import commands
+from allocation.domain.commands import ChangeBatchQuantity
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -35,7 +35,7 @@ def main() -> None:
 def handle_change_batch_quantity(m: RedisMessage, bus: Any) -> None:
     logger.info("handling %s", m)
     data: dict[str, Any] = json.loads(m["data"])
-    cmd: commands.ChangeBatchQuantity = commands.ChangeBatchQuantity(
+    cmd: ChangeBatchQuantity = ChangeBatchQuantity(
         ref=data["batchref"],
         qty=data["qty"],
     )
