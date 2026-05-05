@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
 
 from allocation.domain import commands, events
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from . import unit_of_work
+from collections.abc import Callable
 
 
 logger = logging.getLogger(__name__)
