@@ -1,10 +1,15 @@
 import inspect
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from allocation.adapters import orm, redis_eventpublisher
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
-from allocation.service_layer import handlers, messagebus, unit_of_work
+from allocation.service_layer import handlers, messagebus
+from allocation.service_layer.unit_of_work import AbstractUnitOfWork as AppAbstractUnitOfWork
+from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+
+if TYPE_CHECKING:
+    from allocation.service_layer.messagebus import AbstractUnitOfWork as BusAbstractUnitOfWork
 
 PublishCallable = Callable[..., Any]
 HandlerCallable = Callable[..., Any]
@@ -13,19 +18,18 @@ InjectedHandler = Callable[[Any], Any]
 
 def bootstrap(
     start_orm: bool = True,
-    uow: unit_of_work.AbstractUnitOfWork | None = None,
+    uow: AppAbstractUnitOfWork | None = None,
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = redis_eventpublisher.publish,
 ) -> messagebus.MessageBus:
     if uow is None:
-        uow = unit_of_work.SqlAlchemyUnitOfWork()
+        uow = SqlAlchemyUnitOfWork()
 
     if notifications is None:
         notifications = EmailNotifications()
 
     if start_orm:
-        start_mappers: Callable[[], None] = orm.start_mappers
-        start_mappers()
+        orm.start_mappers()
 
     dependencies: dict[str, Any] = {
         "uow": uow,
@@ -43,8 +47,11 @@ def bootstrap(
         for command_type, handler in handlers.COMMAND_HANDLERS.items()
     }
 
+    # 🔧 FIX: align the UoW type expected by MessageBus
+    bus_uow = cast("BusAbstractUnitOfWork", uow)
+
     return messagebus.MessageBus(
-        uow=uow,
+        uow=bus_uow,
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )
