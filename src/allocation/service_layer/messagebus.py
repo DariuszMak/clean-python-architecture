@@ -40,19 +40,19 @@ class MessageBus:
     def handle_event(self, event: events.Event):
         for handler in self.event_handlers[type(event)]:
             try:
-                logger.debug("Obsługa zdarzenia %s with handler %s", event, handler)
+                logger.debug("Event %s with handler %s", event, handler)
                 handler(event)
                 self.queue.extend(self.uow.collect_new_events())
             except Exception:
-                logger.exception("Wyjątek obsługi zdarzenia %s", event)
+                logger.exception("Event exception %s", event)
                 continue
 
     def handle_command(self, command: commands.Command):
-        logger.debug("Obsługa polecenia %s", command)
+        logger.debug("Command %s", command)
         try:
             handler = self.command_handlers[type(command)]
             handler(command)
             self.queue.extend(self.uow.collect_new_events())
         except Exception:
-            logger.exception("Wyjątek obsługi polecenia %s", command)
+            logger.exception("Command exception %s", command)
             raise
