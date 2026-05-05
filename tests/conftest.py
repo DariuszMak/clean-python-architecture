@@ -1,8 +1,8 @@
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 import time
 from pathlib import Path
-
+import shutil
 import pytest
 import redis
 import requests
@@ -81,7 +81,10 @@ def restart_redis_pubsub():
     wait_for_redis_to_come_up()
     if not shutil.which("docker-compose"):
         return
-    subprocess.run(
-        ["docker-compose", "restart", "-t", "0", "redis_pubsub"],
-        check=True,
-    )
+
+    docker_path = shutil.which("docker-compose")
+
+    if docker_path:
+        subprocess.run([docker_path, "restart", "-t", "0", "redis_pubsub"], check=True)  # noqa: S603
+    else:
+        raise FileNotFoundError("Could not find docker-compose in PATH")
