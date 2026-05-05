@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-Message = Union[commands.Command, events.Event]
+Message = commands.Command | events.Event
 
 
 class MessageBus:
