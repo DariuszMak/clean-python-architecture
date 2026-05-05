@@ -1,41 +1,43 @@
 from __future__ import annotations
 
 import abc
+import importlib
+from typing import Any, Iterator, Self
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
-from allocation import config
-from allocation.adapters import repository
+config = importlib.import_module("allocation.config")
+repository = importlib.import_module("allocation.adapters.repository")
 
 
 class AbstractUnitOfWork(abc.ABC):
-    products: repository.AbstractRepository
+    products: Any
 
-    def __enter__(self) -> AbstractUnitOfWork:
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: Any) -> None:
         self.rollback()
 
-    def commit(self):
+    def commit(self) -> None:
         self._commit()
 
-    def collect_new_events(self):
+    def collect_new_events(self) -> Iterator[Any]:
         for product in self.products.seen:
             while product.events:
                 yield product.events.pop(0)
 
     @abc.abstractmethod
-    def _commit(self):
+    def _commit(self) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def rollback(self):
+    def rollback(self) -> None:
         raise NotImplementedError
 
 
-DEFAULT_SESSION_FACTORY = sessionmaker(
+DEFAULT_SESSION_FACTORY: sessionmaker[Session] = sessionmaker(
     bind=create_engine(
         config.get_postgres_uri(),
         isolation_level="REPEATABLE READ",
@@ -44,20 +46,23 @@ DEFAULT_SESSION_FACTORY = sessionmaker(
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
+    session: Session
+    session_factory: sessionmaker[Session]
+
+    def __init__(self, session_factory: sessionmaker[Session] = DEFAULT_SESSION_FACTORY) -> None:
         self.session_factory = session_factory
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self.session = self.session_factory()
         self.products = repository.SqlAlchemyRepository(self.session)
         return super().__enter__()
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: Any) -> None:
         super().__exit__(*args)
         self.session.close()
 
-    def _commit(self):
+    def _commit(self) -> None:
         self.session.commit()
 
-    def rollback(self):
+    def rollback(self) -> None:
         self.session.rollback()
