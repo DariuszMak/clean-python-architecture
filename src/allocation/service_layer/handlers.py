@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, Protocol
 
+from sqlalchemy.sql.elements import TextClause
 from sqlalchemy import text
 
 from allocation.domain import commands, events, model
@@ -31,7 +32,7 @@ class AbstractUnitOfWork(Protocol):
 
 
 class Session(Protocol):
-    def execute(self, statement: Any, params: dict[str, Any]) -> Any: ...
+    def execute(self, statement: TextClause, params: dict[str, Any]) -> Any: ...
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork, Protocol):
@@ -95,8 +96,11 @@ def add_allocation_to_read_model(
     uow: SqlAlchemyUnitOfWork,
 ) -> None:
     with uow:
+        stmt: TextClause = text(
+            "INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"
+        )
         uow.session.execute(
-            text("INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"),
+            stmt,
             {"orderid": event.orderid, "sku": event.sku, "batchref": event.batchref},
         )
         uow.commit()
@@ -107,20 +111,23 @@ def remove_allocation_from_read_model(
     uow: SqlAlchemyUnitOfWork,
 ) -> None:
     with uow:
+        stmt: TextClause = text(
+            "DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"
+        )
         uow.session.execute(
-            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"),
+            stmt,
             {"orderid": event.orderid, "sku": event.sku},
         )
         uow.commit()
 
 
-EVENT_HANDLERS = {
+EVENT_HANDLERS: dict[type[events.Event], list[Callable[..., Any]]] = {
     events.Allocated: [publish_allocated_event, add_allocation_to_read_model],
     events.Deallocated: [remove_allocation_from_read_model, reallocate],
     events.OutOfStock: [send_out_of_stock_notification],
 }
 
-COMMAND_HANDLERS = {
+COMMAND_HANDLERS: dict[type[commands.Command], Callable[..., Any]] = {
     commands.Allocate: allocate,
     commands.CreateBatch: add_batch,
     commands.ChangeBatchQuantity: change_batch_quantity,
