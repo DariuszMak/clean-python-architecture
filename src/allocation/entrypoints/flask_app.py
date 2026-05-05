@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING, cast
 
 from flask import Flask, Response, jsonify, request
 
@@ -6,12 +7,15 @@ from allocation import bootstrap, views
 from allocation.domain import commands
 from allocation.service_layer.handlers import InvalidSkuError
 
+if TYPE_CHECKING:
+    from allocation.adapters import SqlAlchemyUnitOfWork
+
 app = Flask(__name__)
 bus = bootstrap.bootstrap()
 
 
 @app.route("/add_batch", methods=["POST"])
-def add_batch() -> tuple[str, int]:
+def add_batch() -> tuple[Response, int]:
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -23,11 +27,12 @@ def add_batch() -> tuple[str, int]:
         eta,
     )
     bus.handle(cmd)
-    return "OK", 201
+
+    return jsonify({"status": "OK"}), 201
 
 
 @app.route("/allocate", methods=["POST"])
-def allocate_endpoint() -> Response | tuple[str, int]:
+def allocate_endpoint() -> tuple[Response, int]:
     try:
         cmd = commands.Allocate(
             request.json["orderid"],
@@ -35,15 +40,21 @@ def allocate_endpoint() -> Response | tuple[str, int]:
             request.json["qty"],
         )
         bus.handle(cmd)
+
     except InvalidSkuError as e:
         return jsonify({"message": str(e)}), 400
 
-    return "OK", 202
+    return jsonify({"status": "OK"}), 202
 
 
 @app.route("/allocations/<orderid>", methods=["GET"])
-def allocations_view_endpoint(orderid: str) -> Response | tuple[str, int]:
-    result = views.allocations(orderid, bus.uow)
+def allocations_view_endpoint(orderid: str) -> tuple[Response, int]:
+    result = views.allocations(
+        orderid,
+        cast("SqlAlchemyUnitOfWork", bus.uow),
+    )
+
     if not result:
-        return "not found", 404
+        return jsonify({"message": "not found"}), 404
+
     return jsonify(result), 200
