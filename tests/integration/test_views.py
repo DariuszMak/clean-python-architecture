@@ -17,7 +17,7 @@ today = datetime.now(tz=UTC).date()
 
 @pytest.fixture
 def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> MessageBus:
-    yield bootstrap.bootstrap(
+    yield bootstrap(
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=mock.Mock(),
