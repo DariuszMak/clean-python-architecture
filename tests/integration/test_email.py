@@ -1,6 +1,8 @@
+from typing import Any
+
 import pytest
 import requests
-from sqlalchemy.orm import clear_mappers
+from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
 from allocation import bootstrap, config
 from allocation.adapters import notifications
@@ -10,7 +12,7 @@ from tests.random_refs import random_sku
 
 
 @pytest.fixture
-def bus(sqlite_session_factory):
+def bus(sqlite_session_factory: sessionmaker[Session]) -> Any:
     yield bootstrap.bootstrap(
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
@@ -20,7 +22,7 @@ def bus(sqlite_session_factory):
     clear_mappers()
 
 
-def get_email_from_mailhog(sku):
+def get_email_from_mailhog(sku: str) -> dict[str, Any]:
     host, port = map(config.get_email_host_and_port().get, ["host", "http_port"])
     all_emails = requests.get(
         f"http://{host}:{port}/api/v2/messages",
@@ -29,7 +31,7 @@ def get_email_from_mailhog(sku):
     return next(m for m in all_emails["items"] if sku in str(m))
 
 
-def test_out_of_stock_email(bus) -> None:
+def test_out_of_stock_email(bus: Any) -> None:
     sku = random_sku()
     bus.handle(commands.CreateBatch("batch1", sku, 9, None))
     bus.handle(commands.Allocate("order1", sku, 10))
