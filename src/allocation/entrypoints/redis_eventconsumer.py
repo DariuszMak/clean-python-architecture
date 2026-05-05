@@ -19,7 +19,7 @@ RedisHostPort = dict[str, Any]
 
 
 redis_settings: Mapping[str, Any] = config.get_redis_host_and_port()
-r: redis.Redis = redis.Redis(**redis_settings)
+r: redis.Redis[Any] = redis.Redis(**redis_settings)
 
 
 def main() -> None:
