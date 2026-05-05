@@ -84,7 +84,7 @@ class TestAllocate:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "AREALSKU", 100, None))
 
-        with pytest.raises(handlers.InvalidSku, match="Invalid sku NONEXISTENTSKU"):
+        with pytest.raises(handlers.InvalidSkuError, match="Invalid sku NONEXISTENTSKU"):
             bus.handle(commands.Allocate("o1", "NONEXISTENTSKU", 10))
 
     def test_commits(self) -> None:

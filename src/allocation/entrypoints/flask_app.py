@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 
 from allocation import bootstrap, views
 from allocation.domain import commands
-from allocation.service_layer.handlers import InvalidSku
+from allocation.service_layer.handlers import InvalidSkuError
 
 app = Flask(__name__)
 bus = bootstrap.bootstrap()
@@ -34,7 +34,7 @@ def allocate_endpoint():
             request.json["qty"],
         )
         bus.handle(cmd)
-    except InvalidSku as e:
+    except InvalidSkuError as e:
         return jsonify({"message": str(e)}), 400
 
     return "OK", 202

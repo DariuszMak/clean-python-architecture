@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from . import unit_of_work
 
 
-class InvalidSku(Exception):
+class InvalidSkuError(Exception):
     pass
 
 
@@ -35,7 +35,7 @@ def allocate(cmd: commands.Allocate, uow: unit_of_work.AbstractUnitOfWork):
     with uow:
         product = uow.products.get(sku=line.sku)
         if product is None:
-            raise InvalidSku(f"Invalid sku {line.sku}")
+            raise InvalidSkuError(f"Invalid sku {line.sku}")
         product.allocate(line)
         uow.commit()
 
