@@ -12,8 +12,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from allocation import config
-from allocation.adapters.orm import metadata
-from allocation.adapters.orm import start_mappers as start_mappers_untyped
+from allocation.adapters.orm import metadata, start_mappers
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -26,7 +25,7 @@ get_api_url: Callable[[], str] = config.get_api_url
 get_redis_host_and_port: Callable[[], dict[str, Any]] = config.get_redis_host_and_port
 get_postgres_uri: Callable[[], str] = config.get_postgres_uri
 
-start_mappers_typed: Callable[[], None] = start_mappers_untyped
+start_mappers_typed: Callable[[], None] = start_mappers
 
 wait_for_postgres_to_come_up_untyped: Callable[[Engine], Any] | None = None
 wait_for_webapp_to_come_up_untyped: Callable[[], requests.Response] | None = None
