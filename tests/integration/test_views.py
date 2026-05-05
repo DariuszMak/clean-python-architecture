@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from allocation import views
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from allocation.service_layer.handlers import SqlAlchemyUnitOfWork
+from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+
+
 
 if TYPE_CHECKING:
     from allocation.service_layer.messagebus import MessageBus
