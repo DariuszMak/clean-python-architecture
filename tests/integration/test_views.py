@@ -1,18 +1,22 @@
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from sqlalchemy.orm import clear_mappers
+from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
 from allocation import bootstrap, views
 from allocation.domain import commands
 from allocation.service_layer import unit_of_work
 
+if TYPE_CHECKING:
+    from allocation.service_layer.messagebus import MessageBus
+
 today = datetime.now(tz=UTC).date()
 
 
 @pytest.fixture
-def sqlite_bus(sqlite_session_factory):
+def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> MessageBus:
     yield bootstrap.bootstrap(
         start_orm=True,
         uow=unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory),
@@ -22,7 +26,7 @@ def sqlite_bus(sqlite_session_factory):
     clear_mappers()
 
 
-def test_allocations_view(sqlite_bus) -> None:
+def test_allocations_view(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(commands.CreateBatch("sku1batch", "sku1", 50, None))
     sqlite_bus.handle(commands.CreateBatch("sku2batch", "sku2", 50, today))
     sqlite_bus.handle(commands.Allocate("order1", "sku1", 20))
@@ -38,7 +42,7 @@ def test_allocations_view(sqlite_bus) -> None:
     ]
 
 
-def test_deallocation(sqlite_bus) -> None:
+def test_deallocation(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(commands.CreateBatch("b1", "sku1", 50, None))
     sqlite_bus.handle(commands.CreateBatch("b2", "sku1", 50, today))
     sqlite_bus.handle(commands.Allocate("o1", "sku1", 40))
