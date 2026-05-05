@@ -1,19 +1,23 @@
 import inspect
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Callable
 
 from allocation.adapters import orm, redis_eventpublisher
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
 from allocation.service_layer import handlers, messagebus, unit_of_work
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable as TypingCallable
+
+PublishCallable = Callable[..., Any]
+HandlerCallable = Callable[..., Any]
+InjectedHandler = Callable[[Any], Any]
 
 
 def bootstrap(
     start_orm: bool = True,
-    uow: unit_of_work.AbstractUnitOfWork = None,
-    notifications: AbstractNotifications = None,
-    publish: Callable = redis_eventpublisher.publish,
+    uow: Optional[unit_of_work.AbstractUnitOfWork] = None,
+    notifications: Optional[AbstractNotifications] = None,
+    publish: PublishCallable = redis_eventpublisher.publish,
 ) -> messagebus.MessageBus:
     if uow is None:
         uow = unit_of_work.SqlAlchemyUnitOfWork()
@@ -22,13 +26,23 @@ def bootstrap(
         notifications = EmailNotifications()
 
     if start_orm:
-        orm.start_mappers()
+        start_mappers: Callable[[], None] = orm.start_mappers
+        start_mappers()
 
-    dependencies = {"uow": uow, "notifications": notifications, "publish": publish}
+    dependencies: dict[str, Any] = {
+        "uow": uow,
+        "notifications": notifications,
+        "publish": publish,
+    }
+
     injected_event_handlers = {
-        event_type: [inject_dependencies(handler, dependencies) for handler in event_handlers]
+        event_type: [
+            inject_dependencies(handler, dependencies)
+            for handler in event_handlers
+        ]
         for event_type, event_handlers in handlers.EVENT_HANDLERS.items()
     }
+
     injected_command_handlers = {
         command_type: inject_dependencies(handler, dependencies)
         for command_type, handler in handlers.COMMAND_HANDLERS.items()
@@ -41,7 +55,18 @@ def bootstrap(
     )
 
 
-def inject_dependencies(handler, dependencies):
+def inject_dependencies(
+    handler: HandlerCallable,
+    dependencies: dict[str, Any],
+) -> InjectedHandler:
     params = inspect.signature(handler).parameters
-    deps = {name: dependency for name, dependency in dependencies.items() if name in params}
-    return lambda message: handler(message, **deps)
+    deps = {
+        name: dependency
+        for name, dependency in dependencies.items()
+        if name in params
+    }
+
+    def wrapper(message: Any) -> Any:
+        return handler(message, **deps)
+
+    return wrapper
