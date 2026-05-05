@@ -33,7 +33,7 @@ class AbstractUnitOfWork(Protocol):
 
 
 class Session(Protocol):
-    def execute(self, statement: TextClause, params: dict[str, Any]) -> Any: ...
+    def execute(self, _: TextClause, __: dict[str, Any]) -> Any: ...
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork, Protocol):
@@ -41,7 +41,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork, Protocol):
 
 
 class AbstractNotifications(Protocol):
-    def send(self, to: str, message: str) -> None: ...
+    def send(self, _: str, message: str) -> None: ...
 
 
 def add_batch(cmd: commands.CreateBatch, uow: AbstractUnitOfWork) -> None:
@@ -97,11 +97,8 @@ def add_allocation_to_read_model(
     uow: SqlAlchemyUnitOfWork,
 ) -> None:
     with uow:
-        stmt: TextClause = text(
-            "INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"
-        )
         uow.session.execute(
-            stmt,
+            text("INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"),
             {"orderid": event.orderid, "sku": event.sku, "batchref": event.batchref},
         )
         uow.commit()
@@ -112,9 +109,8 @@ def remove_allocation_from_read_model(
     uow: SqlAlchemyUnitOfWork,
 ) -> None:
     with uow:
-        stmt: TextClause = text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku")
         uow.session.execute(
-            stmt,
+            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"),
             {"orderid": event.orderid, "sku": event.sku},
         )
         uow.commit()
