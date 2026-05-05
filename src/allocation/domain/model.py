@@ -10,11 +10,11 @@ if TYPE_CHECKING:
 
 
 class Product:
-    def __init__(self, sku: str, batches: list[Batch], version_number: int = 0):
+    def __init__(self, sku: str, batches: list[Batch], version_number: int = 0) -> None:
         self.sku = sku
         self.batches = batches
         self.version_number = version_number
-        self.events = []
+        self.events: list[object] = []
 
     def allocate(self, line: OrderLine) -> str | None:
         try:
@@ -35,7 +35,7 @@ class Product:
             )
             return batch.reference
 
-    def change_batch_quantity(self, ref: str, qty: int):
+    def change_batch_quantity(self, ref: str, qty: int) -> None:
         batch = next(b for b in self.batches if b.reference == ref)
         batch._purchased_quantity = qty
         while batch.available_quantity < 0:
@@ -51,32 +51,32 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, qty: int, eta: date | None):
+    def __init__(self, ref: str, sku: str, qty: int, eta: date | None) -> None:
         self.reference = ref
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = qty
-        self._allocations = set()
+        self._allocations: set[OrderLine] = set()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Batch {self.reference}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Batch):
             return False
         return other.reference == self.reference
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.reference)
 
-    def __gt__(self, other):
+    def __gt__(self, other: Batch) -> bool:
         if self.eta is None:
             return False
         if other.eta is None:
             return True
         return self.eta > other.eta
 
-    def allocate(self, line: OrderLine):
+    def allocate(self, line: OrderLine) -> None:
         if self.can_allocate(line):
             self._allocations.add(line)
 
