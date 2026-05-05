@@ -16,9 +16,13 @@ class Product:
         self.version_number = version_number
         self.events = []
 
-    def allocate(self, line: OrderLine) -> str:
+    def allocate(self, line: OrderLine) -> str | None:
         try:
             batch = next(b for b in sorted(self.batches) if b.can_allocate(line))
+        except StopIteration:
+            self.events.append(events.OutOfStock(line.sku))
+            return None
+        else:
             batch.allocate(line)
             self.version_number += 1
             self.events.append(
@@ -30,9 +34,6 @@ class Product:
                 )
             )
             return batch.reference
-        except StopIteration:
-            self.events.append(events.OutOfStock(line.sku))
-            return None
 
     def change_batch_quantity(self, ref: str, qty: int):
         batch = next(b for b in self.batches if b.reference == ref)
