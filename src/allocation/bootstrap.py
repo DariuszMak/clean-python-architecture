@@ -1,15 +1,11 @@
 import inspect
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
 from allocation.adapters import orm, redis_eventpublisher
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
 from allocation.service_layer import handlers, messagebus
-from allocation.service_layer.unit_of_work import AbstractUnitOfWork as AppAbstractUnitOfWork
-from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-
-if TYPE_CHECKING:
-    from allocation.service_layer.messagebus import AbstractUnitOfWork as BusAbstractUnitOfWork
+from allocation.service_layer.unit_of_work import AbstractUnitOfWork, SqlAlchemyUnitOfWork
 
 PublishCallable = Callable[..., Any]
 HandlerCallable = Callable[..., Any]
@@ -18,7 +14,7 @@ InjectedHandler = Callable[[Any], Any]
 
 def bootstrap(
     start_orm: bool = True,
-    uow: AppAbstractUnitOfWork | None = None,
+    uow: AbstractUnitOfWork | None = None,
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = redis_eventpublisher.publish,
 ) -> messagebus.MessageBus:
@@ -47,7 +43,7 @@ def bootstrap(
         for command_type, handler in handlers.COMMAND_HANDLERS.items()
     }
 
-    bus_uow = cast("BusAbstractUnitOfWork", uow)
+    bus_uow: AbstractUnitOfWork = uow
 
     return messagebus.MessageBus(
         uow=bus_uow,
