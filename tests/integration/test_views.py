@@ -5,7 +5,8 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation import bootstrap, views
+from allocation import views
+from allocation.bootstrap import bootstrap
 from allocation.domain import commands
 from allocation.service_layer import unit_of_work
 
