@@ -1,4 +1,3 @@
-
 from datetime import UTC, datetime
 
 from allocation.domain.model import Batch, OrderLine
