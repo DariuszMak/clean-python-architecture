@@ -66,7 +66,7 @@ def wait_for_webapp_to_come_up() -> requests.Response:
 @retry(stop=stop_after_delay(10))
 def wait_for_redis_to_come_up() -> bool:
     cfg = get_redis_host_and_port()
-    r = redis.Redis(host=cfg["host"], port=cfg["port"])  # ✅ FIXED
+    r = redis.Redis(host=cfg["host"], port=cfg["port"])
     return bool(r.ping())
 
 
