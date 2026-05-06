@@ -56,3 +56,9 @@ $env:UV_ENV_FILE = ".dev.env" ;
 make all ; 
 uv run pytest tests/ -vv ; 
 ```
+
+### Fast local refactor
+
+```
+clear ; .\scripts\format_and_lint.ps1 ; uv run pytest tests/ -vv ; 
+```

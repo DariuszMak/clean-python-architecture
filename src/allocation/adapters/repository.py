@@ -1,8 +1,11 @@
 import abc
-from typing import Any
+from typing import TYPE_CHECKING, cast
 
 from allocation.adapters.orm import batches
 from allocation.domain.model import Batch, Product
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 class AbstractRepository(abc.ABC):
@@ -39,7 +42,7 @@ class AbstractRepository(abc.ABC):
 
 
 class SqlAlchemyRepository(AbstractRepository):
-    def __init__(self, session: Any) -> None:
+    def __init__(self, session: Session) -> None:
         super().__init__()
         self.session = session
 
@@ -47,7 +50,9 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session.add(product)
 
     def _get(self, sku: str) -> Product | None:
-        return self.session.query(Product).filter_by(sku=sku).first()
+        result = self.session.query(Product).filter_by(sku=sku).first()
+        return cast("Product | None", result)
 
     def _get_by_batchref(self, batchref: str) -> Product | None:
-        return self.session.query(Product).join(Batch).filter(batches.c.reference == batchref).first()
+        result = self.session.query(Product).join(Batch).filter(batches.c.reference == batchref).first()
+        return cast("Product | None", result)
