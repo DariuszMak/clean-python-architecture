@@ -1,5 +1,3 @@
-
-
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, Protocol
 
