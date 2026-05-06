@@ -1,5 +1,6 @@
 import threading
 import time
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from sqlalchemy import text
@@ -8,10 +9,22 @@ from allocation.domain.model import OrderLine
 from allocation.service_layer import unit_of_work
 from tests.random_refs import random_batchref, random_orderid, random_sku
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from sqlalchemy.orm import Session
+
 pytestmark = pytest.mark.usefixtures("mappers")
 
 
-def insert_batch(session, ref, sku, qty, eta, product_version=1):
+def insert_batch(
+    session: Session,
+    ref: str,
+    sku: str,
+    qty: int,
+    eta: Any,
+    product_version: int = 1,
+) -> None:
     session.execute(
         text("INSERT INTO products (sku, version_number) VALUES (:sku, :version)"),
         {"sku": sku, "version": product_version},
@@ -22,7 +35,7 @@ def insert_batch(session, ref, sku, qty, eta, product_version=1):
     )
 
 
-def get_allocated_batch_ref(session, orderid, sku):
+def get_allocated_batch_ref(session: Session, orderid: str, sku: str) -> str:
     [[orderlineid]] = session.execute(
         text("SELECT id FROM order_lines WHERE orderid=:orderid AND sku=:sku"),
         {"orderid": orderid, "sku": sku},
@@ -36,7 +49,9 @@ def get_allocated_batch_ref(session, orderid, sku):
     return batchref
 
 
-def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory) -> None:
+def test_uow_can_retrieve_a_batch_and_allocate_to_it(
+    sqlite_session_factory: Callable[[], Session],
+) -> None:
     session = sqlite_session_factory()
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
     session.commit()
@@ -52,7 +67,9 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(sqlite_session_factory) -> 
     assert batchref == "batch1"
 
 
-def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory) -> None:
+def test_rolls_back_uncommitted_work_by_default(
+    sqlite_session_factory: Callable[[], Session],
+) -> None:
     uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
         insert_batch(uow.session, "batch1", "MEDIUM-PLINTH", 100, None)
@@ -62,7 +79,9 @@ def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory) -> None:
     assert rows == []
 
 
-def test_rolls_back_on_error(sqlite_session_factory) -> None:
+def test_rolls_back_on_error(
+    sqlite_session_factory: Callable[[], Session],
+) -> None:
     class MyError(Exception):
         pass
 
@@ -79,7 +98,12 @@ def test_rolls_back_on_error(sqlite_session_factory) -> None:
     assert rows == []
 
 
-def try_to_allocate(orderid, sku, exceptions, session_factory):
+def try_to_allocate(
+    orderid: str,
+    sku: str,
+    exceptions: list[Exception],
+    session_factory: Callable[[], Session],
+) -> None:
     line = OrderLine(orderid, sku, 10)
     try:
         with unit_of_work.SqlAlchemyUnitOfWork(session_factory) as uow:
@@ -91,19 +115,21 @@ def try_to_allocate(orderid, sku, exceptions, session_factory):
         exceptions.append(e)
 
 
-def test_concurrent_updates_to_version_are_not_allowed(postgres_session_factory) -> None:
+def test_concurrent_updates_to_version_are_not_allowed(
+    postgres_session_factory: Callable[[], Session],
+) -> None:
     sku, batch = random_sku(), random_batchref()
     session = postgres_session_factory()
     insert_batch(session, batch, sku, 100, eta=None, product_version=1)
     session.commit()
 
-    order1, order2 = random_orderid(1), random_orderid(2)
-    exceptions = []
+    order1, order2 = random_orderid("1"), random_orderid("2")
+    exceptions: list[Exception] = []
 
-    def try_to_allocate_order1():
+    def try_to_allocate_order1() -> None:
         return try_to_allocate(order1, sku, exceptions, postgres_session_factory)
 
-    def try_to_allocate_order2():
+    def try_to_allocate_order2() -> None:
         return try_to_allocate(order2, sku, exceptions, postgres_session_factory)
 
     thread1 = threading.Thread(target=try_to_allocate_order1)
