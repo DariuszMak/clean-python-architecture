@@ -10,9 +10,7 @@ from allocation.service_layer import unit_of_work
 from tests.random_refs import random_batchref, random_orderid, random_sku
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Session, sessionmaker
 
 pytestmark = pytest.mark.usefixtures("mappers")
 
@@ -46,11 +44,11 @@ def get_allocated_batch_ref(session: Session, orderid: str, sku: str) -> str:
         ),
         {"orderlineid": orderlineid},
     )
-    return batchref
+    return str(batchref)
 
 
 def test_uow_can_retrieve_a_batch_and_allocate_to_it(
-    sqlite_session_factory: Callable[[], Session],
+    sqlite_session_factory: sessionmaker[Session],
 ) -> None:
     session = sqlite_session_factory()
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
@@ -68,7 +66,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
 
 
 def test_rolls_back_uncommitted_work_by_default(
-    sqlite_session_factory: Callable[[], Session],
+    sqlite_session_factory: sessionmaker[Session],
 ) -> None:
     uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
@@ -80,7 +78,7 @@ def test_rolls_back_uncommitted_work_by_default(
 
 
 def test_rolls_back_on_error(
-    sqlite_session_factory: Callable[[], Session],
+    sqlite_session_factory: sessionmaker[Session],
 ) -> None:
     class MyError(Exception):
         pass
@@ -102,7 +100,7 @@ def try_to_allocate(
     orderid: str,
     sku: str,
     exceptions: list[Exception],
-    session_factory: Callable[[], Session],
+    session_factory: sessionmaker[Session],
 ) -> None:
     line = OrderLine(orderid, sku, 10)
     try:
@@ -116,7 +114,7 @@ def try_to_allocate(
 
 
 def test_concurrent_updates_to_version_are_not_allowed(
-    postgres_session_factory: Callable[[], Session],
+    postgres_session_factory: sessionmaker[Session],
 ) -> None:
     sku, batch = random_sku(), random_batchref()
     session = postgres_session_factory()
