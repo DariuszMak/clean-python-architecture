@@ -1,5 +1,11 @@
 # EDA template - Python
 
+### Project structure diagram
+
+<p align="center">
+  <img src="images/structure_module.svg" alt="Project Structure Diagram" width="600">
+</p>
+
 ## Setup entire project from scratch
 
 Make sure, that everything is committed or stashed and (optionally):
