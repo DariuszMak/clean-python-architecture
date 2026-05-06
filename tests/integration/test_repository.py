@@ -1,12 +1,17 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
 from allocation.adapters.repository import SqlAlchemyRepository
 from allocation.domain.model import Batch, Product
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session, sessionmaker
+
 pytestmark = pytest.mark.usefixtures("mappers")
 
 
-def test_get_by_batchref(sqlite_session_factory) -> None:
+def test_get_by_batchref(sqlite_session_factory: sessionmaker[Session]) -> None:
     session = sqlite_session_factory()
     repo = SqlAlchemyRepository(session)
     b1 = Batch(ref="b1", sku="sku1", qty=100, eta=None)
