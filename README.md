@@ -4,7 +4,6 @@
 
 Make sure, that everything is committed or stashed and (optionally):
 
-
 ### Local environment
 
 ```commandline
