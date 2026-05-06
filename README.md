@@ -52,6 +52,16 @@ $env:UV_ENV_FILE = ".dev.env" ;
 
 .\scripts\format_and_lint.ps1 ; 
 
+# uv run pydeps src\allocation\entrypoints\flask_app.py --noshow -T svg -o images\structure_runner_clustered.svg --max-bacon 100 --max-module-depth 100 --rankdir LR --cluster ; 
+# uv run pydeps src\allocation\entrypoints\flask_app.py --noshow -T svg -o images\structure_runner.svg --max-bacon 2 --max-module-depth 100 --rankdir LR ; 
+# uv run pydeps src\allocation\entrypoints\flask_app.py --noshow -T svg -o images\structure_runner_pylib.svg --max-bacon 2 --max-module-depth 100 --rankdir LR --pylib ; 
+ 
+# uv run pydeps src\allocation\entrypoints --noshow -T svg -o images\structure_module_clustered.svg --max-bacon 100 --max-module-depth 100 --rankdir LR --cluster ; 
+# uv run pydeps src\allocation\entrypoints --noshow -T svg -o images\structure_module.svg --max-bacon 2 --max-module-depth 100 --rankdir LR ; 
+# uv run pydeps src\allocation\entrypoints --noshow -T svg -o images\structure_module_pylib.svg --max-bacon 2 --max-module-depth 100 --rankdir LR --pylib ; 
+
+#####
+
 make all ; 
 uv run pytest tests/ -vv ; 
 ```
