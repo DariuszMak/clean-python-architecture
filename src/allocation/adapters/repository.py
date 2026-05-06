@@ -1,5 +1,5 @@
 import abc
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from allocation.adapters.orm import batches
 from allocation.domain.model import Batch, Product
@@ -50,9 +50,7 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session.add(product)
 
     def _get(self, sku: str) -> Product | None:
-        result = self.session.query(Product).filter_by(sku=sku).first()
-        return cast("Product | None", result)
+        return self.session.query(Product).filter_by(sku=sku).first()
 
     def _get_by_batchref(self, batchref: str) -> Product | None:
-        result = self.session.query(Product).join(Batch).filter(batches.c.reference == batchref).first()
-        return cast("Product | None", result)
+        return self.session.query(Product).join(Batch).filter(batches.c.reference == batchref).first()
