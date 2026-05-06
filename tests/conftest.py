@@ -19,10 +19,12 @@ if TYPE_CHECKING:
 
     from sqlalchemy.engine import Engine
 
+    from allocation.config import RedisConfig
+
 pytest.register_assert_rewrite("tests.e2e.api_client")
 
 get_api_url: Callable[[], str] = config.get_api_url
-get_redis_host_and_port: Callable[[], dict[str, Any]] = config.get_redis_host_and_port
+get_redis_host_and_port: Callable[[], RedisConfig] = config.get_redis_host_and_port
 get_postgres_uri: Callable[[], str] = config.get_postgres_uri
 
 start_mappers_typed: Callable[[], None] = start_mappers
@@ -63,7 +65,8 @@ def wait_for_webapp_to_come_up() -> requests.Response:
 
 @retry(stop=stop_after_delay(10))
 def wait_for_redis_to_come_up() -> bool:
-    r = redis.Redis(**get_redis_host_and_port())
+    cfg = get_redis_host_and_port()
+    r = redis.Redis(host=cfg["host"], port=cfg["port"])  # ✅ FIXED
     return bool(r.ping())
 
 
