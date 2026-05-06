@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from unittest import mock
 
 import pytest
@@ -11,13 +11,15 @@ from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 from allocation.views import allocations
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from allocation.service_layer.messagebus import MessageBus
 
 today = datetime.now(tz=UTC).date()
 
 
 @pytest.fixture
-def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> MessageBus:
+def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> Iterator[MessageBus]:
     yield bootstrap(
         start_orm=True,
         uow=SqlAlchemyUnitOfWork(sqlite_session_factory),
@@ -37,7 +39,10 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(Allocate("otherorder", "sku1", 30))
     sqlite_bus.handle(Allocate("otherorder", "sku2", 10))
 
-    assert allocations("order1", sqlite_bus.uow) == [
+    assert allocations(
+        "order1",
+        cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
+    ) == [
         {"sku": "sku1", "batchref": "sku1batch"},
         {"sku": "sku2", "batchref": "sku2batch"},
     ]
@@ -49,6 +54,9 @@ def test_deallocation(sqlite_bus: MessageBus) -> None:
     sqlite_bus.handle(Allocate("o1", "sku1", 40))
     sqlite_bus.handle(ChangeBatchQuantity("b1", 10))
 
-    assert allocations("o1", sqlite_bus.uow) == [
+    assert allocations(
+        "o1",
+        cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
+    ) == [
         {"sku": "sku1", "batchref": "b2"},
     ]
