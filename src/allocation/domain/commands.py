@@ -1,22 +1,20 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
-if TYPE_CHECKING:
-    from datetime import date
+from datetime import date
+
+from pydantic import BaseModel
 
 
-class Command:
+class Command(BaseModel):
     pass
 
 
-@dataclass
 class Allocate(Command):
     orderid: str
     sku: str
     qty: int
 
 
-@dataclass
 class CreateBatch(Command):
     ref: str
     sku: str
@@ -24,7 +22,6 @@ class CreateBatch(Command):
     eta: date | None = None
 
 
-@dataclass
 class ChangeBatchQuantity(Command):
     ref: str
     qty: int

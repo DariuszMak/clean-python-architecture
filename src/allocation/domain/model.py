@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+from pydantic import BaseModel
 
 from . import events
 
@@ -20,7 +21,7 @@ class Product:
         try:
             batch = next(b for b in sorted(self.batches) if b.can_allocate(line))
         except StopIteration:
-            self.events.append(events.OutOfStock(line.sku))
+            self.events.append(events.OutOfStock(sku=line.sku))
             return None
         else:
             batch.allocate(line)
@@ -40,14 +41,18 @@ class Product:
         batch._purchased_quantity = qty
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
-            self.events.append(events.Deallocated(line.orderid, line.sku, line.qty))
+            self.events.append(events.Deallocated(orderid=line.orderid, sku=line.sku, qty=line.qty))
 
 
-@dataclass(unsafe_hash=True)
-class OrderLine:
+class OrderLine(BaseModel):
     orderid: str
     sku: str
     qty: int
+
+    model_config = {"frozen": True}
+
+    def __hash__(self) -> int:
+        return hash((self.orderid, self.sku, self.qty))
 
 
 class Batch:

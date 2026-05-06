@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, Protocol
 
 from sqlalchemy import text
@@ -56,7 +55,7 @@ def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
 
 
 def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
-    line = OrderLine(cmd.orderid, cmd.sku, cmd.qty)
+    line = OrderLine(orderid=cmd.orderid, sku=cmd.sku, qty=cmd.qty)
     with uow:
         product = uow.products.get(sku=line.sku)
         if product is None:
@@ -66,7 +65,7 @@ def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
 
 
 def reallocate(event: events.Deallocated, uow: AbstractUnitOfWork) -> None:
-    allocate(Allocate(**asdict(event)), uow=uow)
+    allocate(Allocate(**event.model_dump()), uow=uow)
 
 
 def change_batch_quantity(cmd: ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:

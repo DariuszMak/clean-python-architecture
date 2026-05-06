@@ -5,7 +5,7 @@ from allocation.domain.model import Batch, OrderLine
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=datetime.now(tz=UTC).date())
-    line = OrderLine("order-ref", "SMALL-TABLE", 2)
+    line = OrderLine(orderid="order-ref", sku="SMALL-TABLE", qty=2)
 
     batch.allocate(line)
 
@@ -15,7 +15,7 @@ def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
 def make_batch_and_line(sku: str, batch_qty: int, line_qty: int) -> tuple[Batch, OrderLine]:
     return (
         Batch("batch-001", sku, batch_qty, eta=datetime.now(tz=UTC).date()),
-        OrderLine("order-123", sku, line_qty),
+        OrderLine(orderid="order-123", sku=sku, qty=line_qty),
     )
 
 
@@ -36,7 +36,7 @@ def test_can_allocate_if_available_equal_to_required() -> None:
 
 def test_cannot_allocate_if_skus_do_not_match() -> None:
     batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta=None)
-    different_sku_line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10)
+    different_sku_line = OrderLine(orderid="order-123", sku="EXPENSIVE-TOASTER", qty=10)
     assert batch.can_allocate(different_sku_line) is False
 
 

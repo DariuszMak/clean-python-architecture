@@ -1,11 +1,10 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-class Event:
+class Event(BaseModel):
     pass
 
 
-@dataclass
 class Allocated(Event):
     orderid: str
     sku: str
@@ -13,13 +12,11 @@ class Allocated(Event):
     batchref: str
 
 
-@dataclass
 class Deallocated(Event):
     orderid: str
     sku: str
     qty: int
 
 
-@dataclass
 class OutOfStock(Event):
     sku: str

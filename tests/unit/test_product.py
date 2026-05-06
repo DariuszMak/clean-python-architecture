@@ -12,7 +12,7 @@ def test_prefers_warehouse_batches_to_shipments() -> None:
     in_stock_batch = Batch("in-stock-batch", "RETRO-CLOCK", 100, eta=None)
     shipment_batch = Batch("shipment-batch", "RETRO-CLOCK", 100, eta=tomorrow)
     product = Product(sku="RETRO-CLOCK", batches=[in_stock_batch, shipment_batch])
-    line = OrderLine("oref", "RETRO-CLOCK", 10)
+    line = OrderLine(orderid="oref", sku="RETRO-CLOCK", qty=10)
 
     product.allocate(line)
 
@@ -25,7 +25,7 @@ def test_prefers_earlier_batches() -> None:
     medium = Batch("normal-batch", "MINIMALIST-SPOON", 100, eta=tomorrow)
     latest = Batch("slow-batch", "MINIMALIST-SPOON", 100, eta=later)
     product = Product(sku="MINIMALIST-SPOON", batches=[medium, earliest, latest])
-    line = OrderLine("order1", "MINIMALIST-SPOON", 10)
+    line = OrderLine(orderid="order1", sku="MINIMALIST-SPOON", qty=10)
 
     product.allocate(line)
 
@@ -37,7 +37,7 @@ def test_prefers_earlier_batches() -> None:
 def test_returns_allocated_batch_ref() -> None:
     in_stock_batch = Batch("in-stock-batch-ref", "HIGHBROW-POSTER", 100, eta=None)
     shipment_batch = Batch("shipment-batch-ref", "HIGHBROW-POSTER", 100, eta=tomorrow)
-    line = OrderLine("oref", "HIGHBROW-POSTER", 10)
+    line = OrderLine(orderid="oref", sku="HIGHBROW-POSTER", qty=10)
     product = Product(sku="HIGHBROW-POSTER", batches=[in_stock_batch, shipment_batch])
     allocation = product.allocate(line)
     assert allocation == in_stock_batch.reference
@@ -45,7 +45,7 @@ def test_returns_allocated_batch_ref() -> None:
 
 def test_outputs_allocated_event() -> None:
     batch = Batch("batchref", "RETRO-LAMPSHADE", 100, eta=None)
-    line = OrderLine("oref", "RETRO-LAMPSHADE", 10)
+    line = OrderLine(orderid="oref", sku="RETRO-LAMPSHADE", qty=10)
     product = Product(sku="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
     expected = events.Allocated(orderid="oref", sku="RETRO-LAMPSHADE", qty=10, batchref=batch.reference)
@@ -55,15 +55,15 @@ def test_outputs_allocated_event() -> None:
 def test_records_out_of_stock_event_if_cannot_allocate() -> None:
     batch = Batch("batch1", "SMALL-FORK", 10, eta=today)
     product = Product(sku="SMALL-FORK", batches=[batch])
-    product.allocate(OrderLine("order1", "SMALL-FORK", 10))
+    product.allocate(OrderLine(orderid="order1", sku="SMALL-FORK", qty=10))
 
-    allocation = product.allocate(OrderLine("order2", "SMALL-FORK", 1))
+    allocation = product.allocate(OrderLine(orderid="order2", sku="SMALL-FORK", qty=1))
     assert product.events[-1] == events.OutOfStock(sku="SMALL-FORK")
     assert allocation is None
 
 
 def test_increments_version_number() -> None:
-    line = OrderLine("oref", "SCANDI-PEN", 10)
+    line = OrderLine(orderid="oref", sku="SCANDI-PEN", qty=10)
     product = Product(sku="SCANDI-PEN", batches=[Batch("b1", "SCANDI-PEN", 100, eta=None)])
     product.version_number = 7
     product.allocate(line)
