@@ -47,7 +47,7 @@ def bootstrap(
     bus_uow: AbstractUnitOfWork = uow
 
     return MessageBus(
-        uow=bus_uow,
+        uow=bus_uow,  # type: ignore[arg-type]
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )
