@@ -3,7 +3,9 @@ import json
 import pytest
 from tenacity import Retrying, stop_after_delay
 
-from tests.e2e import api_client, redis_client
+from tests.e2e import  redis_client
+
+from tests.e2e.api_client import get_allocation, post_to_add_batch, post_to_allocate
 from tests.random_refs import random_batchref, random_orderid, random_sku
 
 
@@ -14,11 +16,11 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     orderid, sku = random_orderid(), random_sku()
     earlier_batch, later_batch = random_batchref("old"), random_batchref("newer")
-    api_client.post_to_add_batch(earlier_batch, sku, qty=10, eta="2011-01-02")
-    api_client.post_to_add_batch(later_batch, sku, qty=10, eta="2011-01-03")
-    r = api_client.post_to_allocate(orderid, sku, 10)
+    post_to_add_batch(earlier_batch, sku, qty=10, eta="2011-01-02")
+    post_to_add_batch(later_batch, sku, qty=10, eta="2011-01-03")
+    r = post_to_allocate(orderid, sku, 10)
     assert r.ok
-    response = api_client.get_allocation(orderid)
+    response = get_allocation(orderid)
     assert response.json()[0]["batchref"] == earlier_batch
 
     subscription = redis_client.subscribe_to("line_allocated")
