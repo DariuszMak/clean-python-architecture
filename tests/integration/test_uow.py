@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import text
 
 from allocation.domain.model import OrderLine
-from allocation.service_layer import unit_of_work
+from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 from tests.random_refs import random_batchref, random_orderid, random_sku
 
 if TYPE_CHECKING:
@@ -54,7 +54,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
     session.commit()
 
-    uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
+    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
         product = uow.products.get(sku="HIPSTER-WORKBENCH")
         line = OrderLine("o1", "HIPSTER-WORKBENCH", 10)
@@ -68,7 +68,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
 def test_rolls_back_uncommitted_work_by_default(
     sqlite_session_factory: sessionmaker[Session],
 ) -> None:
-    uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
+    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
         insert_batch(uow.session, "batch1", "MEDIUM-PLINTH", 100, None)
 
@@ -83,7 +83,7 @@ def test_rolls_back_on_error(
     class MyError(Exception):
         pass
 
-    uow = unit_of_work.SqlAlchemyUnitOfWork(sqlite_session_factory)
+    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
 
     with uow:
         insert_batch(uow.session, "batch1", "LARGE-FORK", 100, None)
@@ -104,7 +104,7 @@ def try_to_allocate(
 ) -> None:
     line = OrderLine(orderid, sku, 10)
     try:
-        with unit_of_work.SqlAlchemyUnitOfWork(session_factory) as uow:
+        with SqlAlchemyUnitOfWork(session_factory) as uow:
             product = uow.products.get(sku=sku)
             product.allocate(line)
             time.sleep(0.2)
@@ -157,5 +157,5 @@ def test_concurrent_updates_to_version_are_not_allowed(
         )
     )
     assert len(orders) == 1
-    with unit_of_work.SqlAlchemyUnitOfWork(postgres_session_factory) as uow:
+    with SqlAlchemyUnitOfWork(postgres_session_factory) as uow:
         uow.session.execute(text("select 1"))
