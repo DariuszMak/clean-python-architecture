@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from hypothesis import assume, given
 from hypothesis import strategies as st
@@ -10,8 +10,8 @@ today = datetime.now(tz=UTC).date()
 tomorrow = today + timedelta(days=1)
 later = tomorrow + timedelta(days=10)
 
-sku_text = st.text(alphabet=st.characters(whitelist_categories=("Lu",)), min_size=1, max_size=20)
-ref_text = st.text(alphabet=st.characters(whitelist_categories=("Lu", "Nd")), min_size=1, max_size=20)
+sku_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
+ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
 pos_qty = st.integers(min_value=1, max_value=10_000)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
@@ -78,7 +78,7 @@ def test_increments_version_number() -> None:
     assert product.version_number == 8
 
 
-def make_eta(days: int | None) -> datetime.date | None:
+def make_eta(days: int | None) -> date | None:
     return (today + timedelta(days=days)) if days is not None else None
 
 
