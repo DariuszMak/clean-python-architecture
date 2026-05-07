@@ -5,6 +5,12 @@ from hypothesis import strategies as st
 
 from allocation.domain.model import Batch, OrderLine
 
+batch_qty = st.integers(min_value=1, max_value=10_000)
+line_qty = st.integers(min_value=1, max_value=10_000)
+sku_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
+ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
+eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
+
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=datetime.now(tz=UTC).date())
@@ -53,13 +59,6 @@ def test_allocation_is_idempotent() -> None:
 def build_batch(ref: str, sku: str, qty: int, days_ahead: int | None) -> Batch:
     eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
     return Batch(ref, sku, qty, eta)
-
-
-batch_qty = st.integers(min_value=1, max_value=10_000)
-line_qty = st.integers(min_value=1, max_value=10_000)
-sku_text = st.text(alphabet=st.characters(whitelist_categories=("Lu",)), min_size=1, max_size=20)
-ref_text = st.text(alphabet=st.characters(whitelist_categories=("Lu", "Nd")), min_size=1, max_size=20)
-eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
 @given(sku=sku_text, ref=ref_text, batch_qty=batch_qty, line_qty=line_qty, days=eta_days)
