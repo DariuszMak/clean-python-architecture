@@ -69,7 +69,8 @@ $env:UV_ENV_FILE = ".dev.env" ;
 #####
 
 make all ; 
-uv run pytest tests/ -vv ; 
+uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml -vv ; 
+Start-Process .\htmlcov\index.html ; 
 ```
 
 ### Fast local refactor
