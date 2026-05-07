@@ -17,6 +17,7 @@ dev = [
     "pydeps>=3.0.6",
     "pylint>=4.0.5",
     "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
     "pytest-icdiff>=0.9",
     "redis>=7.4.0",
     "requests>=2.33.1",
