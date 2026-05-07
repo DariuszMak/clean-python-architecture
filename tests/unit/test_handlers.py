@@ -18,6 +18,7 @@ from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+
 sku_text = st.text(
     alphabet=st.characters(whitelist_categories=["Lu"]),
     min_size=1,
@@ -35,11 +36,16 @@ order_text = st.text(
     min_size=1,
     max_size=20,
 )
+
 pos_qty = st.integers(min_value=1, max_value=10_000)
-eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
+
+eta_days = st.one_of(
+    st.none(),
+    st.integers(min_value=0, max_value=365),
+)
 
 
-class FakeRepository(AbstractRepository):
+class FakeRepository(AbstractRepository):  # type: ignore[misc]
     def __init__(self, products: Iterable[Any]) -> None:
         super().__init__()
         self._products = set(products)
@@ -57,7 +63,7 @@ class FakeRepository(AbstractRepository):
         )
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):
+class FakeUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
     def __init__(self) -> None:
         self.products: FakeRepository = FakeRepository([])
         self.committed: bool = False
@@ -69,7 +75,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         pass
 
 
-class FakeNotifications(AbstractNotifications):
+class FakeNotifications(AbstractNotifications):  # type: ignore[misc]
     def __init__(self) -> None:
         self.sent: dict[str, list[str]] = defaultdict(list)
 
