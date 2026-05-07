@@ -34,6 +34,7 @@ dev = [
 python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
+ignore_missing_imports = true
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
