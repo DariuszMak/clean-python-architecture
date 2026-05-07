@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import Protocol
+from typing import Protocol, TypeAlias
 
 from allocation.domain import events
 from allocation.domain.commands import Command
 
 logger = logging.getLogger(__name__)
 
-Message = Command | events.Event
+Message: TypeAlias = Command | events.Event
 
 
 class AbstractUnitOfWork(Protocol):
