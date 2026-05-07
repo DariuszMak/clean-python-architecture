@@ -16,6 +16,10 @@ pos_qty = st.integers(min_value=1, max_value=10_000)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
+def make_eta(days: int | None) -> date | None:
+    return (today + timedelta(days=days)) if days is not None else None
+
+
 def test_prefers_warehouse_batches_to_shipments() -> None:
     in_stock_batch = Batch("in-stock-batch", "RETRO-CLOCK", 100, eta=None)
     shipment_batch = Batch("shipment-batch", "RETRO-CLOCK", 100, eta=tomorrow)
@@ -76,10 +80,6 @@ def test_increments_version_number() -> None:
     product.version_number = 7
     product.allocate(line)
     assert product.version_number == 8
-
-
-def make_eta(days: int | None) -> date | None:
-    return (today + timedelta(days=days)) if days is not None else None
 
 
 @given(sku=sku_text, ref=ref_text, batch_qty=pos_qty, line_qty=pos_qty, days=eta_days)

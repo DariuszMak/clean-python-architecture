@@ -86,6 +86,12 @@ def bootstrap_test_app() -> Any:
     )
 
 
+def make_eta_str(days: int | None) -> str | None:
+    if days is None:
+        return None
+    return (datetime.now(tz=UTC).date() + timedelta(days=days)).isoformat()
+
+
 class TestAddBatch:
     def test_for_new_product(self) -> None:
         bus = bootstrap_test_app()
@@ -164,12 +170,6 @@ class TestChangeBatchQuantity:
 
         assert batch1.available_quantity == 5
         assert batch2.available_quantity == 30
-
-
-def make_eta_str(days: int | None) -> str | None:
-    if days is None:
-        return None
-    return (datetime.now(tz=UTC).date() + timedelta(days=days)).isoformat()
 
 
 @given(ref=ref_text, sku=sku_text, qty=pos_qty, days=eta_days)

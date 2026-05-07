@@ -12,6 +12,11 @@ ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), mi
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
+def build_batch(ref: str, sku: str, qty: int, days_ahead: int | None) -> Batch:
+    eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
+    return Batch(ref, sku, qty, eta)
+
+
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=datetime.now(tz=UTC).date())
     line = OrderLine("order-ref", "SMALL-TABLE", 2)
@@ -54,11 +59,6 @@ def test_allocation_is_idempotent() -> None:
     batch.allocate(line)
     batch.allocate(line)
     assert batch.available_quantity == 18
-
-
-def build_batch(ref: str, sku: str, qty: int, days_ahead: int | None) -> Batch:
-    eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
-    return Batch(ref, sku, qty, eta)
 
 
 @given(sku=sku_text, ref=ref_text, batch_qty=batch_qty, line_qty=line_qty, days=eta_days)
