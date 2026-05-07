@@ -93,5 +93,5 @@ Start-Process .\htmlcov\index.html ;
 ### Fast local refactor
 
 ```
-clear ; .\scripts\format_and_lint.ps1 ; uv run pytest tests/ -vv ; 
+clear ; .\scripts\format_and_lint.ps1 ; uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml -vv ; Start-Process .\htmlcov\index.html ; 
 ```
