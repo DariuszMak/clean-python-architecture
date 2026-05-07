@@ -205,3 +205,29 @@ skip-magic-trailing-comma = false
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
 docstring-code-format = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=xml --cov-report=term"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*"]
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+
+[tool.importlinter]
+root_package = "src"
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+
+layers = [
+    "src.ui",
+    "src.app",
+    "src.api",
+    "src.helpers",
+]
