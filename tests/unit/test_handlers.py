@@ -18,9 +18,23 @@ from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-sku_text = st.text(alphabet=st.characters(whitelist_categories=("Lu",)), min_size=1, max_size=20)
-ref_text = st.text(alphabet=st.characters(whitelist_categories=("Lu", "Nd")), min_size=1, max_size=20)
-order_text = st.text(alphabet=st.characters(whitelist_categories=("Lu", "Nd")), min_size=1, max_size=20)
+sku_text = st.text(
+    alphabet=st.characters(whitelist_categories=["Lu"]),
+    min_size=1,
+    max_size=20,
+)
+
+ref_text = st.text(
+    alphabet=st.characters(whitelist_categories=["Lu", "Nd"]),
+    min_size=1,
+    max_size=20,
+)
+
+order_text = st.text(
+    alphabet=st.characters(whitelist_categories=["Lu", "Nd"]),
+    min_size=1,
+    max_size=20,
+)
 pos_qty = st.integers(min_value=1, max_value=10_000)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
