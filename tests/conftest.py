@@ -15,7 +15,7 @@ from allocation import config
 from allocation.adapters.orm import metadata, start_mappers
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Generator
 
     from sqlalchemy.engine import Engine
 
@@ -35,7 +35,7 @@ wait_for_redis_to_come_up_untyped: Callable[[], bool] | None = None
 
 
 @pytest.fixture
-def in_memory_sqlite_db() -> Engine:
+def in_memory_sqlite_db() -> Generator[Engine]:
     engine = create_engine("sqlite:///:memory:")
     metadata.create_all(engine)
     yield engine
@@ -43,12 +43,14 @@ def in_memory_sqlite_db() -> Engine:
 
 
 @pytest.fixture
-def sqlite_session_factory(in_memory_sqlite_db: Engine) -> sessionmaker[Session]:
+def sqlite_session_factory(
+    in_memory_sqlite_db: Engine,
+) -> sessionmaker[Session]:
     return sessionmaker(bind=in_memory_sqlite_db)
 
 
 @pytest.fixture
-def mappers() -> Any:
+def mappers() -> Generator[Any]:
     start_mappers_typed()
     yield
     clear_mappers()
@@ -80,12 +82,16 @@ def postgres_db() -> Engine:
 
 
 @pytest.fixture
-def postgres_session_factory(postgres_db: Engine) -> sessionmaker[Session]:
+def postgres_session_factory(
+    postgres_db: Engine,
+) -> sessionmaker[Session]:
     return sessionmaker(bind=postgres_db)
 
 
 @pytest.fixture
-def postgres_session(postgres_session_factory: sessionmaker[Session]) -> Session:
+def postgres_session(
+    postgres_session_factory: sessionmaker[Session],
+) -> Session:
     return postgres_session_factory()
 
 
