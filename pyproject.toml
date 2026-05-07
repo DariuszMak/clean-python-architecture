@@ -227,8 +227,8 @@ name = "Layered architecture"
 type = "layers"
 
 layers = [
-    "src.ui",
-    "src.app",
-    "src.api",
-    "src.helpers",
+    "src.allocation.adapters",
+    "src.allocation.domain",
+    "src.allocation.entrypoints",
+    "src.allocation.service_layer",
 ]
