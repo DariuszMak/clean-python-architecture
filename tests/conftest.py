@@ -38,7 +38,8 @@ wait_for_redis_to_come_up_untyped: Callable[[], bool] | None = None
 def in_memory_sqlite_db() -> Engine:
     engine = create_engine("sqlite:///:memory:")
     metadata.create_all(engine)
-    return engine
+    yield engine
+    engine.dispose()
 
 
 @pytest.fixture
