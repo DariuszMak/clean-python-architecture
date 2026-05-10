@@ -60,12 +60,119 @@ uv python pin 3.14 ;
 uv sync --dev --no-cache ; 
 uv lock ; 
 
-#####
+########## STATIC ANALYSIS & TESTS
 
 .venv\Scripts\Activate.ps1 ; 
 $env:UV_ENV_FILE = ".dev.env" ; 
 
 .\scripts\format_and_lint.ps1 ; 
+
+make all ; 
+uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml --cov-config=.coveragerc -vv ; 
+Start-Process .\htmlcov\index.html ; 
+
+########## SONARQUBE
+
+# Start SonarQube + DB
+docker compose up -d sonarqube sonardb
+
+Write-Host "Waiting for SonarQube to start..."
+
+# Wait until SonarQube API responds
+do {
+    Start-Sleep -Seconds 5
+
+    try {
+        $status = Invoke-RestMethod `
+            -Uri "http://127.0.0.1:9000/api/system/status" `
+            -Method Get
+    }
+    catch {
+        $status = $null
+    }
+
+} until ($status.status -eq "UP")
+
+Write-Host "SonarQube is UP"
+
+# Default credentials
+$oldPassword = "admin"
+$newPassword = "Admin1@Admin1@"
+
+$pair = "admin:$oldPassword"
+$encoded = [Convert]::ToBase64String(
+    [Text.Encoding]::ASCII.GetBytes($pair)
+)
+
+$headers = @{
+    Authorization = "Basic $encoded"
+}
+
+# Change admin password
+Invoke-RestMethod `
+    -Uri "http://127.0.0.1:9000/api/users/change_password" `
+    -Method Post `
+    -Headers $headers `
+    -Body @{
+        login = "admin"
+        previousPassword = $oldPassword
+        password = $newPassword
+    }
+
+Write-Host "Password changed"
+
+# Authenticate with new password
+$newPair = "admin:$newPassword"
+$newEncoded = [Convert]::ToBase64String(
+    [Text.Encoding]::ASCII.GetBytes($newPair)
+)
+
+$newHeaders = @{
+    Authorization = "Basic $newEncoded"
+}
+
+# Generate token
+$tokenName = "global-analysis-token"
+
+$tokenResponse = Invoke-RestMethod `
+    -Uri "http://127.0.0.1:9000/api/user_tokens/generate" `
+    -Method Post `
+    -Headers $newHeaders `
+    -Body @{
+        name = $tokenName
+        type = "GLOBAL_ANALYSIS_TOKEN"
+    }
+
+$token = $tokenResponse.token
+
+Write-Host "Generated token:"
+Write-Host $token
+
+# Create .sonar.env dynamically
+@"
+SONAR_HOST_URL=http://host.docker.internal:9000
+SONAR_TOKEN=$token
+"@ | Out-File -Encoding utf8 ".sonar.env"
+
+# Run scanner
+$scannerOutput = docker run --rm `
+    --network python-standalone-gui-template_default `
+    --env-file .sonar.env `
+    -v "${PWD}:/usr/src" `
+    sonarsource/sonar-scanner-cli 2>&1
+$scannerOutput
+
+$reportUrls = ($scannerOutput |
+    Select-String "http://\S+") |
+    ForEach-Object { $_.Matches.Value }
+
+foreach ($url in $reportUrls) {
+    Write-Host "Opening:"
+    Write-Host $url
+    Start-Process $url
+}
+
+########## UPDATE DIAGRAMS
 
 # uv run pydeps src\allocation\entrypoints\flask_app.py --noshow -T svg -o images\structure_runner_clustered.svg --max-bacon 100 --max-module-depth 100 --rankdir LR --cluster ; 
 # uv run pydeps src\allocation\entrypoints\flask_app.py --noshow -T svg -o images\structure_runner.svg --max-bacon 2 --max-module-depth 100 --rankdir LR ; 
@@ -98,9 +205,6 @@ $env:UV_ENV_FILE = ".dev.env" ;
 
 #####
 
-make all ; 
-uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml --cov-config=.coveragerc -vv ; 
-Start-Process .\htmlcov\index.html ; 
 ```
 
 ### Fast local refactor
