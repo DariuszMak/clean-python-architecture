@@ -202,9 +202,6 @@ foreach ($file in $files) {
     Set-Content -Path $file.FullName -Value $svg -Encoding UTF8
     Write-Host "Structure preserved: $($file.Name)"
 }
-
-#####
-
 ```
 
 ### Fast local refactor
