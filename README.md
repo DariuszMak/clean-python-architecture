@@ -99,7 +99,7 @@ $env:UV_ENV_FILE = ".dev.env" ;
 #####
 
 make all ; 
-uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml -vv ; 
+uv run pytest tests/ --cov=src --cov-report=html --cov-report=xml --cov-config=.coveragerc -vv ; 
 Start-Process .\htmlcov\index.html ; 
 ```
 
