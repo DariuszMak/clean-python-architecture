@@ -156,7 +156,7 @@ SONAR_TOKEN=$token
 
 # Run scanner
 $scannerOutput = docker run --rm `
-    --network python-standalone-gui-template_default `
+    --network eda-template-python_default `
     --env-file .sonar.env `
     -v "${PWD}:/usr/src" `
     sonarsource/sonar-scanner-cli 2>&1
