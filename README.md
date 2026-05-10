@@ -71,6 +71,8 @@ Start-Process .\htmlcov\index.html ;
 
 ## Full static analysis
 
+Login in SonarQube as `admin` with password `Admin1@Admin1@`.
+
 ```commandline
 deactivate ; 
 clear; 
