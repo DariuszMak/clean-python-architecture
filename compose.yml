@@ -82,6 +82,8 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_extensions:/opt/sonarqube/extensions
+    networks:
+      - sonar-network
 
   sonardb:
     image: postgres:17
@@ -92,9 +94,15 @@ services:
       POSTGRES_DB: sonar
     volumes:
       - sonardb_data:/var/lib/postgresql/data
+    networks:
+      - sonar-network
 
 volumes:
   sonarqube_data:
   sonarqube_logs:
   sonarqube_extensions:
   sonardb_data:
+
+networks:
+  sonar-network:
+    name: sonar-network
