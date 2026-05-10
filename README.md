@@ -28,6 +28,7 @@ docker system df ;
 docker stop $(docker ps -a -q) ; 
 docker rm -f $(docker ps -a -q) ; 
 docker system prune --volumes -a -f ; 
+docker volume rm -f $(docker volume ls -q) ; 
 docker system df ; 
 
 $ports = 5005, 54321, 6378, 11025, 18025
