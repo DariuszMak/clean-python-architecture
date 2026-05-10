@@ -110,3 +110,6 @@ GitHub.sublime-settings
 
 # UV
 uv.lock
+
+# Ruff
+ruff-report.json
