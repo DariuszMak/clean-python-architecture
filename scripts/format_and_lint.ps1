@@ -7,6 +7,8 @@ uv run pip-audit
 uv run ruff check src tests
 uv run ruff format --check src tests
 
+uv run ruff check src tests --output-format json > ruff-report.json
+
 uv run vulture src tests --min-confidence 80
 
 uv run mypy --strict src tests
