@@ -45,7 +45,7 @@ eta_days = st.one_of(
 )
 
 
-class FakeRepository(AbstractRepository):  
+class FakeRepository(AbstractRepository):
     def __init__(self, products: Iterable[Any]) -> None:
         super().__init__()
         self._products = set(products)
@@ -63,7 +63,7 @@ class FakeRepository(AbstractRepository):
         )
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):  
+class FakeUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
         self.products: FakeRepository = FakeRepository([])
         self.committed: bool = False
@@ -75,7 +75,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         pass
 
 
-class FakeNotifications(AbstractNotifications):  
+class FakeNotifications(AbstractNotifications):
     def __init__(self) -> None:
         self.sent: dict[str, list[str]] = defaultdict(list)
 

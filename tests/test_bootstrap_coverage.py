@@ -20,7 +20,7 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
         MockNotif.return_value = mock.MagicMock()
         bus = bootstrap(
             start_orm=False,
-            uow=None,  
+            uow=None,
             notifications=mock.MagicMock(),
             publish=lambda *_: None,
         )
@@ -29,7 +29,7 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
 
 
 def test_bootstrap_creates_default_notifications_when_none_given() -> None:
-    from tests.unit.test_handlers import FakeUnitOfWork 
+    from tests.unit.test_handlers import FakeUnitOfWork
 
     with mock.patch("allocation.bootstrap.EmailNotifications") as MockNotif:
         mock_notif_instance = mock.MagicMock()
@@ -38,7 +38,7 @@ def test_bootstrap_creates_default_notifications_when_none_given() -> None:
         bus = bootstrap(
             start_orm=False,
             uow=FakeUnitOfWork(),
-            notifications=None,  
+            notifications=None,
             publish=lambda *_: None,
         )
 

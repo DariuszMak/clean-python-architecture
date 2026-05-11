@@ -6,10 +6,8 @@ from unittest import mock
 
 import pytest
 
-
 FAKE_BUS = mock.MagicMock()
 BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
-
 
 
 @pytest.fixture()
@@ -19,7 +17,7 @@ def flask_client():
 
         import allocation.entrypoints.flask_app as flask_module
 
-        importlib.reload(flask_module)  
+        importlib.reload(flask_module)
         flask_module.app.config["TESTING"] = True
         with flask_module.app.test_client() as client:
             yield client, flask_module
@@ -71,7 +69,7 @@ def test_allocate_returns_400_on_invalid_sku(flask_client) -> None:
     )
     assert resp.status_code == 400
     assert resp.get_json() == {"message": "Invalid sku GHOST"}
-    FAKE_BUS.handle.side_effect = None 
+    FAKE_BUS.handle.side_effect = None
 
 
 def test_allocations_view_returns_200(flask_client) -> None:
@@ -93,7 +91,6 @@ def test_allocations_view_returns_404_when_empty(flask_client) -> None:
     with mock.patch.object(flask_module, "allocations", return_value=[]):
         resp = client.get("/allocations/unknown")
     assert resp.status_code == 404
-
 
 
 def _make_redis_message(data: dict) -> dict:

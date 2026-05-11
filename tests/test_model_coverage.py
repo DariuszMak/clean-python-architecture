@@ -15,7 +15,7 @@ def test_batch_eq_with_non_batch() -> None:
     batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=None)
     assert batch != "not-a-batch"
     assert batch != 42
-    assert batch != None  
+    assert batch is not None
 
 
 def test_batch_gt_self_has_no_eta() -> None:
