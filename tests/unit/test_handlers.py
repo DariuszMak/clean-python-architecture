@@ -109,9 +109,7 @@ class TestAddBatch:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "GARISH-RUG", 100, None))
         bus.handle(CreateBatch("b2", "GARISH-RUG", 99, None))
-        assert "b2" in [
-            b.reference for b in bus.uow.products.get("GARISH-RUG").batches
-        ]
+        assert "b2" in [b.reference for b in bus.uow.products.get("GARISH-RUG").batches]
 
 
 class TestAllocate:
@@ -176,9 +174,7 @@ class TestChangeBatchQuantity:
         for msg in history:
             bus.handle(msg)
 
-        [batch1, batch2] = bus.uow.products.get(
-            sku="INDIFFERENT-TABLE"
-        ).batches
+        [batch1, batch2] = bus.uow.products.get(sku="INDIFFERENT-TABLE").batches
 
         assert batch1.available_quantity == 10
         assert batch2.available_quantity == 50
@@ -198,11 +194,7 @@ def test_create_batch_creates_product_if_not_exists(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = (
-        datetime.now(tz=UTC).date() + timedelta(days=days)
-        if days is not None
-        else None
-    )
+    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, qty, eta_date))
 
@@ -218,11 +210,7 @@ def test_create_batch_commits(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = (
-        datetime.now(tz=UTC).date() + timedelta(days=days)
-        if days is not None
-        else None
-    )
+    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, qty, eta_date))
 
@@ -249,11 +237,7 @@ def test_allocate_reduces_available_quantity(
 
     bus = bootstrap_test_app()
 
-    eta_date = (
-        datetime.now(tz=UTC).date() + timedelta(days=days)
-        if days is not None
-        else None
-    )
+    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, batch_qty, eta_date))
     bus.handle(Allocate(orderid, sku, line_qty))
@@ -283,11 +267,7 @@ def test_allocate_commits_on_success(
 
     bus = bootstrap_test_app()
 
-    eta_date = (
-        datetime.now(tz=UTC).date() + timedelta(days=days)
-        if days is not None
-        else None
-    )
+    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, batch_qty, eta_date))
 
@@ -326,11 +306,7 @@ def test_change_batch_quantity_updates_available(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = (
-        datetime.now(tz=UTC).date() + timedelta(days=days)
-        if days is not None
-        else None
-    )
+    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, qty, eta_date))
     bus.handle(ChangeBatchQuantity(ref, new_qty))
@@ -368,10 +344,7 @@ def test_out_of_stock_sends_email(
     bus.handle(CreateBatch(ref, sku, batch_qty, None))
     bus.handle(Allocate(orderid, sku, line_qty))
 
-    assert (
-        f"Out of stock for {sku}"
-        in fake_notifs.sent.get("stock@made.com", [])
-    )
+    assert f"Out of stock for {sku}" in fake_notifs.sent.get("stock@made.com", [])
 
 
 @given(
