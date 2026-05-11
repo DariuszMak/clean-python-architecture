@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = Flask(__name__)
+app.config["WTF_CSRF_ENABLED"] = False
 bus = bootstrap()
 
 
