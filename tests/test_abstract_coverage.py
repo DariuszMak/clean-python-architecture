@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from allocation.adapters.repository import AbstractRepository
@@ -5,13 +7,13 @@ from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class BareRepository(AbstractRepository):
-    def _add(self, product):
+    def _add(self, product: Any) -> Any:
         return super()._add(product)
 
-    def _get(self, sku):
+    def _get(self, sku: str) -> Any:
         return super()._get(sku)
 
-    def _get_by_batchref(self, batchref):
+    def _get_by_batchref(self, batchref: str) -> Any:
         return super()._get_by_batchref(batchref)
 
 
@@ -34,10 +36,10 @@ def test_abstract_repository_get_by_batchref_raises() -> None:
 
 
 class BareUnitOfWork(AbstractUnitOfWork):
-    def _commit(self):
+    def _commit(self) -> None:
         return super()._commit()
 
-    def rollback(self):
+    def rollback(self) -> None:
         return super().rollback()
 
 
