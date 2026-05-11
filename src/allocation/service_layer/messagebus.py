@@ -9,7 +9,7 @@ from allocation.domain.commands import Command
 
 logger = logging.getLogger(__name__)
 
-Message: TypeAlias = Command | events.Event
+type Message = Command | events.Event
 
 
 class AbstractUnitOfWork(Protocol):
