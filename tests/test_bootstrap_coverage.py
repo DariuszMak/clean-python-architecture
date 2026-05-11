@@ -15,9 +15,9 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
             fake_session_factory,
         ),
         mock.patch("allocation.adapters.orm.start_mappers"),
-        mock.patch("allocation.adapters.notifications.EmailNotifications") as MockNotif,
+        mock.patch("allocation.adapters.notifications.EmailNotifications") as mock_notif,
     ):
-        MockNotif.return_value = mock.MagicMock()
+        mock_notif.return_value = mock.MagicMock()
         bus = bootstrap(
             start_orm=False,
             uow=None,
@@ -31,9 +31,9 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
 def test_bootstrap_creates_default_notifications_when_none_given() -> None:
     from tests.unit.test_handlers import FakeUnitOfWork
 
-    with mock.patch("allocation.bootstrap.EmailNotifications") as MockNotif:
+    with mock.patch("allocation.bootstrap.EmailNotifications") as mock_notif:
         mock_notif_instance = mock.MagicMock()
-        MockNotif.return_value = mock_notif_instance
+        mock_notif.return_value = mock_notif_instance
 
         bus = bootstrap(
             start_orm=False,
@@ -43,4 +43,4 @@ def test_bootstrap_creates_default_notifications_when_none_given() -> None:
         )
 
     assert isinstance(bus, MessageBus)
-    MockNotif.assert_called_once()
+    mock_notif.assert_called_once()
