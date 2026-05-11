@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import importlib
-
-import allocation.entrypoints.redis_eventconsumer as consumer
-from allocation.service_layer.handlers import InvalidSkuError
-import importlib
 import json
 from datetime import UTC, datetime, timedelta
 from unittest import mock
-import allocation.entrypoints.flask_app as flask_module
 
 import pytest
+
+import allocation.entrypoints.flask_app as flask_module
+import allocation.entrypoints.redis_eventconsumer as consumer
+from allocation.service_layer.handlers import InvalidSkuError
 
 FAKE_BUS = mock.MagicMock()
 BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
@@ -105,7 +104,6 @@ def consumer_module():
         mock.patch("redis.Redis", return_value=fake_redis_instance),
         mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS),
     ):
-
         importlib.reload(consumer)
         yield consumer, fake_redis_instance
 
