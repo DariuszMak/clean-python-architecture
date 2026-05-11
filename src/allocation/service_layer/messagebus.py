@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import Protocol, TypeAlias
+from typing import Protocol
 
 from allocation.domain import events
 from allocation.domain.commands import Command
