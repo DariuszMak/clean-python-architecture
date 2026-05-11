@@ -18,8 +18,6 @@ def get_postgres_uri() -> str:
     port = 54321 if host == "localhost" else 5432
 
     password = os.environ.get("DB_PASSWORD")
-    if not password:
-        raise RuntimeError("DB_PASSWORD environment variable is required")
 
     user, db_name = "allocation", "allocation"
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
