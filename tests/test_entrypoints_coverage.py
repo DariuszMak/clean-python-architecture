@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import importlib
+
+import allocation.entrypoints.redis_eventconsumer as consumer
+from allocation.service_layer.handlers import InvalidSkuError
+import importlib
 import json
 from datetime import UTC, datetime, timedelta
 from unittest import mock
+import allocation.entrypoints.flask_app as flask_module
 
 import pytest
 
@@ -13,10 +19,6 @@ BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
 @pytest.fixture()
 def flask_client():
     with mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS):
-        import importlib
-
-        import allocation.entrypoints.flask_app as flask_module
-
         importlib.reload(flask_module)
         flask_module.app.config["TESTING"] = True
         with flask_module.app.test_client() as client:
@@ -58,7 +60,6 @@ def test_allocate_returns_202(flask_client) -> None:
 
 
 def test_allocate_returns_400_on_invalid_sku(flask_client) -> None:
-    from allocation.service_layer.handlers import InvalidSkuError
 
     client, _ = flask_client
     FAKE_BUS.reset_mock()
@@ -104,9 +105,6 @@ def consumer_module():
         mock.patch("redis.Redis", return_value=fake_redis_instance),
         mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS),
     ):
-        import importlib
-
-        import allocation.entrypoints.redis_eventconsumer as consumer
 
         importlib.reload(consumer)
         yield consumer, fake_redis_instance
