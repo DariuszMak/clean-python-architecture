@@ -6,9 +6,9 @@ from allocation.adapters.repository import AbstractRepository
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 
-class BareRepository(AbstractRepository):
+class BareRepository(AbstractRepository):  # type: ignore[misc]
     def _add(self, product: Any) -> Any:
-        return super()._add(product)
+        super()._add(product)
 
     def _get(self, sku: str) -> Any:
         return super()._get(sku)
@@ -35,12 +35,12 @@ def test_abstract_repository_get_by_batchref_raises() -> None:
         repo._get_by_batchref("any-ref")
 
 
-class BareUnitOfWork(AbstractUnitOfWork):
+class BareUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
     def _commit(self) -> None:
-        return super()._commit()
+        super()._commit()
 
     def rollback(self) -> None:
-        return super().rollback()
+        super().rollback()
 
 
 def test_abstract_uow_commit_raises() -> None:
