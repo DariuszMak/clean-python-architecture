@@ -1,5 +1,3 @@
-"""Tests targeting 0%-covered entrypoints: flask_app.py and redis_eventconsumer.py."""
-
 from __future__ import annotations
 
 import json
@@ -21,7 +19,6 @@ BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
 
 @pytest.fixture()
 def flask_client():
-    """Return a Flask test client with bootstrap mocked out."""
     with mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS):
         # Import inside the patch so module-level `bus = bootstrap()` is mocked.
         import importlib
@@ -115,7 +112,6 @@ def _make_redis_message(data: dict) -> dict:
 
 @pytest.fixture()
 def consumer_module():
-    """Import redis_eventconsumer with redis and bootstrap mocked."""
     fake_redis_instance = mock.MagicMock()
     with (
         mock.patch("redis.Redis", return_value=fake_redis_instance),

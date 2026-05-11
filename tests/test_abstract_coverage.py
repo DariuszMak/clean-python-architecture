@@ -1,5 +1,3 @@
-"""Tests targeting uncovered abstract method bodies in repository.py and unit_of_work.py."""
-
 import pytest
 
 from allocation.adapters.repository import AbstractRepository
@@ -9,7 +7,6 @@ from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class BareRepository(AbstractRepository):
-    """Subclass that calls super() on each abstract method to hit the raise lines."""
 
     def _add(self, product):  # type: ignore[override]
         return super()._add(product)
@@ -43,7 +40,6 @@ def test_abstract_repository_get_by_batchref_raises() -> None:
 
 
 class BareUnitOfWork(AbstractUnitOfWork):
-    """Subclass that calls super() on each abstract method to hit the raise lines."""
 
     def _commit(self):  # type: ignore[override]
         return super()._commit()

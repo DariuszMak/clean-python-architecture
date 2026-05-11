@@ -1,5 +1,3 @@
-"""Tests targeting uncovered lines in allocation/domain/model.py."""
-
 from datetime import UTC, datetime, timedelta
 
 from allocation.domain.model import Batch
@@ -24,7 +22,6 @@ def test_batch_eq_with_non_batch() -> None:
 
 # model.py lines 66-70 — __gt__ branches
 def test_batch_gt_self_has_no_eta() -> None:
-    """self.eta is None → always return False (not greater)."""
     no_eta = Batch("b1", "SKU", 10, eta=None)
     with_eta = Batch("b2", "SKU", 10, eta=tomorrow)
     assert not (no_eta > with_eta)
@@ -32,14 +29,12 @@ def test_batch_gt_self_has_no_eta() -> None:
 
 
 def test_batch_gt_other_has_no_eta() -> None:
-    """other.eta is None → return True (shipment > in-stock)."""
     with_eta = Batch("b1", "SKU", 10, eta=tomorrow)
     no_eta = Batch("b2", "SKU", 10, eta=None)
     assert with_eta > no_eta
 
 
 def test_batch_gt_both_have_eta() -> None:
-    """Both have etas — compare dates."""
     earlier = Batch("b1", "SKU", 10, eta=today)
     later = Batch("b2", "SKU", 10, eta=tomorrow)
     assert later > earlier

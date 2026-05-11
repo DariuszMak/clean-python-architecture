@@ -1,5 +1,3 @@
-"""Tests targeting uncovered branches in allocation/bootstrap.py (lines 24, 27)."""
-
 from unittest import mock
 
 from allocation.bootstrap import bootstrap
@@ -7,7 +5,6 @@ from allocation.service_layer.messagebus import MessageBus
 
 
 def test_bootstrap_creates_default_uow_when_none_given() -> None:
-    """Line 24: uow is None → SqlAlchemyUnitOfWork() is created."""
     fake_session_factory = mock.MagicMock()
     fake_session = mock.MagicMock()
     fake_session_factory.return_value = fake_session
@@ -32,7 +29,6 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
 
 
 def test_bootstrap_creates_default_notifications_when_none_given() -> None:
-    """Line 27: notifications is None → EmailNotifications() is created."""
     from tests.unit.test_handlers import FakeUnitOfWork  # reuse existing fake
 
     with mock.patch("allocation.bootstrap.EmailNotifications") as MockNotif:
