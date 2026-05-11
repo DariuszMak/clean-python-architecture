@@ -75,7 +75,7 @@ services:
     ports:
       - "9000:9000"
     environment:
-      SONAR_JDBC_URL: jdbc:postgresql://sonardb:5432/sonar
+      SONAR_JDBC_URL: jdbc:postgresql://sonardb:5433/sonar
       SONAR_JDBC_USERNAME: sonar
       SONAR_JDBC_PASSWORD: sonar
     volumes:
@@ -88,6 +88,7 @@ services:
   sonardb:
     image: postgres:17
     container_name: sonardb
+    command: -p 5433
     environment:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD: sonar
