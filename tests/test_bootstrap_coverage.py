@@ -37,7 +37,7 @@ def test_bootstrap_creates_default_notifications_when_none_given() -> None:
     from tests.unit.test_handlers import FakeUnitOfWork  # reuse existing fake
 
     with mock.patch(
-        "allocation.adapters.notifications.EmailNotifications"
+        "allocation.bootstrap.EmailNotifications"
     ) as MockNotif:
         mock_notif_instance = mock.MagicMock()
         MockNotif.return_value = mock_notif_instance

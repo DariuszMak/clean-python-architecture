@@ -1,4 +1,5 @@
 """Tests targeting 0%-covered entrypoints: flask_app.py and redis_eventconsumer.py."""
+
 from __future__ import annotations
 
 import json

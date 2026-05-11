@@ -1,9 +1,8 @@
 """Tests targeting uncovered lines in allocation/domain/model.py."""
+
 from datetime import UTC, datetime, timedelta
 
-import pytest
-
-from allocation.domain.model import Batch, OrderLine
+from allocation.domain.model import Batch
 
 today = datetime.now(tz=UTC).date()
 tomorrow = today + timedelta(days=1)

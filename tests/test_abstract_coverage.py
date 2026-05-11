@@ -1,9 +1,9 @@
 """Tests targeting uncovered abstract method bodies in repository.py and unit_of_work.py."""
+
 import pytest
 
 from allocation.adapters.repository import AbstractRepository
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
-
 
 # ── repository.py lines 33, 37, 41 ──────────────────────────────────────────
 
