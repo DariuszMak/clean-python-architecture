@@ -3,18 +3,17 @@ import pytest
 from allocation.adapters.repository import AbstractRepository
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
-# ── repository.py lines 33, 37, 41 ──────────────────────────────────────────
 
 
 class BareRepository(AbstractRepository):
 
-    def _add(self, product):  # type: ignore[override]
+    def _add(self, product):  
         return super()._add(product)
 
-    def _get(self, sku):  # type: ignore[override]
+    def _get(self, sku): 
         return super()._get(sku)
 
-    def _get_by_batchref(self, batchref):  # type: ignore[override]
+    def _get_by_batchref(self, batchref):  
         return super()._get_by_batchref(batchref)
 
 
@@ -36,15 +35,14 @@ def test_abstract_repository_get_by_batchref_raises() -> None:
         repo._get_by_batchref("any-ref")
 
 
-# ── unit_of_work.py lines 38, 42 ────────────────────────────────────────────
 
 
 class BareUnitOfWork(AbstractUnitOfWork):
 
-    def _commit(self):  # type: ignore[override]
+    def _commit(self): 
         return super()._commit()
 
-    def rollback(self):  # type: ignore[override]
+    def rollback(self): 
         return super().rollback()
 
 

@@ -6,26 +6,20 @@ from unittest import mock
 
 import pytest
 
-# ── Shared bootstrap patch ────────────────────────────────────────────────────
 
 FAKE_BUS = mock.MagicMock()
 BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# flask_app.py
-# ═════════════════════════════════════════════════════════════════════════════
-
 
 @pytest.fixture()
 def flask_client():
     with mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS):
-        # Import inside the patch so module-level `bus = bootstrap()` is mocked.
         import importlib
 
         import allocation.entrypoints.flask_app as flask_module
 
-        importlib.reload(flask_module)  # re-run module top-level with mock in place
+        importlib.reload(flask_module)  
         flask_module.app.config["TESTING"] = True
         with flask_module.app.test_client() as client:
             yield client, flask_module
@@ -77,7 +71,7 @@ def test_allocate_returns_400_on_invalid_sku(flask_client) -> None:
     )
     assert resp.status_code == 400
     assert resp.get_json() == {"message": "Invalid sku GHOST"}
-    FAKE_BUS.handle.side_effect = None  # reset for other tests
+    FAKE_BUS.handle.side_effect = None 
 
 
 def test_allocations_view_returns_200(flask_client) -> None:
@@ -100,10 +94,6 @@ def test_allocations_view_returns_404_when_empty(flask_client) -> None:
         resp = client.get("/allocations/unknown")
     assert resp.status_code == 404
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# redis_eventconsumer.py
-# ═════════════════════════════════════════════════════════════════════════════
 
 
 def _make_redis_message(data: dict) -> dict:
@@ -144,7 +134,6 @@ def test_main_subscribes_and_handles_messages(consumer_module) -> None:
     fake_redis_instance.pubsub.return_value = fake_pubsub
 
     msg = _make_redis_message({"batchref": "b2", "qty": 50})
-    # listen() yields one message then stops
     fake_pubsub.listen.return_value = iter([msg])
 
     with mock.patch.object(consumer, "bootstrap", return_value=FAKE_BUS):
