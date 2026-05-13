@@ -203,7 +203,7 @@ Write-Host $token
 
 # Create .sonar.env dynamically
 @"
-SONAR_HOST_URL=http://host.docker.internal:9000
+SONAR_HOST_URL=http://127.0.0.1:9000
 SONAR_TOKEN=$token
 "@ | Out-File -Encoding utf8 ".sonar.env"
 
