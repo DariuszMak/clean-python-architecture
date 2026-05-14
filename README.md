@@ -205,7 +205,7 @@ Write-Host $token
 
 # Create .sonar.env dynamically
 @"
-SONAR_HOST_URL=http://host.docker.internal:9000
+SONAR_HOST_URL=http://sonarqube:9000
 SONAR_TOKEN=$token
 "@ | Out-File -Encoding utf8 ".sonar.env"
 
@@ -224,9 +224,14 @@ $reportUrls = ($scannerOutput |
     ForEach-Object { $_.Matches.Value }
 
 foreach ($url in $reportUrls) {
+    $localUrl = $url `
+        -replace "http://sonarqube:9000", "http://127.0.0.1:9000" `
+        -replace "http://host.docker.internal:9000", "http://127.0.0.1:9000"
+
     Write-Host "Opening:"
-    Write-Host $url
-    Start-Process $url
+    Write-Host $localUrl
+
+    Start-Process $localUrl
 }
 
 ########## UPDATE DIAGRAMS
