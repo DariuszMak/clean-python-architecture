@@ -16,12 +16,12 @@ InjectedHandler = Callable[[Any], Any]
 
 def bootstrap(
     start_orm: bool = True,
-    uow: AbstractUnitOfWork | None = None,
+    unit_of_work: AbstractUnitOfWork | None = None,
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = publish,
 ) -> MessageBus:
-    if uow is None:
-        uow = SqlAlchemyUnitOfWork()
+    if unit_of_work is None:
+        unit_of_work = SqlAlchemyUnitOfWork()
 
     if notifications is None:
         notifications = EmailNotifications()
@@ -30,7 +30,7 @@ def bootstrap(
         start_mappers()
 
     dependencies: dict[str, Any] = {
-        "uow": uow,
+        "unit_of_work": unit_of_work,
         "notifications": notifications,
         "publish": publish,
     }
@@ -44,10 +44,10 @@ def bootstrap(
         command_type: inject_dependencies(handler, dependencies) for command_type, handler in COMMAND_HANDLERS.items()
     }
 
-    bus_uow: AbstractUnitOfWork = uow
+    bus_unit_of_work: AbstractUnitOfWork = unit_of_work
 
     return MessageBus(
-        uow=bus_uow,
+        unit_of_work=bus_unit_of_work,
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )

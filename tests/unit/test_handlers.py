@@ -86,7 +86,7 @@ class FakeNotifications(AbstractNotifications):  # type: ignore[misc]
 def bootstrap_test_app() -> Any:
     return bootstrap(
         start_orm=False,
-        uow=FakeUnitOfWork(),
+        unit_of_work=FakeUnitOfWork(),
         notifications=FakeNotifications(),
         publish=lambda *_: None,
     )
@@ -102,14 +102,14 @@ class TestAddBatch:
     def test_for_new_product(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "CRUNCHY-ARMCHAIR", 100, None))
-        assert bus.uow.products.get("CRUNCHY-ARMCHAIR") is not None
-        assert bus.uow.committed
+        assert bus.unit_of_work.products.get("CRUNCHY-ARMCHAIR") is not None
+        assert bus.unit_of_work.committed
 
     def test_for_existing_product(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "GARISH-RUG", 100, None))
         bus.handle(CreateBatch("b2", "GARISH-RUG", 99, None))
-        assert "b2" in [b.referenceerence for b in bus.uow.products.get("GARISH-RUG").batches]
+        assert "b2" in [b.referenceerence for b in bus.unit_of_work.products.get("GARISH-RUG").batches]
 
 
 class TestAllocate:
@@ -117,7 +117,7 @@ class TestAllocate:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("batch1", "COMPLICATED-LAMP", 100, None))
         bus.handle(Allocate("o1", "COMPLICATED-LAMP", 10))
-        [batch] = bus.uow.products.get("COMPLICATED-LAMP").batches
+        [batch] = bus.unit_of_work.products.get("COMPLICATED-LAMP").batches
         assert batch.available_quantity == 90
 
     def test_errors_for_invalid_stock_keeping_unit(self) -> None:
@@ -133,13 +133,13 @@ class TestAllocate:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "OMINOUS-MIRROR", 100, None))
         bus.handle(Allocate("o1", "OMINOUS-MIRROR", 10))
-        assert bus.uow.committed
+        assert bus.unit_of_work.committed
 
     def test_sends_email_on_out_of_stock_error(self) -> None:
         fake_notifs = FakeNotifications()
         bus = bootstrap(
             start_orm=False,
-            uow=FakeUnitOfWork(),
+            unit_of_work=FakeUnitOfWork(),
             notifications=fake_notifs,
             publish=lambda *_: None,
         )
@@ -154,7 +154,7 @@ class TestChangeBatchQuantity:
     def test_changes_available_quantity(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("batch1", "ADORABLE-SETTEE", 100, None))
-        [batch] = bus.uow.products.get(stock_keeping_unit="ADORABLE-SETTEE").batches
+        [batch] = bus.unit_of_work.products.get(stock_keeping_unit="ADORABLE-SETTEE").batches
         assert batch.available_quantity == 100
 
         bus.handle(ChangeBatchQuantity("batch1", 50))
@@ -176,7 +176,7 @@ class TestChangeBatchQuantity:
         for msg in history:
             bus.handle(msg)
 
-        [batch1, batch2] = bus.uow.products.get(stock_keeping_unit="INDIFFERENT-TABLE").batches
+        [batch1, batch2] = bus.unit_of_work.products.get(stock_keeping_unit="INDIFFERENT-TABLE").batches
 
         assert batch1.available_quantity == 10
         assert batch2.available_quantity == 50
@@ -205,7 +205,7 @@ def test_create_batch_creates_product_if_not_exists(
 
     bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
-    assert bus.uow.products.get(stock_keeping_unit) is not None
+    assert bus.unit_of_work.products.get(stock_keeping_unit) is not None
 
 
 @given(
@@ -226,7 +226,7 @@ def test_create_batch_commits(
 
     bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
-    assert bus.uow.committed
+    assert bus.unit_of_work.committed
 
 
 @given(
@@ -254,7 +254,7 @@ def test_allocate_reduces_available_quantity(
     bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
-    [batch] = bus.uow.products.get(stock_keeping_unit).batches
+    [batch] = bus.unit_of_work.products.get(stock_keeping_unit).batches
 
     assert batch.available_quantity == batch_quantity - line_quantity
 
@@ -283,11 +283,11 @@ def test_allocate_commits_on_success(
 
     bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
 
-    bus.uow.committed = False
+    bus.unit_of_work.committed = False
 
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
-    assert bus.uow.committed
+    assert bus.unit_of_work.committed
 
 
 @given(stock_keeping_unit=stock_keeping_unit_text, orderid=order_text, quantity=pos_quantity)
@@ -323,7 +323,7 @@ def test_change_batch_quantity_updates_available(
     bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
     bus.handle(ChangeBatchQuantity(referenceerence, new_quantity))
 
-    [batch] = bus.uow.products.get(stock_keeping_unit).batches
+    [batch] = bus.unit_of_work.products.get(stock_keeping_unit).batches
 
     assert batch._purchased_quantity == new_quantity
 
@@ -348,7 +348,7 @@ def test_out_of_stock_sends_email(
 
     bus = bootstrap(
         start_orm=False,
-        uow=FakeUnitOfWork(),
+        unit_of_work=FakeUnitOfWork(),
         notifications=fake_notifs,
         publish=lambda *_: None,
     )
@@ -397,7 +397,7 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
 
     bus.handle(ChangeBatchQuantity(reference1, new_quantity))
 
-    product = bus.uow.products.get(stock_keeping_unit)
+    product = bus.unit_of_work.products.get(stock_keeping_unit)
 
     b2 = next(b for b in product.batches if b.referenceerence == reference2)
 

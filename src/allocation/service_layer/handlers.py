@@ -45,37 +45,37 @@ class AbstractNotifications(Protocol):
     def send(self, _: str, message: str) -> None: ...
 
 
-def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
-    with uow:
-        product = uow.products.get(stock_keeping_unit=cmd.stock_keeping_unit)
+def add_batch(cmd: CreateBatch, unit_of_work: AbstractUnitOfWork) -> None:
+    with unit_of_work:
+        product = unit_of_work.products.get(stock_keeping_unit=cmd.stock_keeping_unit)
         if product is None:
             product = Product(cmd.stock_keeping_unit, batches=[])
-            uow.products.add(product)
+            unit_of_work.products.add(product)
         product.batches.append(
             Batch(cmd.referenceerence, cmd.stock_keeping_unit, cmd.quantity, cmd.estimated_time_of_arrival)
         )
-        uow.commit()
+        unit_of_work.commit()
 
 
-def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
+def allocate(cmd: Allocate, unit_of_work: AbstractUnitOfWork) -> None:
     line = OrderLine(cmd.orderid, cmd.stock_keeping_unit, cmd.quantity)
-    with uow:
-        product = uow.products.get(stock_keeping_unit=line.stock_keeping_unit)
+    with unit_of_work:
+        product = unit_of_work.products.get(stock_keeping_unit=line.stock_keeping_unit)
         if product is None:
             raise InvalidStockKeepingUnitError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
         product.allocate(line)
-        uow.commit()
+        unit_of_work.commit()
 
 
-def reallocate(event: events.Deallocated, uow: AbstractUnitOfWork) -> None:
-    allocate(Allocate(**asdict(event)), uow=uow)
+def reallocate(event: events.Deallocated, unit_of_work: AbstractUnitOfWork) -> None:
+    allocate(Allocate(**asdict(event)), unit_of_work=unit_of_work)
 
 
-def change_batch_quantity(cmd: ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:
-    with uow:
-        product = uow.products.get_by_batchreference(batchreference=cmd.referenceerence)
+def change_batch_quantity(cmd: ChangeBatchQuantity, unit_of_work: AbstractUnitOfWork) -> None:
+    with unit_of_work:
+        product = unit_of_work.products.get_by_batchreference(batchreference=cmd.referenceerence)
         product.change_batch_quantity(referenceerence=cmd.referenceerence, quantity=cmd.quantity)
-        uow.commit()
+        unit_of_work.commit()
 
 
 def send_out_of_stock_notification(
@@ -97,10 +97,10 @@ def publish_allocated_event(
 
 def add_allocation_to_read_model(
     event: events.Allocated,
-    uow: SqlAlchemyUnitOfWork,
+    unit_of_work: SqlAlchemyUnitOfWork,
 ) -> None:
-    with uow:
-        uow.session.execute(
+    with unit_of_work:
+        unit_of_work.session.execute(
             text(
                 "INSERT INTO allocations_view (orderid, stock_keeping_unit, batchreference) VALUES (:orderid, :stock_keeping_unit, :batchreference)"
             ),
@@ -110,19 +110,19 @@ def add_allocation_to_read_model(
                 "batchreference": event.batchreference,
             },
         )
-        uow.commit()
+        unit_of_work.commit()
 
 
 def remove_allocation_from_read_model(
     event: events.Deallocated,
-    uow: SqlAlchemyUnitOfWork,
+    unit_of_work: SqlAlchemyUnitOfWork,
 ) -> None:
-    with uow:
-        uow.session.execute(
+    with unit_of_work:
+        unit_of_work.session.execute(
             text("DELETE FROM allocations_view  WHERE orderid = :orderid AND stock_keeping_unit = :stock_keeping_unit"),
             {"orderid": event.orderid, "stock_keeping_unit": event.stock_keeping_unit},
         )
-        uow.commit()
+        unit_of_work.commit()
 
 
 EVENT_HANDLERS: dict[type[events.Event], list[Callable[..., Any]]] = {

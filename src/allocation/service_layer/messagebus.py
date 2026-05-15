@@ -23,11 +23,11 @@ CommandHandler = Callable[[Command], None]
 class MessageBus:
     def __init__(
         self,
-        uow: AbstractUnitOfWork,
+        unit_of_work: AbstractUnitOfWork,
         event_handlers: dict[type[events.Event], list[EventHandler]],
         command_handlers: dict[type[Command], CommandHandler],
     ):
-        self.uow = uow
+        self.unit_of_work = unit_of_work
         self.event_handlers = event_handlers
         self.command_handlers = command_handlers
         self.queue: list[Message] = []
@@ -48,7 +48,7 @@ class MessageBus:
             try:
                 logger.debug("Event %s with handler %s", event, handler)
                 handler(event)
-                self.queue.extend(self.uow.collect_new_events())
+                self.queue.extend(self.unit_of_work.collect_new_events())
             except Exception:
                 logger.exception("Event exception %s", event)
                 continue
@@ -58,7 +58,7 @@ class MessageBus:
         try:
             handler = self.command_handlers[type(command)]
             handler(command)
-            self.queue.extend(self.uow.collect_new_events())
+            self.queue.extend(self.unit_of_work.collect_new_events())
         except Exception:
             logger.exception("Command exception %s", command)
             raise

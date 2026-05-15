@@ -54,19 +54,19 @@ def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_
     return str(batchreference)
 
 
-def test_uow_can_retrieve_a_batch_and_allocate_to_it(
+def test_unit_of_work_can_retrieve_a_batch_and_allocate_to_it(
     sqlite_session_factory: sessionmaker[Session],
 ) -> None:
     session = sqlite_session_factory()
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
     session.commit()
 
-    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
-    with uow:
-        product = uow.products.get(stock_keeping_unit="HIPSTER-WORKBENCH")
+    unit_of_work = SqlAlchemyUnitOfWork(sqlite_session_factory)
+    with unit_of_work:
+        product = unit_of_work.products.get(stock_keeping_unit="HIPSTER-WORKBENCH")
         line = OrderLine("o1", "HIPSTER-WORKBENCH", 10)
         product.allocate(line)
-        uow.commit()
+        unit_of_work.commit()
 
     batchreference = get_allocated_batch_reference(session, "o1", "HIPSTER-WORKBENCH")
     assert batchreference == "batch1"
@@ -75,9 +75,9 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
 def test_rolls_back_uncommitted_work_by_default(
     sqlite_session_factory: sessionmaker[Session],
 ) -> None:
-    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
-    with uow:
-        insert_batch(uow.session, "batch1", "MEDIUM-PLINTH", 100, None)
+    unit_of_work = SqlAlchemyUnitOfWork(sqlite_session_factory)
+    with unit_of_work:
+        insert_batch(unit_of_work.session, "batch1", "MEDIUM-PLINTH", 100, None)
 
     new_session = sqlite_session_factory()
     rows = list(new_session.execute(text('SELECT * FROM "batches"')))
@@ -90,10 +90,10 @@ def test_rolls_back_on_error(
     class MyError(Exception):
         pass
 
-    uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
+    unit_of_work = SqlAlchemyUnitOfWork(sqlite_session_factory)
 
-    with uow:
-        insert_batch(uow.session, "batch1", "LARGE-FORK", 100, None)
+    with unit_of_work:
+        insert_batch(unit_of_work.session, "batch1", "LARGE-FORK", 100, None)
         with pytest.raises(MyError):
             raise MyError
 
@@ -111,11 +111,11 @@ def try_to_allocate(
 ) -> None:
     line = OrderLine(orderid, stock_keeping_unit, 10)
     try:
-        with SqlAlchemyUnitOfWork(session_factory) as uow:
-            product = uow.products.get(stock_keeping_unit=stock_keeping_unit)
+        with SqlAlchemyUnitOfWork(session_factory) as unit_of_work:
+            product = unit_of_work.products.get(stock_keeping_unit=stock_keeping_unit)
             product.allocate(line)
             time.sleep(0.2)
-            uow.commit()
+            unit_of_work.commit()
     except Exception as e:
         exceptions.append(e)
 
@@ -164,5 +164,5 @@ def test_concurrent_updates_to_version_are_not_allowed(
         )
     )
     assert len(orders) == 1
-    with SqlAlchemyUnitOfWork(postgres_session_factory) as uow:
-        uow.session.execute(text("select 1"))
+    with SqlAlchemyUnitOfWork(postgres_session_factory) as unit_of_work:
+        unit_of_work.session.execute(text("select 1"))

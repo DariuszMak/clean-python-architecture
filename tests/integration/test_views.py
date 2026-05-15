@@ -22,7 +22,7 @@ today = datetime.now(tz=UTC).date()
 def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> Iterator[MessageBus]:
     yield bootstrap(
         start_orm=True,
-        uow=SqlAlchemyUnitOfWork(sqlite_session_factory),
+        unit_of_work=SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=mock.Mock(),
         publish=lambda *_: None,
     )
@@ -41,7 +41,7 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
 
     assert allocations(
         "order1",
-        cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
+        cast("SqlAlchemyUnitOfWork", sqlite_bus.unit_of_work),
     ) == [
         {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "stock_keeping_unit1batch"},
         {"stock_keeping_unit": "stock_keeping_unit2", "batchreference": "stock_keeping_unit2batch"},
@@ -56,7 +56,7 @@ def test_deallocation(sqlite_bus: MessageBus) -> None:
 
     assert allocations(
         "o1",
-        cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
+        cast("SqlAlchemyUnitOfWork", sqlite_bus.unit_of_work),
     ) == [
         {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "b2"},
     ]

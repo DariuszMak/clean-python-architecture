@@ -16,7 +16,7 @@ from tests.random_references import random_stock_keeping_unit
 def bus(sqlite_session_factory: sessionmaker[Session]) -> Any:
     yield bootstrap(
         start_orm=True,
-        uow=SqlAlchemyUnitOfWork(sqlite_session_factory),
+        unit_of_work=SqlAlchemyUnitOfWork(sqlite_session_factory),
         notifications=notifications.EmailNotifications(),
         publish=lambda *_: None,
     )

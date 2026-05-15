@@ -52,7 +52,7 @@ def allocate_endpoint() -> tuple[Response, int]:
 def allocations_view_endpoint(orderid: str) -> tuple[Response, int]:
     result = allocations(
         orderid,
-        cast("SqlAlchemyUnitOfWork", bus.uow),
+        cast("SqlAlchemyUnitOfWork", bus.unit_of_work),
     )
 
     if not result:

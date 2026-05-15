@@ -43,13 +43,13 @@ class BareUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
         super().rollback()
 
 
-def test_abstract_uow_commit_raises() -> None:
-    uow = BareUnitOfWork()
+def test_abstract_unit_of_work_commit_raises() -> None:
+    unit_of_work = BareUnitOfWork()
     with pytest.raises(NotImplementedError):
-        uow._commit()
+        unit_of_work._commit()
 
 
-def test_abstract_uow_rollback_raises() -> None:
-    uow = BareUnitOfWork()
+def test_abstract_unit_of_work_rollback_raises() -> None:
+    unit_of_work = BareUnitOfWork()
     with pytest.raises(NotImplementedError):
-        uow.rollback()
+        unit_of_work.rollback()

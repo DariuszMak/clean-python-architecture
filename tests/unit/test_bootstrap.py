@@ -5,7 +5,7 @@ from allocation.service_layer.messagebus import MessageBus
 from tests.unit.test_handlers import FakeUnitOfWork
 
 
-def test_bootstrap_creates_default_uow_when_none_given() -> None:
+def test_bootstrap_creates_default_unit_of_work_when_none_given() -> None:
     fake_session_factory = mock.MagicMock()
     fake_session = mock.MagicMock()
     fake_session_factory.return_value = fake_session
@@ -21,7 +21,7 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
         mock_notif.return_value = mock.MagicMock()
         bus = bootstrap(
             start_orm=False,
-            uow=None,
+            unit_of_work=None,
             notifications=mock.MagicMock(),
             publish=lambda *_: None,
         )
@@ -37,7 +37,7 @@ def test_bootstrap_creates_default_notifications_when_none_given() -> None:
 
         bus = bootstrap(
             start_orm=False,
-            uow=FakeUnitOfWork(),
+            unit_of_work=FakeUnitOfWork(),
             notifications=None,
             publish=lambda *_: None,
         )
