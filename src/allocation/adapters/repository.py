@@ -1,7 +1,7 @@
 import abc
 from typing import TYPE_CHECKING
 
-from allocation.adapters.orm import batches
+from src.allocation.adapters.orm.orm import batches
 from allocation.domain.model import Batch, Product
 
 if TYPE_CHECKING:

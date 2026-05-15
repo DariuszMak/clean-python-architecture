@@ -3,7 +3,7 @@ from collections.abc import Callable
 from typing import Any
 
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
-from allocation.adapters.orm import start_mappers
+from src.allocation.adapters.orm.orm import start_mappers
 from allocation.adapters.redis_eventpublisher import publish
 from allocation.service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 from allocation.service_layer.messagebus import MessageBus
