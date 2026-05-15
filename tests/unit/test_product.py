@@ -56,12 +56,12 @@ def test_returns_allocated_batch_reference() -> None:
 
 
 def test_outputs_allocated_event() -> None:
-    batch = Batch("batchreference", "RETRO-LAMPSHADE", 100, estimated_time_of_arrival=None)
+    batch = Batch("batch_reference", "RETRO-LAMPSHADE", 100, estimated_time_of_arrival=None)
     line = OrderLine("oreference", "RETRO-LAMPSHADE", 10)
     product = Product(stock_keeping_unit="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
     expected = events.Allocated(
-        orderid="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batchreference=batch.referenceerence
+        orderid="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batch_reference=batch.referenceerence
     )
     assert product.events[-1] == expected
 
@@ -93,7 +93,7 @@ def test_increments_version_number() -> None:
     line_quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
-def test_allocate_returns_batchreference_when_sufficient_stock(
+def test_allocate_returns_batch_reference_when_sufficient_stock(
     stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(batch_quantity >= line_quantity)
@@ -232,7 +232,7 @@ def test_allocated_event_has_correct_fields(
     assert ev.orderid == "order-1"
     assert ev.stock_keeping_unit == stock_keeping_unit
     assert ev.quantity == line_quantity
-    assert ev.batchreference == referenceerence
+    assert ev.batch_reference == referenceerence
 
 
 @given(

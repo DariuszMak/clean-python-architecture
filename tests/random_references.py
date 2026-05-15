@@ -9,7 +9,7 @@ def random_stock_keeping_unit(name: str = "") -> str:
     return f"stock_keeping_unit-{name}-{random_suffix()}"
 
 
-def random_batchreference(name: str = "") -> str:
+def random_batch_reference(name: str = "") -> str:
     return f"batch-{name}-{random_suffix()}"
 
 

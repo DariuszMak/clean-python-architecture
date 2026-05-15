@@ -43,8 +43,8 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
         "order1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.unit_of_work),
     ) == [
-        {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "stock_keeping_unit1batch"},
-        {"stock_keeping_unit": "stock_keeping_unit2", "batchreference": "stock_keeping_unit2batch"},
+        {"stock_keeping_unit": "stock_keeping_unit1", "batch_reference": "stock_keeping_unit1batch"},
+        {"stock_keeping_unit": "stock_keeping_unit2", "batch_reference": "stock_keeping_unit2batch"},
     ]
 
 
@@ -58,5 +58,5 @@ def test_deallocation(sqlite_bus: MessageBus) -> None:
         "o1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.unit_of_work),
     ) == [
-        {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "b2"},
+        {"stock_keeping_unit": "stock_keeping_unit1", "batch_reference": "b2"},
     ]

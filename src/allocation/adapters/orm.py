@@ -50,7 +50,7 @@ allocations_view = Table(
     metadata,
     Column("orderid", String(255)),
     Column("stock_keeping_unit", String(255)),
-    Column("batchreference", String(255)),
+    Column("batch_reference", String(255)),
 )
 
 

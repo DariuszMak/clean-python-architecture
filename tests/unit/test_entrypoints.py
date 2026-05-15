@@ -133,7 +133,7 @@ def test_allocations_view_returns_200(
         return_value=[
             {
                 "stock_keeping_unit": "SMALL-TABLE",
-                "batchreference": "b1",
+                "batch_reference": "b1",
             }
         ],
     ):
@@ -143,7 +143,7 @@ def test_allocations_view_returns_200(
     assert resp.get_json() == [
         {
             "stock_keeping_unit": "SMALL-TABLE",
-            "batchreference": "b1",
+            "batch_reference": "b1",
         }
     ]
 
@@ -200,7 +200,7 @@ def test_handle_change_batch_quantity(
     FAKE_BUS.reset_mock()
 
     msg = _make_redis_message({
-        "batchreference": "b1",
+        "batch_reference": "b1",
         "quantity": 25,
     })
 
@@ -229,7 +229,7 @@ def test_main_subscribes_and_handles_messages(
     fake_redis_instance.pubsub.return_value = fake_pubsub
 
     msg = _make_redis_message({
-        "batchreference": "b2",
+        "batch_reference": "b2",
         "quantity": 50,
     })
 

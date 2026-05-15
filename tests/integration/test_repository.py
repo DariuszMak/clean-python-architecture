@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 pytestmark = pytest.mark.usefixtures("mappers")
 
 
-def test_get_by_batchreference(sqlite_session_factory: sessionmaker[Session]) -> None:
+def test_get_by_batch_reference(sqlite_session_factory: sessionmaker[Session]) -> None:
     session = sqlite_session_factory()
     repo = SqlAlchemyRepository(session)
     b1 = Batch(
@@ -27,5 +27,5 @@ def test_get_by_batchreference(sqlite_session_factory: sessionmaker[Session]) ->
     p2 = Product(stock_keeping_unit="stock_keeping_unit2", batches=[b3])
     repo.add(p1)
     repo.add(p2)
-    assert repo.get_by_batchreference("b2") == p1
-    assert repo.get_by_batchreference("b3") == p2
+    assert repo.get_by_batch_reference("b2") == p1
+    assert repo.get_by_batch_reference("b3") == p2

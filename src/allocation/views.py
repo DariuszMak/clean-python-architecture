@@ -10,7 +10,7 @@ def allocations(orderid: str, unit_of_work: SqlAlchemyUnitOfWork) -> list[dict[s
     with unit_of_work:
         results = list(
             unit_of_work.session.execute(
-                text("SELECT stock_keeping_unit, batchreference FROM allocations_view WHERE orderid = :orderid"),
+                text("SELECT stock_keeping_unit, batch_reference FROM allocations_view WHERE orderid = :orderid"),
                 {"orderid": orderid},
             )
         )

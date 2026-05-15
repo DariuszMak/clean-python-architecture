@@ -56,9 +56,9 @@ class FakeRepository(AbstractRepository):  # type: ignore[misc]
     def _get(self, stock_keeping_unit: str) -> Any:
         return next((p for p in self._products if p.stock_keeping_unit == stock_keeping_unit), None)
 
-    def _get_by_batchreference(self, batchreference: str) -> Any:
+    def _get_by_batch_reference(self, batch_reference: str) -> Any:
         return next(
-            (p for p in self._products for b in p.batches if b.referenceerence == batchreference),
+            (p for p in self._products for b in p.batches if b.referenceerence == batch_reference),
             None,
         )
 

@@ -30,7 +30,7 @@ class Product:
                     orderid=line.orderid,
                     stock_keeping_unit=line.stock_keeping_unit,
                     quantity=line.quantity,
-                    batchreference=batch.referenceerence,
+                    batch_reference=batch.referenceerence,
                 )
             )
             return batch.referenceerence

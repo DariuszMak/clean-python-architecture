@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from allocation.domain.model import OrderLine
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from tests.random_references import random_batchreference, random_orderid, random_stock_keeping_unit
+from tests.random_references import random_batch_reference, random_orderid, random_stock_keeping_unit
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker
@@ -46,14 +46,14 @@ def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_
         text("SELECT id FROM order_lines WHERE orderid=:orderid AND stock_keeping_unit=:stock_keeping_unit"),
         {"orderid": orderid, "stock_keeping_unit": stock_keeping_unit},
     )
-    [[batchreference]] = session.execute(
+    [[batch_reference]] = session.execute(
         text(
             "SELECT b.referenceerence FROM allocations JOIN batches AS b ON batch_id = b.id"
             " WHERE orderline_id=:orderlineid"
         ),
         {"orderlineid": orderlineid},
     )
-    return str(batchreference)
+    return str(batch_reference)
 
 
 def test_unit_of_work_can_retrieve_a_batch_and_allocate_to_it(
@@ -70,8 +70,8 @@ def test_unit_of_work_can_retrieve_a_batch_and_allocate_to_it(
         product.allocate(line)
         unit_of_work.commit()
 
-    batchreference = get_allocated_batch_reference(session, "o1", "HIPSTER-WORKBENCH")
-    assert batchreference == "batch1"
+    batch_reference = get_allocated_batch_reference(session, "o1", "HIPSTER-WORKBENCH")
+    assert batch_reference == "batch1"
 
 
 def test_rolls_back_uncommitted_work_by_default(
@@ -125,7 +125,7 @@ def try_to_allocate(
 def test_concurrent_updates_to_version_are_not_allowed(
     postgres_session_factory: sessionmaker[Session],
 ) -> None:
-    stock_keeping_unit, batch = random_stock_keeping_unit(), random_batchreference()
+    stock_keeping_unit, batch = random_stock_keeping_unit(), random_batch_reference()
     session = postgres_session_factory()
     insert_batch(session, batch, stock_keeping_unit, 100, estimated_time_of_arrival=None, product_version=1)
     session.commit()

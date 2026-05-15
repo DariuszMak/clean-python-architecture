@@ -22,7 +22,7 @@ class InvalidStockKeepingUnitError(Exception):
 class ProductsRepository(Protocol):
     def get(self, stock_keeping_unit: str) -> Product | None: ...
     def add(self, product: Product) -> None: ...
-    def get_by_batchreference(self, batchreference: str) -> Product: ...
+    def get_by_batch_reference(self, batch_reference: str) -> Product: ...
 
 
 class AbstractUnitOfWork(Protocol):
@@ -73,7 +73,7 @@ def reallocate(event: events.Deallocated, unit_of_work: AbstractUnitOfWork) -> N
 
 def change_batch_quantity(cmd: ChangeBatchQuantity, unit_of_work: AbstractUnitOfWork) -> None:
     with unit_of_work:
-        product = unit_of_work.products.get_by_batchreference(batchreference=cmd.referenceerence)
+        product = unit_of_work.products.get_by_batch_reference(batch_reference=cmd.referenceerence)
         product.change_batch_quantity(referenceerence=cmd.referenceerence, quantity=cmd.quantity)
         unit_of_work.commit()
 
@@ -102,13 +102,13 @@ def add_allocation_to_read_model(
     with unit_of_work:
         unit_of_work.session.execute(
             text(
-                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batchreference)"
-                " VALUES (:orderid, :stock_keeping_unit, :batchreference)"
+                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batch_reference)"
+                " VALUES (:orderid, :stock_keeping_unit, :batch_reference)"
             ),
             {
                 "orderid": event.orderid,
                 "stock_keeping_unit": event.stock_keeping_unit,
-                "batchreference": event.batchreference,
+                "batch_reference": event.batch_reference,
             },
         )
         unit_of_work.commit()
