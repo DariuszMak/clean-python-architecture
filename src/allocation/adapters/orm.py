@@ -1,14 +1,14 @@
 import logging
 from typing import Any
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, Mestimated_time_of_arrivalData, String, Table, event
+from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
 from allocation.domain.model import Batch, OrderLine, Product
 
 logger = logging.getLogger(__name__)
 
-mestimated_time_of_arrivaldata = Mestimated_time_of_arrivalData()
+mestimated_time_of_arrivaldata = MetaData()
 mapper_registry = registry()
 
 order_lines = Table(

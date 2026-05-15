@@ -78,7 +78,9 @@ def test_records_out_of_stock_event_if_cannot_allocate() -> None:
 
 def test_increments_version_number() -> None:
     line = OrderLine("oreference", "SCANDI-PEN", 10)
-    product = Product(stock_keeping_unit="SCANDI-PEN", batches=[Batch("b1", "SCANDI-PEN", 100, estimated_time_of_arrival=None)])
+    product = Product(
+        stock_keeping_unit="SCANDI-PEN", batches=[Batch("b1", "SCANDI-PEN", 100, estimated_time_of_arrival=None)]
+    )
     product.version_number = 7
     product.allocate(line)
     assert product.version_number == 8
@@ -125,7 +127,12 @@ def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
     assert any(isinstance(e, events.OutOfStock) for e in product.events)
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    quantity=pos_quantity,
+    days=estimated_time_of_arrival_days,
+)
 def test_version_number_increments_on_successful_allocation(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:
@@ -139,7 +146,12 @@ def test_version_number_increments_on_successful_allocation(
     assert product.version_number == initial_version + 1
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    quantity=pos_quantity,
+    days=estimated_time_of_arrival_days,
+)
 def test_version_number_does_not_increment_on_out_of_stock(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:

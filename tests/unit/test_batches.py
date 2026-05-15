@@ -13,7 +13,9 @@ estimated_time_of_arrival_days = st.one_of(st.none(), st.integers(min_value=0, m
 
 
 def build_batch(referenceerence: str, stock_keeping_unit: str, quantity: int, days_ahead: int | None) -> Batch:
-    estimated_time_of_arrival = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
+    estimated_time_of_arrival = (
+        (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
+    )
     return Batch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival)
 
 
@@ -99,7 +101,10 @@ def test_can_allocate_iff_sufficient_quantity(
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=estimated_time_of_arrival_days
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    quantity=batch_quantity,
+    days=estimated_time_of_arrival_days,
 )
 def test_allocation_is_idempotent_with_hypothesis(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
@@ -137,7 +142,10 @@ def test_cannot_allocate_if_stock_keeping_units_differ(
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=estimated_time_of_arrival_days
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    quantity=batch_quantity,
+    days=estimated_time_of_arrival_days,
 )
 def test_available_quantity_never_exceeds_purchased(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
@@ -168,6 +176,8 @@ def test_in_stock_batch_is_never_greater_than_shipment(
     stock_keeping_unit: str, referenceerence: str, quantity: int
 ) -> None:
     in_stock = Batch(referenceerence + "S", stock_keeping_unit, quantity, estimated_time_of_arrival=None)
-    shipment = Batch(referenceerence + "P", stock_keeping_unit, quantity, estimated_time_of_arrival=datetime.now(tz=UTC).date())
+    shipment = Batch(
+        referenceerence + "P", stock_keeping_unit, quantity, estimated_time_of_arrival=datetime.now(tz=UTC).date()
+    )
 
     assert not (in_stock > shipment)

@@ -51,7 +51,9 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, referenceerence: str, stock_keeping_unit: str, quantity: int, estimated_time_of_arrival: date | None) -> None:
+    def __init__(
+        self, referenceerence: str, stock_keeping_unit: str, quantity: int, estimated_time_of_arrival: date | None
+    ) -> None:
         self.referenceerence = referenceerence
         self.stock_keeping_unit = stock_keeping_unit
         self.estimated_time_of_arrival = estimated_time_of_arrival

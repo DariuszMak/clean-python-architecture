@@ -187,7 +187,12 @@ class TestChangeBatchQuantity:
         assert batch2.available_quantity == 30
 
 
-@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
+@given(
+    referenceerence=reference_text,
+    stock_keeping_unit=stock_keeping_unit_text,
+    quantity=pos_quantity,
+    days=estimated_time_of_arrival_days,
+)
 def test_create_batch_creates_product_if_not_exists(
     referenceerence: str,
     stock_keeping_unit: str,
@@ -203,7 +208,12 @@ def test_create_batch_creates_product_if_not_exists(
     assert bus.uow.products.get(stock_keeping_unit) is not None
 
 
-@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
+@given(
+    referenceerence=reference_text,
+    stock_keeping_unit=stock_keeping_unit_text,
+    quantity=pos_quantity,
+    days=estimated_time_of_arrival_days,
+)
 def test_create_batch_commits(
     referenceerence: str,
     stock_keeping_unit: str,

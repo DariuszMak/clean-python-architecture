@@ -51,7 +51,9 @@ def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
         if product is None:
             product = Product(cmd.stock_keeping_unit, batches=[])
             uow.products.add(product)
-        product.batches.append(Batch(cmd.referenceerence, cmd.stock_keeping_unit, cmd.quantity, cmd.estimated_time_of_arrival))
+        product.batches.append(
+            Batch(cmd.referenceerence, cmd.stock_keeping_unit, cmd.quantity, cmd.estimated_time_of_arrival)
+        )
         uow.commit()
 
 
