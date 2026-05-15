@@ -15,8 +15,8 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     orderid, stock_keeping_unit = random_orderid(), random_stock_keeping_unit()
     earlier_batch, later_batch = random_batchreference("old"), random_batchreference("newer")
-    post_to_add_batch(earlier_batch, stock_keeping_unit, quantity=10, eta="2011-01-02")
-    post_to_add_batch(later_batch, stock_keeping_unit, quantity=10, eta="2011-01-03")
+    post_to_add_batch(earlier_batch, stock_keeping_unit, quantity=10, estimated_time_of_arrival="2011-01-02")
+    post_to_add_batch(later_batch, stock_keeping_unit, quantity=10, estimated_time_of_arrival="2011-01-03")
     r = post_to_allocate(orderid, stock_keeping_unit, 10)
     assert r.ok
     response = get_allocation(orderid)

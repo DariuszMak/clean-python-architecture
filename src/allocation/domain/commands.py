@@ -21,7 +21,7 @@ class CreateBatch(Command):
     referenceerence: str
     stock_keeping_unit: str
     quantity: int
-    eta: date | None = None
+    estimated_time_of_arrival: date | None = None
 
 
 @dataclass

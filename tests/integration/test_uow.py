@@ -20,7 +20,7 @@ def insert_batch(
     referenceerence: str,
     stock_keeping_unit: str,
     quantity: int,
-    eta: Any,
+    estimated_time_of_arrival: Any,
     product_version: int = 1,
 ) -> None:
     session.execute(
@@ -29,13 +29,13 @@ def insert_batch(
     )
     session.execute(
         text(
-            "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, eta) VALUES (:referenceerence, :stock_keeping_unit, :quantity, :eta)"
+            "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, estimated_time_of_arrival) VALUES (:referenceerence, :stock_keeping_unit, :quantity, :estimated_time_of_arrival)"
         ),
         {
             "referenceerence": referenceerence,
             "stock_keeping_unit": stock_keeping_unit,
             "quantity": quantity,
-            "eta": eta,
+            "estimated_time_of_arrival": estimated_time_of_arrival,
         },
     )
 
@@ -125,7 +125,7 @@ def test_concurrent_updates_to_version_are_not_allowed(
 ) -> None:
     stock_keeping_unit, batch = random_stock_keeping_unit(), random_batchreference()
     session = postgres_session_factory()
-    insert_batch(session, batch, stock_keeping_unit, 100, eta=None, product_version=1)
+    insert_batch(session, batch, stock_keeping_unit, 100, estimated_time_of_arrival=None, product_version=1)
     session.commit()
 
     order1, order2 = random_orderid("1"), random_orderid("2")

@@ -9,16 +9,16 @@ batch_quantity = st.integers(min_value=1, max_value=10_000)
 line_quantity = st.integers(min_value=1, max_value=10_000)
 stock_keeping_unit_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
 reference_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
-eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
+estimated_time_of_arrival_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
 def build_batch(referenceerence: str, stock_keeping_unit: str, quantity: int, days_ahead: int | None) -> Batch:
-    eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
-    return Batch(referenceerence, stock_keeping_unit, quantity, eta)
+    estimated_time_of_arrival = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
+    return Batch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival)
 
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
-    batch = Batch("batch-001", "SMALL-TABLE", quantity=20, eta=datetime.now(tz=UTC).date())
+    batch = Batch("batch-001", "SMALL-TABLE", quantity=20, estimated_time_of_arrival=datetime.now(tz=UTC).date())
     line = OrderLine("order-referenceerence", "SMALL-TABLE", 2)
 
     batch.allocate(line)
@@ -28,7 +28,7 @@ def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
 
 def make_batch_and_line(stock_keeping_unit: str, batch_quantity: int, line_quantity: int) -> tuple[Batch, OrderLine]:
     return (
-        Batch("batch-001", stock_keeping_unit, batch_quantity, eta=datetime.now(tz=UTC).date()),
+        Batch("batch-001", stock_keeping_unit, batch_quantity, estimated_time_of_arrival=datetime.now(tz=UTC).date()),
         OrderLine("order-123", stock_keeping_unit, line_quantity),
     )
 
@@ -49,7 +49,7 @@ def test_can_allocate_if_available_equal_to_required() -> None:
 
 
 def test_cannot_allocate_if_stock_keeping_units_do_not_match() -> None:
-    batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta=None)
+    batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, estimated_time_of_arrival=None)
     different_stock_keeping_unit_line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10)
     assert batch.can_allocate(different_stock_keeping_unit_line) is False
 
@@ -66,7 +66,7 @@ def test_allocation_is_idempotent() -> None:
     referenceerence=reference_text,
     batch_quantity=batch_quantity,
     line_quantity=line_quantity,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_allocating_reduces_available_quantity(
     stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
@@ -85,7 +85,7 @@ def test_allocating_reduces_available_quantity(
     referenceerence=reference_text,
     batch_quantity=batch_quantity,
     line_quantity=line_quantity,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_can_allocate_iff_sufficient_quantity(
     stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
@@ -99,7 +99,7 @@ def test_can_allocate_iff_sufficient_quantity(
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days
+    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=estimated_time_of_arrival_days
 )
 def test_allocation_is_idempotent_with_hypothesis(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
@@ -119,7 +119,7 @@ def test_allocation_is_idempotent_with_hypothesis(
     referenceerence=reference_text,
     quantity=batch_quantity,
     line_quantity=line_quantity,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_cannot_allocate_if_stock_keeping_units_differ(
     stock_keeping_unit: str,
@@ -137,7 +137,7 @@ def test_cannot_allocate_if_stock_keeping_units_differ(
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days
+    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=estimated_time_of_arrival_days
 )
 def test_available_quantity_never_exceeds_purchased(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
@@ -153,7 +153,7 @@ def test_available_quantity_never_exceeds_purchased(
     days_a=st.integers(min_value=1, max_value=100),
     days_b=st.integers(min_value=101, max_value=200),
 )
-def test_earlier_eta_batch_is_less_than_later(
+def test_earlier_estimated_time_of_arrival_batch_is_less_than_later(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days_a: int, days_b: int
 ) -> None:
     today = datetime.now(tz=UTC).date()
@@ -167,7 +167,7 @@ def test_earlier_eta_batch_is_less_than_later(
 def test_in_stock_batch_is_never_greater_than_shipment(
     stock_keeping_unit: str, referenceerence: str, quantity: int
 ) -> None:
-    in_stock = Batch(referenceerence + "S", stock_keeping_unit, quantity, eta=None)
-    shipment = Batch(referenceerence + "P", stock_keeping_unit, quantity, eta=datetime.now(tz=UTC).date())
+    in_stock = Batch(referenceerence + "S", stock_keeping_unit, quantity, estimated_time_of_arrival=None)
+    shipment = Batch(referenceerence + "P", stock_keeping_unit, quantity, estimated_time_of_arrival=datetime.now(tz=UTC).date())
 
     assert not (in_stock > shipment)

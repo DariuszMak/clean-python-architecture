@@ -44,7 +44,7 @@ def test_add_batch_returns_201(
             "referenceerence": "b1",
             "stock_keeping_unit": "SMALL-TABLE",
             "quantity": 10,
-            "eta": None,
+            "estimated_time_of_arrival": None,
         },
     )
 
@@ -54,14 +54,14 @@ def test_add_batch_returns_201(
     FAKE_BUS.handle.assert_called_once()
 
 
-def test_add_batch_with_eta(
+def test_add_batch_with_estimated_time_of_arrival(
     flask_client: tuple[FlaskClient, Any],
 ) -> None:
     client, _ = flask_client
 
     FAKE_BUS.reset_mock()
 
-    eta_str = (datetime.now(tz=UTC).date() + timedelta(days=5)).isoformat()
+    estimated_time_of_arrival_str = (datetime.now(tz=UTC).date() + timedelta(days=5)).isoformat()
 
     resp = client.post(
         "/add_batch",
@@ -69,7 +69,7 @@ def test_add_batch_with_eta(
             "referenceerence": "b2",
             "stock_keeping_unit": "LAMP",
             "quantity": 5,
-            "eta": eta_str,
+            "estimated_time_of_arrival": estimated_time_of_arrival_str,
         },
     )
 

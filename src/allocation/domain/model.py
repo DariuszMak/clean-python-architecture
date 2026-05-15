@@ -51,10 +51,10 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, referenceerence: str, stock_keeping_unit: str, quantity: int, eta: date | None) -> None:
+    def __init__(self, referenceerence: str, stock_keeping_unit: str, quantity: int, estimated_time_of_arrival: date | None) -> None:
         self.referenceerence = referenceerence
         self.stock_keeping_unit = stock_keeping_unit
-        self.eta = eta
+        self.estimated_time_of_arrival = estimated_time_of_arrival
         self._purchased_quantity = quantity
         self._allocations: set[OrderLine] = set()
 
@@ -70,11 +70,11 @@ class Batch:
         return hash(self.referenceerence)
 
     def __gt__(self, other: Batch) -> bool:
-        if self.eta is None:
+        if self.estimated_time_of_arrival is None:
             return False
-        if other.eta is None:
+        if other.estimated_time_of_arrival is None:
             return True
-        return self.eta > other.eta
+        return self.estimated_time_of_arrival > other.estimated_time_of_arrival
 
     def allocate(self, line: OrderLine) -> None:
         if self.can_allocate(line):

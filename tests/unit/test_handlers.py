@@ -39,7 +39,7 @@ order_text = st.text(
 
 pos_quantity = st.integers(min_value=1, max_value=10_000)
 
-eta_days = st.one_of(
+estimated_time_of_arrival_days = st.one_of(
     st.none(),
     st.integers(min_value=0, max_value=365),
 )
@@ -92,7 +92,7 @@ def bootstrap_test_app() -> Any:
     )
 
 
-def make_eta_str(days: int | None) -> str | None:
+def make_estimated_time_of_arrival_str(days: int | None) -> str | None:
     if days is None:
         return None
     return (datetime.now(tz=UTC).date() + timedelta(days=days)).isoformat()
@@ -187,7 +187,7 @@ class TestChangeBatchQuantity:
         assert batch2.available_quantity == 30
 
 
-@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=eta_days)
+@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
 def test_create_batch_creates_product_if_not_exists(
     referenceerence: str,
     stock_keeping_unit: str,
@@ -196,14 +196,14 @@ def test_create_batch_creates_product_if_not_exists(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
+    estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, eta_date))
+    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
     assert bus.uow.products.get(stock_keeping_unit) is not None
 
 
-@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=eta_days)
+@given(referenceerence=reference_text, stock_keeping_unit=stock_keeping_unit_text, quantity=pos_quantity, days=estimated_time_of_arrival_days)
 def test_create_batch_commits(
     referenceerence: str,
     stock_keeping_unit: str,
@@ -212,9 +212,9 @@ def test_create_batch_commits(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
+    estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, eta_date))
+    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
     assert bus.uow.committed
 
@@ -225,7 +225,7 @@ def test_create_batch_commits(
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
     orderid=order_text,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_allocate_reduces_available_quantity(
     referenceerence: str,
@@ -239,9 +239,9 @@ def test_allocate_reduces_available_quantity(
 
     bus = bootstrap_test_app()
 
-    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
+    estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, eta_date))
+    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
     [batch] = bus.uow.products.get(stock_keeping_unit).batches
@@ -255,7 +255,7 @@ def test_allocate_reduces_available_quantity(
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
     orderid=order_text,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_allocate_commits_on_success(
     referenceerence: str,
@@ -269,9 +269,9 @@ def test_allocate_commits_on_success(
 
     bus = bootstrap_test_app()
 
-    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
+    estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, eta_date))
+    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
 
     bus.uow.committed = False
 
@@ -297,7 +297,7 @@ def test_allocate_raises_for_unknown_stock_keeping_unit(
     stock_keeping_unit=stock_keeping_unit_text,
     quantity=pos_quantity,
     new_quantity=pos_quantity,
-    days=eta_days,
+    days=estimated_time_of_arrival_days,
 )
 def test_change_batch_quantity_updates_available(
     referenceerence: str,
@@ -308,9 +308,9 @@ def test_change_batch_quantity_updates_available(
 ) -> None:
     bus = bootstrap_test_app()
 
-    eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
+    estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, eta_date))
+    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
     bus.handle(ChangeBatchQuantity(referenceerence, new_quantity))
 
     [batch] = bus.uow.products.get(stock_keeping_unit).batches
@@ -376,11 +376,11 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
     bus = bootstrap_test_app()
 
     today = datetime.now(tz=UTC).date()
-    eta1 = today + timedelta(days=days1)
-    eta2 = today + timedelta(days=days2)
+    estimated_time_of_arrival1 = today + timedelta(days=days1)
+    estimated_time_of_arrival2 = today + timedelta(days=days2)
 
-    bus.handle(CreateBatch(reference1, stock_keeping_unit, quantity, eta1))
-    bus.handle(CreateBatch(reference2, stock_keeping_unit, quantity, eta2))
+    bus.handle(CreateBatch(reference1, stock_keeping_unit, quantity, estimated_time_of_arrival1))
+    bus.handle(CreateBatch(reference2, stock_keeping_unit, quantity, estimated_time_of_arrival2))
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
     new_quantity = line_quantity - 1

@@ -17,15 +17,15 @@ bus = bootstrap()
 
 @app.route("/add_batch", methods=["POST"])
 def add_batch() -> tuple[Response, int]:
-    eta = request.json["eta"]
-    if eta is not None:
-        eta = datetime.fromisoformat(eta).date()
+    estimated_time_of_arrival = request.json["estimated_time_of_arrival"]
+    if estimated_time_of_arrival is not None:
+        estimated_time_of_arrival = datetime.fromisoformat(estimated_time_of_arrival).date()
 
     cmd = CreateBatch(
         request.json["referenceerence"],
         request.json["stock_keeping_unit"],
         request.json["quantity"],
-        eta,
+        estimated_time_of_arrival,
     )
     bus.handle(cmd)
 
