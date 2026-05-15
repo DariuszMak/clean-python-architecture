@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from allocation.domain.model import OrderLine
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from tests.random_references import random_batch_reference, random_orderid, random_stock_keeping_unit
+from tests.random_references import random_batch_reference, random_order_id, random_stock_keeping_unit
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker
@@ -41,16 +41,16 @@ def insert_batch(
     )
 
 
-def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_unit: str) -> str:
-    [[orderlineid]] = session.execute(
-        text("SELECT id FROM order_lines WHERE orderid=:orderid AND stock_keeping_unit=:stock_keeping_unit"),
-        {"orderid": orderid, "stock_keeping_unit": stock_keeping_unit},
+def get_allocated_batch_reference(session: Session, order_id: str, stock_keeping_unit: str) -> str:
+    [[orderline_id]] = session.execute(
+        text("SELECT id FROM order_lines WHERE order_id=:order_id AND stock_keeping_unit=:stock_keeping_unit"),
+        {"order_id": order_id, "stock_keeping_unit": stock_keeping_unit},
     )
     [[batch_reference]] = session.execute(
         text(
-            "SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderlineid"
+            "SELECT b.reference FROM allocations JOIN batches AS b ON batch__id = b.id WHERE orderline__id=:orderline_id"
         ),
-        {"orderlineid": orderlineid},
+        {"orderline_id": orderline_id},
     )
     return str(batch_reference)
 
@@ -105,12 +105,12 @@ def test_rolls_back_on_error(
 
 
 def try_to_allocate(
-    orderid: str,
+    order_id: str,
     stock_keeping_unit: str,
     exceptions: list[Exception],
     session_factory: sessionmaker[Session],
 ) -> None:
-    line = OrderLine(orderid, stock_keeping_unit, 10)
+    line = OrderLine(order_id, stock_keeping_unit, 10)
     try:
         with SqlAlchemyUnitOfWork(session_factory) as unit_of_work:
             product = unit_of_work.products.get(stock_keeping_unit=stock_keeping_unit)
@@ -129,7 +129,7 @@ def test_concurrent_updates_to_version_are_not_allowed(
     insert_batch(session, batch, stock_keeping_unit, 100, estimated_time_of_arrival=None, product_version=1)
     session.commit()
 
-    order1, order2 = random_orderid("1"), random_orderid("2")
+    order1, order2 = random_order_id("1"), random_order_id("2")
     exceptions: list[Exception] = []
 
     def try_to_allocate_order1() -> None:
@@ -156,9 +156,9 @@ def test_concurrent_updates_to_version_are_not_allowed(
     orders = list(
         session.execute(
             text(
-                "SELECT orderid FROM allocations"
-                " JOIN batches ON allocations.batch_id = batches.id"
-                " JOIN order_lines ON allocations.orderline_id = order_lines.id"
+                "SELECT order_id FROM allocations"
+                " JOIN batches ON allocations.batch__id = batches.id"
+                " JOIN order_lines ON allocations.orderline__id = order_lines.id"
                 " WHERE order_lines.stock_keeping_unit=:stock_keeping_unit"
             ),
             {"stock_keeping_unit": stock_keeping_unit},

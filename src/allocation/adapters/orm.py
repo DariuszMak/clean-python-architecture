@@ -17,7 +17,7 @@ order_lines = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("stock_keeping_unit", String(255)),
     Column("quantity", Integer, nullable=False),
-    Column("orderid", String(255)),
+    Column("order_id", String(255)),
 )
 
 products = Table(
@@ -41,14 +41,14 @@ allocations = Table(
     "allocations",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("orderline_id", ForeignKey("order_lines.id")),
-    Column("batch_id", ForeignKey("batches.id")),
+    Column("orderline__id", ForeignKey("order_lines.id")),
+    Column("batch__id", ForeignKey("batches.id")),
 )
 
 allocations_view = Table(
     "allocations_view",
     metadata,
-    Column("orderid", String(255)),
+    Column("order_id", String(255)),
     Column("stock_keeping_unit", String(255)),
     Column("batch_reference", String(255)),
 )

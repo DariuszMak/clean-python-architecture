@@ -24,7 +24,7 @@ def post_to_add_batch(reference: Any, stock_keeping_unit: Any, quantity: Any, es
 
 
 def post_to_allocate(
-    orderid: Any,
+    order_id: Any,
     stock_keeping_unit: Any,
     quantity: Any,
     expect_success: bool = True,
@@ -33,7 +33,7 @@ def post_to_allocate(
     r: Response = requests.post(
         f"{url}/allocate",
         json={
-            "orderid": orderid,
+            "order_id": order_id,
             "stock_keeping_unit": stock_keeping_unit,
             "quantity": quantity,
         },
@@ -44,6 +44,6 @@ def post_to_allocate(
     return r
 
 
-def get_allocation(orderid: Any) -> Response:
+def get_allocation(order_id: Any) -> Response:
     url: str = config.get_api_url()
-    return requests.get(f"{url}/allocations/{orderid}", timeout=TIMEOUT)
+    return requests.get(f"{url}/allocations/{order_id}", timeout=TIMEOUT)

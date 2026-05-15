@@ -11,7 +11,7 @@ class Command:
 
 @dataclass
 class Allocate(Command):
-    orderid: str
+    order_id: str
     stock_keeping_unit: str
     quantity: int
 

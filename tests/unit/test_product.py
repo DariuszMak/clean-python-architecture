@@ -61,7 +61,7 @@ def test_outputs_allocated_event() -> None:
     product = Product(stock_keeping_unit="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
     expected = events.Allocated(
-        orderid="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batch_reference=batch.reference
+        order_id="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batch_reference=batch.reference
     )
     assert product.events[-1] == expected
 
@@ -229,7 +229,7 @@ def test_allocated_event_has_correct_fields(
     allocated_events = [e for e in product.events if isinstance(e, events.Allocated)]
     assert len(allocated_events) == 1
     ev = allocated_events[0]
-    assert ev.orderid == "order-1"
+    assert ev.order_id == "order-1"
     assert ev.stock_keeping_unit == stock_keeping_unit
     assert ev.quantity == line_quantity
     assert ev.batch_reference == reference

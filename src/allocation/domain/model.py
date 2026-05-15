@@ -27,7 +27,7 @@ class Product:
             self.version_number += 1
             self.events.append(
                 events.Allocated(
-                    orderid=line.orderid,
+                    order_id=line.order_id,
                     stock_keeping_unit=line.stock_keeping_unit,
                     quantity=line.quantity,
                     batch_reference=batch.reference,
@@ -40,12 +40,12 @@ class Product:
         batch._purchased_quantity = quantity
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
-            self.events.append(events.Deallocated(line.orderid, line.stock_keeping_unit, line.quantity))
+            self.events.append(events.Deallocated(line.order_id, line.stock_keeping_unit, line.quantity))
 
 
 @dataclass(unsafe_hash=True)
 class OrderLine:
-    orderid: str
+    order_id: str
     stock_keeping_unit: str
     quantity: int
 

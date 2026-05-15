@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from sqlalchemy.sql.elements import TextClause
 
 
-class InvalidStockKeepingUnitError(Exception):
+class Inval_idStockKeepingUnitError(Exception):
     pass
 
 
@@ -58,11 +58,11 @@ def add_batch(cmd: CreateBatch, unit_of_work: AbstractUnitOfWork) -> None:
 
 
 def allocate(cmd: Allocate, unit_of_work: AbstractUnitOfWork) -> None:
-    line = OrderLine(cmd.orderid, cmd.stock_keeping_unit, cmd.quantity)
+    line = OrderLine(cmd.order_id, cmd.stock_keeping_unit, cmd.quantity)
     with unit_of_work:
         product = unit_of_work.products.get(stock_keeping_unit=line.stock_keeping_unit)
         if product is None:
-            raise InvalidStockKeepingUnitError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
+            raise Inval_idStockKeepingUnitError(f"Inval_id stock_keeping_unit {line.stock_keeping_unit}")
         product.allocate(line)
         unit_of_work.commit()
 
@@ -102,11 +102,11 @@ def add_allocation_to_read_model(
     with unit_of_work:
         unit_of_work.session.execute(
             text(
-                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batch_reference)"
-                " VALUES (:orderid, :stock_keeping_unit, :batch_reference)"
+                "INSERT INTO allocations_view (order_id, stock_keeping_unit, batch_reference)"
+                " VALUES (:order_id, :stock_keeping_unit, :batch_reference)"
             ),
             {
-                "orderid": event.orderid,
+                "order_id": event.order_id,
                 "stock_keeping_unit": event.stock_keeping_unit,
                 "batch_reference": event.batch_reference,
             },
@@ -120,8 +120,8 @@ def remove_allocation_from_read_model(
 ) -> None:
     with unit_of_work:
         unit_of_work.session.execute(
-            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND stock_keeping_unit = :stock_keeping_unit"),
-            {"orderid": event.orderid, "stock_keeping_unit": event.stock_keeping_unit},
+            text("DELETE FROM allocations_view  WHERE order_id = :order_id AND stock_keeping_unit = :stock_keeping_unit"),
+            {"order_id": event.order_id, "stock_keeping_unit": event.stock_keeping_unit},
         )
         unit_of_work.commit()
 

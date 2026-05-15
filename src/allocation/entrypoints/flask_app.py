@@ -5,7 +5,7 @@ from flask import Flask, Response, jsonify, request
 
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
-from allocation.service_layer.handlers import InvalidStockKeepingUnitError
+from allocation.service_layer.handlers import Inval_idStockKeepingUnitError
 from allocation.views import allocations
 
 if TYPE_CHECKING:
@@ -36,22 +36,22 @@ def add_batch() -> tuple[Response, int]:
 def allocate_endpoint() -> tuple[Response, int]:
     try:
         cmd = Allocate(
-            request.json["orderid"],
+            request.json["order_id"],
             request.json["stock_keeping_unit"],
             request.json["quantity"],
         )
         bus.handle(cmd)
 
-    except InvalidStockKeepingUnitError as e:
+    except Inval_idStockKeepingUnitError as e:
         return jsonify({"message": str(e)}), 400
 
     return jsonify({"status": "OK"}), 202
 
 
-@app.route("/allocations/<orderid>", methods=["GET"])
-def allocations_view_endpoint(orderid: str) -> tuple[Response, int]:
+@app.route("/allocations/<order_id>", methods=["GET"])
+def allocations_view_endpoint(order_id: str) -> tuple[Response, int]:
     result = allocations(
-        orderid,
+        order_id,
         cast("SqlAlchemyUnitOfWork", bus.unit_of_work),
     )
 

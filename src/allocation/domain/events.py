@@ -7,7 +7,7 @@ class Event:
 
 @dataclass
 class Allocated(Event):
-    orderid: str
+    order_id: str
     stock_keeping_unit: str
     quantity: int
     batch_reference: str
@@ -15,7 +15,7 @@ class Allocated(Event):
 
 @dataclass
 class Deallocated(Event):
-    orderid: str
+    order_id: str
     stock_keeping_unit: str
     quantity: int
 

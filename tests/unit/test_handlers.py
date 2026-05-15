@@ -12,7 +12,7 @@ from allocation.adapters.notifications import AbstractNotifications
 from allocation.adapters.repository import AbstractRepository
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from allocation.service_layer.handlers import InvalidStockKeepingUnitError
+from allocation.service_layer.handlers import Inval_idStockKeepingUnitError
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
@@ -120,12 +120,12 @@ class TestAllocate:
         [batch] = bus.unit_of_work.products.get("COMPLICATED-LAMP").batches
         assert batch.available_quantity == 90
 
-    def test_errors_for_invalid_stock_keeping_unit(self) -> None:
+    def test_errors_for_inval_id_stock_keeping_unit(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "AREALSTOCKKEEPINGUNIT", 100, None))
 
         with pytest.raises(
-            InvalidStockKeepingUnitError, match="Invalid stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
+            Inval_idStockKeepingUnitError, match="Inval_id stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
         ):
             bus.handle(Allocate("o1", "NONEXISTENTSTOCKKEEPINGUNIT", 10))
 
@@ -234,7 +234,7 @@ def test_create_batch_commits(
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
-    orderid=order_text,
+    order_id=order_text,
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_reduces_available_quantity(
@@ -242,7 +242,7 @@ def test_allocate_reduces_available_quantity(
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
-    orderid: str,
+    order_id: str,
     days: int | None,
 ) -> None:
     assume(batch_quantity >= line_quantity)
@@ -252,7 +252,7 @@ def test_allocate_reduces_available_quantity(
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(reference, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
-    bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
+    bus.handle(Allocate(order_id, stock_keeping_unit, line_quantity))
 
     [batch] = bus.unit_of_work.products.get(stock_keeping_unit).batches
 
@@ -264,7 +264,7 @@ def test_allocate_reduces_available_quantity(
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
-    orderid=order_text,
+    order_id=order_text,
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_commits_on_success(
@@ -272,7 +272,7 @@ def test_allocate_commits_on_success(
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
-    orderid: str,
+    order_id: str,
     days: int | None,
 ) -> None:
     assume(batch_quantity >= line_quantity)
@@ -285,21 +285,21 @@ def test_allocate_commits_on_success(
 
     bus.unit_of_work.committed = False
 
-    bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
+    bus.handle(Allocate(order_id, stock_keeping_unit, line_quantity))
 
     assert bus.unit_of_work.committed
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, orderid=order_text, quantity=pos_quantity)
+@given(stock_keeping_unit=stock_keeping_unit_text, order_id=order_text, quantity=pos_quantity)
 def test_allocate_raises_for_unknown_stock_keeping_unit(
     stock_keeping_unit: str,
-    orderid: str,
+    order_id: str,
     quantity: int,
 ) -> None:
     bus = bootstrap_test_app()
 
-    with pytest.raises(InvalidStockKeepingUnitError, match=f"Invalid stock_keeping_unit {stock_keeping_unit}"):
-        bus.handle(Allocate(orderid, stock_keeping_unit, quantity))
+    with pytest.raises(Inval_idStockKeepingUnitError, match=f"Inval_id stock_keeping_unit {stock_keeping_unit}"):
+        bus.handle(Allocate(order_id, stock_keeping_unit, quantity))
 
 
 @given(
@@ -333,14 +333,14 @@ def test_change_batch_quantity_updates_available(
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
-    orderid=order_text,
+    order_id=order_text,
 )
 def test_out_of_stock_sends_email(
     reference: str,
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
-    orderid: str,
+    order_id: str,
 ) -> None:
     assume(batch_quantity < line_quantity)
 
@@ -354,7 +354,7 @@ def test_out_of_stock_sends_email(
     )
 
     bus.handle(CreateBatch(reference, stock_keeping_unit, batch_quantity, None))
-    bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
+    bus.handle(Allocate(order_id, stock_keeping_unit, line_quantity))
 
     assert f"Out of stock for {stock_keeping_unit}" in fake_notifs.sent.get("stock@made.com", [])
 
@@ -365,7 +365,7 @@ def test_out_of_stock_sends_email(
     stock_keeping_unit=stock_keeping_unit_text,
     quantity=pos_quantity,
     line_quantity=pos_quantity,
-    orderid=order_text,
+    order_id=order_text,
     days1=st.integers(min_value=1, max_value=100),
     days2=st.integers(min_value=101, max_value=200),
 )
@@ -375,7 +375,7 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
     stock_keeping_unit: str,
     quantity: int,
     line_quantity: int,
-    orderid: str,
+    order_id: str,
     days1: int,
     days2: int,
 ) -> None:
@@ -391,7 +391,7 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
 
     bus.handle(CreateBatch(reference1, stock_keeping_unit, quantity, estimated_time_of_arrival1))
     bus.handle(CreateBatch(reference2, stock_keeping_unit, quantity, estimated_time_of_arrival2))
-    bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
+    bus.handle(Allocate(order_id, stock_keeping_unit, line_quantity))
 
     new_quantity = line_quantity - 1
 

@@ -56,7 +56,7 @@ def test_cannot_allocate_if_stock_keeping_units_do_not_match() -> None:
     assert batch.can_allocate(different_stock_keeping_unit_line) is False
 
 
-def test_allocation_is_idempotent() -> None:
+def test_allocation_is__idempotent() -> None:
     batch, line = make_batch_and_line("ANGULAR-DESK", 20, 2)
     batch.allocate(line)
     batch.allocate(line)
@@ -106,7 +106,7 @@ def test_can_allocate_iff_sufficient_quantity(
     quantity=batch_quantity,
     days=estimated_time_of_arrival_days,
 )
-def test_allocation_is_idempotent_with_hypothesis(
+def test_allocation_is__idempotent_with_hypothesis(
     stock_keeping_unit: str, reference: str, quantity: int, days: int | None
 ) -> None:
     batch = build_batch(reference, stock_keeping_unit, quantity, days)

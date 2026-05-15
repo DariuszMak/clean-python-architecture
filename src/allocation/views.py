@@ -6,12 +6,12 @@ if TYPE_CHECKING:
     from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 
-def allocations(orderid: str, unit_of_work: SqlAlchemyUnitOfWork) -> list[dict[str, str]]:
+def allocations(order_id: str, unit_of_work: SqlAlchemyUnitOfWork) -> list[dict[str, str]]:
     with unit_of_work:
         results = list(
             unit_of_work.session.execute(
-                text("SELECT stock_keeping_unit, batch_reference FROM allocations_view WHERE orderid = :orderid"),
-                {"orderid": orderid},
+                text("SELECT stock_keeping_unit, batch_reference FROM allocations_view WHERE order_id = :order_id"),
+                {"order_id": order_id},
             )
         )
     return [dict(r._mapping) for r in results]
