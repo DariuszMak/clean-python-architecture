@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from allocation import config
-from allocation.adapters.orm import mestimated_time_of_arrivaldata, start_mappers
+from allocation.adapters.orm import metadata, start_mappers
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -37,7 +37,7 @@ wait_for_redis_to_come_up_untyped: Callable[[], bool] | None = None
 @pytest.fixture
 def in_memory_sqlite_db() -> Generator[Engine]:
     engine = create_engine("sqlite:///:memory:")
-    mestimated_time_of_arrivaldata.create_all(engine)
+    metadata.create_all(engine)
     yield engine
     engine.dispose()
 
@@ -77,7 +77,7 @@ def wait_for_redis_to_come_up() -> bool:
 def postgres_db() -> Engine:
     engine = create_engine(get_postgres_uri(), isolation_level="SERIALIZABLE")
     wait_for_postgres_to_come_up(engine)
-    mestimated_time_of_arrivaldata.create_all(engine)
+    metadata.create_all(engine)
     return engine
 
 

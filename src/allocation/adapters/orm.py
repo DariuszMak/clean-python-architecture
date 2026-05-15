@@ -8,12 +8,12 @@ from allocation.domain.model import Batch, OrderLine, Product
 
 logger = logging.getLogger(__name__)
 
-mestimated_time_of_arrivaldata = MetaData()
+metadata = MetaData()
 mapper_registry = registry()
 
 order_lines = Table(
     "order_lines",
-    mestimated_time_of_arrivaldata,
+    metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("stock_keeping_unit", String(255)),
     Column("quantity", Integer, nullable=False),
@@ -22,14 +22,14 @@ order_lines = Table(
 
 products = Table(
     "products",
-    mestimated_time_of_arrivaldata,
+    metadata,
     Column("stock_keeping_unit", String(255), primary_key=True),
     Column("version_number", Integer, nullable=False, server_default="0"),
 )
 
 batches = Table(
     "batches",
-    mestimated_time_of_arrivaldata,
+    metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("referenceerence", String(255)),
     Column("stock_keeping_unit", ForeignKey("products.stock_keeping_unit")),
@@ -39,7 +39,7 @@ batches = Table(
 
 allocations = Table(
     "allocations",
-    mestimated_time_of_arrivaldata,
+    metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("orderline_id", ForeignKey("order_lines.id")),
     Column("batch_id", ForeignKey("batches.id")),
@@ -47,7 +47,7 @@ allocations = Table(
 
 allocations_view = Table(
     "allocations_view",
-    mestimated_time_of_arrivaldata,
+    metadata,
     Column("orderid", String(255)),
     Column("stock_keeping_unit", String(255)),
     Column("batchreference", String(255)),
