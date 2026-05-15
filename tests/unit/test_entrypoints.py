@@ -10,7 +10,7 @@ import pytest
 
 import allocation.entrypoints.flask_app as flask_module
 import allocation.entrypoints.redis_eventconsumer as consumer
-from allocation.service_layer.handlers import Inval_idStockKeepingUnitError
+from allocation.service_layer.handlers import InvalidStockKeepingUnitError
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -103,7 +103,7 @@ def test_allocate_returns_400_on_inval_id_stock_keeping_unit(
 
     FAKE_BUS.reset_mock()
 
-    FAKE_BUS.handle.s_ide_effect = Inval_idStockKeepingUnitError("Inval_id stock_keeping_unit GHOST")
+    FAKE_BUS.handle.s_ide_effect = InvalidStockKeepingUnitError("Inval_id stock_keeping_unit GHOST")
 
     resp = client.post(
         "/allocate",

@@ -12,7 +12,7 @@ from allocation.adapters.notifications import AbstractNotifications
 from allocation.adapters.repository import AbstractRepository
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from allocation.service_layer.handlers import Inval_idStockKeepingUnitError
+from allocation.service_layer.handlers import InvalidStockKeepingUnitError
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
@@ -125,7 +125,7 @@ class TestAllocate:
         bus.handle(CreateBatch("b1", "AREALSTOCKKEEPINGUNIT", 100, None))
 
         with pytest.raises(
-            Inval_idStockKeepingUnitError, match="Inval_id stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
+            InvalidStockKeepingUnitError, match="Inval_id stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
         ):
             bus.handle(Allocate("o1", "NONEXISTENTSTOCKKEEPINGUNIT", 10))
 
@@ -298,7 +298,7 @@ def test_allocate_raises_for_unknown_stock_keeping_unit(
 ) -> None:
     bus = bootstrap_test_app()
 
-    with pytest.raises(Inval_idStockKeepingUnitError, match=f"Inval_id stock_keeping_unit {stock_keeping_unit}"):
+    with pytest.raises(InvalidStockKeepingUnitError, match=f"Inval_id stock_keeping_unit {stock_keeping_unit}"):
         bus.handle(Allocate(order_id, stock_keeping_unit, quantity))
 
 

@@ -5,7 +5,7 @@ from flask import Flask, Response, jsonify, request
 
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
-from allocation.service_layer.handlers import Inval_idStockKeepingUnitError
+from allocation.service_layer.handlers import InvalidStockKeepingUnitError
 from allocation.views import allocations
 
 if TYPE_CHECKING:
@@ -42,7 +42,7 @@ def allocate_endpoint() -> tuple[Response, int]:
         )
         bus.handle(cmd)
 
-    except Inval_idStockKeepingUnitError as e:
+    except InvalidStockKeepingUnitError as e:
         return jsonify({"message": str(e)}), 400
 
     return jsonify({"status": "OK"}), 202
