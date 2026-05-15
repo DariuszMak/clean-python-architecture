@@ -103,7 +103,7 @@ def test_allocate_returns_400_on_invalid_stock_keeping_unit(
 
     FAKE_BUS.reset_mock()
 
-    FAKE_BUS.handle.s_ide_effect = InvalidStockKeepingUnitError("Invalid stock_keeping_unit GHOST")
+    FAKE_BUS.handle.side_effect = InvalidStockKeepingUnitError("Invalid stock_keeping_unit GHOST")
 
     resp = client.post(
         "/allocate",
@@ -117,7 +117,7 @@ def test_allocate_returns_400_on_invalid_stock_keeping_unit(
     assert resp.status_code == 400
     assert resp.get_json() == {"message": "Invalid stock_keeping_unit GHOST"}
 
-    FAKE_BUS.handle.s_ide_effect = None
+    FAKE_BUS.handle.side_effect = None
 
 
 def test_allocations_view_returns_200(
