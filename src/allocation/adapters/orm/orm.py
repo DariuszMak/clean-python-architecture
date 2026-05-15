@@ -1,44 +1,11 @@
 import logging
-from enum import StrEnum
 from typing import Any
 
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
 from allocation.domain.model import Batch, OrderLine, Product
-
-logger = logging.getLogger(__name__)
-
-
-class TableName(StrEnum):
-    ORDER_LINES = "order_lines"
-    PRODUCTS = "products"
-    BATCHES = "batches"
-    ALLOCATIONS = "allocations"
-    ALLOCATIONS_VIEW = "allocations_view"
-
-
-class ColumnName(StrEnum):
-    ID = "id"
-    SKU = "sku"
-    QTY = "qty"
-    ORDERID = "orderid"
-    VERSION_NUMBER = "version_number"
-    REFERENCE = "reference"
-    PURCHASED_QUANTITY = "_purchased_quantity"
-    ETA = "eta"
-    ORDERLINE_ID = "orderline_id"
-    BATCH_ID = "batch_id"
-    BATCHREF = "batchref"
-
-
-class RelationshipName(StrEnum):
-    ALLOCATIONS = "_allocations"
-    BATCHES = "batches"
-
-
-class EventName(StrEnum):
-    LOAD = "load"
+from allocation.adapters.orm.strenums import ColumnName, EventName, RelationshipName, TableName
 
 
 logger = logging.getLogger(__name__)
