@@ -1,8 +1,8 @@
 import abc
 from typing import TYPE_CHECKING
 
-from src.allocation.adapters.orm.orm import batches
 from allocation.domain.model import Batch, Product
+from src.allocation.adapters.orm.orm import batches
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session

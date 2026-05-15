@@ -4,9 +4,8 @@ from typing import Any
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
-from allocation.domain.model import Batch, OrderLine, Product
 from allocation.adapters.orm.strenums import ColumnName, EventName, RelationshipName, TableName
-
+from allocation.domain.model import Batch, OrderLine, Product
 
 logger = logging.getLogger(__name__)
 
