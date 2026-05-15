@@ -98,7 +98,9 @@ def test_can_allocate_iff_sufficient_quantity(
     assert result == (batch_quantity >= line_quantity)
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days
+)
 def test_allocation_is_idempotent_with_hypothesis(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:
@@ -120,7 +122,12 @@ def test_allocation_is_idempotent_with_hypothesis(
     days=eta_days,
 )
 def test_cannot_allocate_if_stock_keeping_units_differ(
-    stock_keeping_unit: str, other_stock_keeping_unit: str, referenceerence: str, quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str,
+    other_stock_keeping_unit: str,
+    referenceerence: str,
+    quantity: int,
+    line_quantity: int,
+    days: int | None,
 ) -> None:
     assume(stock_keeping_unit != other_stock_keeping_unit)
     batch = build_batch(referenceerence, stock_keeping_unit, quantity, days)
@@ -129,7 +136,9 @@ def test_cannot_allocate_if_stock_keeping_units_differ(
     assert batch.can_allocate(line) is False
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days
+)
 def test_available_quantity_never_exceeds_purchased(
     stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:
@@ -155,7 +164,9 @@ def test_earlier_eta_batch_is_less_than_later(
 
 
 @given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity)
-def test_in_stock_batch_is_never_greater_than_shipment(stock_keeping_unit: str, referenceerence: str, quantity: int) -> None:
+def test_in_stock_batch_is_never_greater_than_shipment(
+    stock_keeping_unit: str, referenceerence: str, quantity: int
+) -> None:
     in_stock = Batch(referenceerence + "S", stock_keeping_unit, quantity, eta=None)
     shipment = Batch(referenceerence + "P", stock_keeping_unit, quantity, eta=datetime.now(tz=UTC).date())
 

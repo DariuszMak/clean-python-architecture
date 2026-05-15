@@ -85,7 +85,11 @@ def test_increments_version_number() -> None:
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    batch_quantity=pos_quantity,
+    line_quantity=pos_quantity,
+    days=eta_days,
 )
 def test_allocate_returns_batchreference_when_sufficient_stock(
     stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
@@ -101,7 +105,11 @@ def test_allocate_returns_batchreference_when_sufficient_stock(
 
 
 @given(
-    stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    batch_quantity=pos_quantity,
+    line_quantity=pos_quantity,
+    days=eta_days,
 )
 def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
     stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
@@ -167,7 +175,13 @@ def test_preferenceers_earlier_batch(
     assert result == reference1
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, reference1=reference_text, reference2=reference_text, quantity=pos_quantity, days=eta_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text,
+    reference1=reference_text,
+    reference2=reference_text,
+    quantity=pos_quantity,
+    days=eta_days,
+)
 def test_preferenceers_in_stock_over_shipment(
     stock_keeping_unit: str, reference1: str, reference2: str, quantity: int, days: int | None
 ) -> None:
@@ -183,7 +197,13 @@ def test_preferenceers_in_stock_over_shipment(
     assert result == reference1
 
 
-@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
+@given(
+    stock_keeping_unit=stock_keeping_unit_text,
+    referenceerence=reference_text,
+    quantity=pos_quantity,
+    line_quantity=pos_quantity,
+    days=eta_days,
+)
 def test_allocated_event_has_correct_fields(
     stock_keeping_unit: str, referenceerence: str, quantity: int, line_quantity: int, days: int | None
 ) -> None:

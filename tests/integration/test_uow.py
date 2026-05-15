@@ -31,7 +31,12 @@ def insert_batch(
         text(
             "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, eta) VALUES (:referenceerence, :stock_keeping_unit, :quantity, :eta)"
         ),
-        {"referenceerence": referenceerence, "stock_keeping_unit": stock_keeping_unit, "quantity": quantity, "eta": eta},
+        {
+            "referenceerence": referenceerence,
+            "stock_keeping_unit": stock_keeping_unit,
+            "quantity": quantity,
+            "eta": eta,
+        },
     )
 
 

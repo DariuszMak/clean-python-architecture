@@ -12,7 +12,12 @@ def post_to_add_batch(referenceerence: Any, stock_keeping_unit: Any, quantity: A
     url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",
-        json={"referenceerence": referenceerence, "stock_keeping_unit": stock_keeping_unit, "quantity": quantity, "eta": eta},
+        json={
+            "referenceerence": referenceerence,
+            "stock_keeping_unit": stock_keeping_unit,
+            "quantity": quantity,
+            "eta": eta,
+        },
         timeout=TIMEOUT,
     )
     assert r.status_code == 201
