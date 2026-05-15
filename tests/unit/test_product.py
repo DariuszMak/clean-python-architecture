@@ -12,7 +12,7 @@ later = tomorrow + timedelta(days=10)
 
 sku_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
 ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
-pos_qty = st.integers(min_value=1, max_value=10_000)
+pos_quantity = st.integers(min_value=1, max_value=10_000)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
@@ -82,28 +82,28 @@ def test_increments_version_number() -> None:
     assert product.version_number == 8
 
 
-@given(sku=sku_text, ref=ref_text, batch_qty=pos_qty, line_qty=pos_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
 def test_allocate_returns_batchref_when_sufficient_stock(
-    sku: str, ref: str, batch_qty: int, line_qty: int, days: int | None
+    sku: str, ref: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    assume(batch_qty >= line_qty)
-    batch = Batch(ref, sku, batch_qty, make_eta(days))
+    assume(batch_quantity >= line_quantity)
+    batch = Batch(ref, sku, batch_quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
-    line = OrderLine("order-1", sku, line_qty)
+    line = OrderLine("order-1", sku, line_quantity)
 
     result = product.allocate(line)
 
     assert result == ref
 
 
-@given(sku=sku_text, ref=ref_text, batch_qty=pos_qty, line_qty=pos_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
 def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
-    sku: str, ref: str, batch_qty: int, line_qty: int, days: int | None
+    sku: str, ref: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    assume(batch_qty < line_qty)
-    batch = Batch(ref, sku, batch_qty, make_eta(days))
+    assume(batch_quantity < line_quantity)
+    batch = Batch(ref, sku, batch_quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
-    line = OrderLine("order-1", sku, line_qty)
+    line = OrderLine("order-1", sku, line_quantity)
 
     result = product.allocate(line)
 
@@ -111,7 +111,7 @@ def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
     assert any(isinstance(e, events.OutOfStock) for e in product.events)
 
 
-@given(sku=sku_text, ref=ref_text, quantity=pos_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, quantity=pos_quantity, days=eta_days)
 def test_version_number_increments_on_successful_allocation(
     sku: str, ref: str, quantity: int, days: int | None
 ) -> None:
@@ -125,7 +125,7 @@ def test_version_number_increments_on_successful_allocation(
     assert product.version_number == initial_version + 1
 
 
-@given(sku=sku_text, ref=ref_text, quantity=pos_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, quantity=pos_quantity, days=eta_days)
 def test_version_number_does_not_increment_on_out_of_stock(sku: str, ref: str, quantity: int, days: int | None) -> None:
     batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
@@ -141,7 +141,7 @@ def test_version_number_does_not_increment_on_out_of_stock(sku: str, ref: str, q
     sku=sku_text,
     ref1=ref_text,
     ref2=ref_text,
-    quantity=pos_qty,
+    quantity=pos_quantity,
     days_early=st.integers(min_value=1, max_value=100),
     days_late=st.integers(min_value=101, max_value=200),
 )
@@ -157,7 +157,7 @@ def test_prefers_earlier_batch(sku: str, ref1: str, ref2: str, quantity: int, da
     assert result == ref1
 
 
-@given(sku=sku_text, ref1=ref_text, ref2=ref_text, quantity=pos_qty, days=eta_days)
+@given(sku=sku_text, ref1=ref_text, ref2=ref_text, quantity=pos_quantity, days=eta_days)
 def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, quantity: int, days: int | None) -> None:
     assume(ref1 != ref2)
     assume(days is not None)
@@ -171,12 +171,12 @@ def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, quantity
     assert result == ref1
 
 
-@given(sku=sku_text, ref=ref_text, quantity=pos_qty, line_qty=pos_qty, days=eta_days)
-def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, line_qty: int, days: int | None) -> None:
-    assume(quantity >= line_qty)
+@given(sku=sku_text, ref=ref_text, quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
+def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, line_quantity: int, days: int | None) -> None:
+    assume(quantity >= line_quantity)
     batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
-    line = OrderLine("order-1", sku, line_qty)
+    line = OrderLine("order-1", sku, line_quantity)
 
     product.allocate(line)
 
@@ -185,26 +185,26 @@ def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, l
     ev = allocated_events[0]
     assert ev.orderid == "order-1"
     assert ev.sku == sku
-    assert ev.quantity == line_qty
+    assert ev.quantity == line_quantity
     assert ev.batchref == ref
 
 
 @given(
     sku=sku_text,
     ref=ref_text,
-    initial_qty=st.integers(min_value=2, max_value=10_000),
+    initial_quantity=st.integers(min_value=2, max_value=10_000),
     n_extra=st.integers(min_value=1, max_value=5),
 )
-def test_change_batch_quantity_deallocates_excess_orders(sku: str, ref: str, initial_qty: int, n_extra: int) -> None:
-    new_qty = max(1, initial_qty - n_extra)
-    batch = Batch(ref, sku, initial_qty, eta=None)
+def test_change_batch_quantity_deallocates_excess_orders(sku: str, ref: str, initial_quantity: int, n_extra: int) -> None:
+    new_quantity = max(1, initial_quantity - n_extra)
+    batch = Batch(ref, sku, initial_quantity, eta=None)
     product = Product(sku=sku, batches=[batch])
 
     for i in range(n_extra):
         line = OrderLine(f"order-{i}", sku, 1)
         product.allocate(line)
 
-    product.change_batch_quantity(ref, new_qty)
+    product.change_batch_quantity(ref, new_quantity)
 
     assert batch.available_quantity >= 0
 

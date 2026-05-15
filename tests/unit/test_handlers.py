@@ -37,7 +37,7 @@ order_text = st.text(
     max_size=20,
 )
 
-pos_qty = st.integers(min_value=1, max_value=10_000)
+pos_quantity = st.integers(min_value=1, max_value=10_000)
 
 eta_days = st.one_of(
     st.none(),
@@ -185,7 +185,7 @@ class TestChangeBatchQuantity:
         assert batch2.available_quantity == 30
 
 
-@given(ref=ref_text, sku=sku_text, quantity=pos_qty, days=eta_days)
+@given(ref=ref_text, sku=sku_text, quantity=pos_quantity, days=eta_days)
 def test_create_batch_creates_product_if_not_exists(
     ref: str,
     sku: str,
@@ -201,7 +201,7 @@ def test_create_batch_creates_product_if_not_exists(
     assert bus.uow.products.get(sku) is not None
 
 
-@given(ref=ref_text, sku=sku_text, quantity=pos_qty, days=eta_days)
+@given(ref=ref_text, sku=sku_text, quantity=pos_quantity, days=eta_days)
 def test_create_batch_commits(
     ref: str,
     sku: str,
@@ -220,65 +220,65 @@ def test_create_batch_commits(
 @given(
     ref=ref_text,
     sku=sku_text,
-    batch_qty=pos_qty,
-    line_qty=pos_qty,
+    batch_quantity=pos_quantity,
+    line_quantity=pos_quantity,
     orderid=order_text,
     days=eta_days,
 )
 def test_allocate_reduces_available_quantity(
     ref: str,
     sku: str,
-    batch_qty: int,
-    line_qty: int,
+    batch_quantity: int,
+    line_quantity: int,
     orderid: str,
     days: int | None,
 ) -> None:
-    assume(batch_qty >= line_qty)
+    assume(batch_quantity >= line_quantity)
 
     bus = bootstrap_test_app()
 
     eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(ref, sku, batch_qty, eta_date))
-    bus.handle(Allocate(orderid, sku, line_qty))
+    bus.handle(CreateBatch(ref, sku, batch_quantity, eta_date))
+    bus.handle(Allocate(orderid, sku, line_quantity))
 
     [batch] = bus.uow.products.get(sku).batches
 
-    assert batch.available_quantity == batch_qty - line_qty
+    assert batch.available_quantity == batch_quantity - line_quantity
 
 
 @given(
     ref=ref_text,
     sku=sku_text,
-    batch_qty=pos_qty,
-    line_qty=pos_qty,
+    batch_quantity=pos_quantity,
+    line_quantity=pos_quantity,
     orderid=order_text,
     days=eta_days,
 )
 def test_allocate_commits_on_success(
     ref: str,
     sku: str,
-    batch_qty: int,
-    line_qty: int,
+    batch_quantity: int,
+    line_quantity: int,
     orderid: str,
     days: int | None,
 ) -> None:
-    assume(batch_qty >= line_qty)
+    assume(batch_quantity >= line_quantity)
 
     bus = bootstrap_test_app()
 
     eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(ref, sku, batch_qty, eta_date))
+    bus.handle(CreateBatch(ref, sku, batch_quantity, eta_date))
 
     bus.uow.committed = False
 
-    bus.handle(Allocate(orderid, sku, line_qty))
+    bus.handle(Allocate(orderid, sku, line_quantity))
 
     assert bus.uow.committed
 
 
-@given(sku=sku_text, orderid=order_text, quantity=pos_qty)
+@given(sku=sku_text, orderid=order_text, quantity=pos_quantity)
 def test_allocate_raises_for_unknown_sku(
     sku: str,
     orderid: str,
@@ -293,15 +293,15 @@ def test_allocate_raises_for_unknown_sku(
 @given(
     ref=ref_text,
     sku=sku_text,
-    quantity=pos_qty,
-    new_qty=pos_qty,
+    quantity=pos_quantity,
+    new_quantity=pos_quantity,
     days=eta_days,
 )
 def test_change_batch_quantity_updates_available(
     ref: str,
     sku: str,
     quantity: int,
-    new_qty: int,
+    new_quantity: int,
     days: int | None,
 ) -> None:
     bus = bootstrap_test_app()
@@ -309,28 +309,28 @@ def test_change_batch_quantity_updates_available(
     eta_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
     bus.handle(CreateBatch(ref, sku, quantity, eta_date))
-    bus.handle(ChangeBatchQuantity(ref, new_qty))
+    bus.handle(ChangeBatchQuantity(ref, new_quantity))
 
     [batch] = bus.uow.products.get(sku).batches
 
-    assert batch._purchased_quantity == new_qty
+    assert batch._purchased_quantity == new_quantity
 
 
 @given(
     ref=ref_text,
     sku=sku_text,
-    batch_qty=pos_qty,
-    line_qty=pos_qty,
+    batch_quantity=pos_quantity,
+    line_quantity=pos_quantity,
     orderid=order_text,
 )
 def test_out_of_stock_sends_email(
     ref: str,
     sku: str,
-    batch_qty: int,
-    line_qty: int,
+    batch_quantity: int,
+    line_quantity: int,
     orderid: str,
 ) -> None:
-    assume(batch_qty < line_qty)
+    assume(batch_quantity < line_quantity)
 
     fake_notifs = FakeNotifications()
 
@@ -341,8 +341,8 @@ def test_out_of_stock_sends_email(
         publish=lambda *_: None,
     )
 
-    bus.handle(CreateBatch(ref, sku, batch_qty, None))
-    bus.handle(Allocate(orderid, sku, line_qty))
+    bus.handle(CreateBatch(ref, sku, batch_quantity, None))
+    bus.handle(Allocate(orderid, sku, line_quantity))
 
     assert f"Out of stock for {sku}" in fake_notifs.sent.get("stock@made.com", [])
 
@@ -351,8 +351,8 @@ def test_out_of_stock_sends_email(
     ref1=ref_text,
     ref2=ref_text,
     sku=sku_text,
-    quantity=pos_qty,
-    line_qty=pos_qty,
+    quantity=pos_quantity,
+    line_quantity=pos_quantity,
     orderid=order_text,
     days1=st.integers(min_value=1, max_value=100),
     days2=st.integers(min_value=101, max_value=200),
@@ -362,14 +362,14 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
     ref2: str,
     sku: str,
     quantity: int,
-    line_qty: int,
+    line_quantity: int,
     orderid: str,
     days1: int,
     days2: int,
 ) -> None:
     assume(ref1 != ref2)
-    assume(quantity >= line_qty)
-    assume(quantity > line_qty)
+    assume(quantity >= line_quantity)
+    assume(quantity > line_quantity)
 
     bus = bootstrap_test_app()
 
@@ -379,14 +379,14 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
 
     bus.handle(CreateBatch(ref1, sku, quantity, eta1))
     bus.handle(CreateBatch(ref2, sku, quantity, eta2))
-    bus.handle(Allocate(orderid, sku, line_qty))
+    bus.handle(Allocate(orderid, sku, line_quantity))
 
-    new_qty = line_qty - 1
+    new_quantity = line_quantity - 1
 
-    bus.handle(ChangeBatchQuantity(ref1, new_qty))
+    bus.handle(ChangeBatchQuantity(ref1, new_quantity))
 
     product = bus.uow.products.get(sku)
 
     b2 = next(b for b in product.batches if b.reference == ref2)
 
-    assert b2.available_quantity == quantity - line_qty
+    assert b2.available_quantity == quantity - line_quantity

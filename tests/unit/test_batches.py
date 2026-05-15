@@ -5,8 +5,8 @@ from hypothesis import strategies as st
 
 from allocation.domain.model import Batch, OrderLine
 
-batch_qty = st.integers(min_value=1, max_value=10_000)
-line_qty = st.integers(min_value=1, max_value=10_000)
+batch_quantity = st.integers(min_value=1, max_value=10_000)
+line_quantity = st.integers(min_value=1, max_value=10_000)
 sku_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
 ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
@@ -26,10 +26,10 @@ def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     assert batch.available_quantity == 18
 
 
-def make_batch_and_line(sku: str, batch_qty: int, line_qty: int) -> tuple[Batch, OrderLine]:
+def make_batch_and_line(sku: str, batch_quantity: int, line_quantity: int) -> tuple[Batch, OrderLine]:
     return (
-        Batch("batch-001", sku, batch_qty, eta=datetime.now(tz=UTC).date()),
-        OrderLine("order-123", sku, line_qty),
+        Batch("batch-001", sku, batch_quantity, eta=datetime.now(tz=UTC).date()),
+        OrderLine("order-123", sku, line_quantity),
     )
 
 
@@ -61,32 +61,32 @@ def test_allocation_is_idempotent() -> None:
     assert batch.available_quantity == 18
 
 
-@given(sku=sku_text, ref=ref_text, batch_qty=batch_qty, line_qty=line_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, batch_quantity=batch_quantity, line_quantity=line_quantity, days=eta_days)
 def test_allocating_reduces_available_quantity(
-    sku: str, ref: str, batch_qty: int, line_qty: int, days: int | None
+    sku: str, ref: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    assume(batch_qty >= line_qty)
-    batch = build_batch(ref, sku, batch_qty, days)
-    line = OrderLine("order-1", sku, line_qty)
+    assume(batch_quantity >= line_quantity)
+    batch = build_batch(ref, sku, batch_quantity, days)
+    line = OrderLine("order-1", sku, line_quantity)
 
     batch.allocate(line)
 
-    assert batch.available_quantity == batch_qty - line_qty
+    assert batch.available_quantity == batch_quantity - line_quantity
 
 
-@given(sku=sku_text, ref=ref_text, batch_qty=batch_qty, line_qty=line_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, batch_quantity=batch_quantity, line_quantity=line_quantity, days=eta_days)
 def test_can_allocate_iff_sufficient_quantity(
-    sku: str, ref: str, batch_qty: int, line_qty: int, days: int | None
+    sku: str, ref: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    batch = build_batch(ref, sku, batch_qty, days)
-    line = OrderLine("order-1", sku, line_qty)
+    batch = build_batch(ref, sku, batch_quantity, days)
+    line = OrderLine("order-1", sku, line_quantity)
 
     result = batch.can_allocate(line)
 
-    assert result == (batch_qty >= line_qty)
+    assert result == (batch_quantity >= line_quantity)
 
 
-@given(sku=sku_text, ref=ref_text, quantity=batch_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, quantity=batch_quantity, days=eta_days)
 def test_allocation_is_idempotent_with_hypothesis(sku: str, ref: str, quantity: int, days: int | None) -> None:
     batch = build_batch(ref, sku, quantity, days)
     line = OrderLine("order-1", sku, 1)
@@ -101,21 +101,21 @@ def test_allocation_is_idempotent_with_hypothesis(sku: str, ref: str, quantity: 
     sku=sku_text,
     other_sku=sku_text,
     ref=ref_text,
-    quantity=batch_qty,
-    line_qty=line_qty,
+    quantity=batch_quantity,
+    line_quantity=line_quantity,
     days=eta_days,
 )
 def test_cannot_allocate_if_skus_differ(
-    sku: str, other_sku: str, ref: str, quantity: int, line_qty: int, days: int | None
+    sku: str, other_sku: str, ref: str, quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(sku != other_sku)
     batch = build_batch(ref, sku, quantity, days)
-    line = OrderLine("order-1", other_sku, line_qty)
+    line = OrderLine("order-1", other_sku, line_quantity)
 
     assert batch.can_allocate(line) is False
 
 
-@given(sku=sku_text, ref=ref_text, quantity=batch_qty, days=eta_days)
+@given(sku=sku_text, ref=ref_text, quantity=batch_quantity, days=eta_days)
 def test_available_quantity_never_exceeds_purchased(sku: str, ref: str, quantity: int, days: int | None) -> None:
     batch = build_batch(ref, sku, quantity, days)
     assert batch.available_quantity <= batch._purchased_quantity
@@ -124,7 +124,7 @@ def test_available_quantity_never_exceeds_purchased(sku: str, ref: str, quantity
 @given(
     sku=sku_text,
     ref=ref_text,
-    quantity=batch_qty,
+    quantity=batch_quantity,
     days_a=st.integers(min_value=1, max_value=100),
     days_b=st.integers(min_value=101, max_value=200),
 )
@@ -136,7 +136,7 @@ def test_earlier_eta_batch_is_less_than_later(sku: str, ref: str, quantity: int,
     assert earlier < later
 
 
-@given(sku=sku_text, ref=ref_text, quantity=batch_qty)
+@given(sku=sku_text, ref=ref_text, quantity=batch_quantity)
 def test_in_stock_batch_is_never_greater_than_shipment(sku: str, ref: str, quantity: int) -> None:
     in_stock = Batch(ref + "S", sku, quantity, eta=None)
     shipment = Batch(ref + "P", sku, quantity, eta=datetime.now(tz=UTC).date())
