@@ -13,7 +13,7 @@ metadata = MetaData()
 mapper_registry = registry()
 
 order_lines = Table(
-    TableName.ORDER_LINES.value,
+    TableName.ORDER_LINES,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("sku", String(255)),
@@ -22,14 +22,14 @@ order_lines = Table(
 )
 
 products = Table(
-    TableName.PRODUCTS.value,
+    TableName.PRODUCTS,
     metadata,
     Column("sku", String(255), primary_key=True),
     Column("version_number", Integer, nullable=False, server_default="0"),
 )
 
 batches = Table(
-    TableName.BATCHES.value,
+    TableName.BATCHES,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("reference", String(255)),
@@ -39,7 +39,7 @@ batches = Table(
 )
 
 allocations = Table(
-    TableName.ALLOCATIONS.value,
+    TableName.ALLOCATIONS,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("orderline_id", ForeignKey("order_lines.id")),
@@ -47,7 +47,7 @@ allocations = Table(
 )
 
 allocations_view = Table(
-    TableName.ALLOCATIONS_VIEW.value,
+    TableName.ALLOCATIONS_VIEW,
     metadata,
     Column("orderid", String(255)),
     Column("sku", String(255)),
