@@ -11,6 +11,7 @@ class TableName(StrEnum):
 
 class ColumnName(StrEnum):
     ID = "id"
+    REF = "ref"
     SKU = "sku"
     QTY = "qty"
     ORDERID = "orderid"

@@ -7,6 +7,7 @@ from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer.handlers import InvalidSkuError
 from allocation.views import allocations
+from src.allocation.helpers.strenums import ColumnName
 
 if TYPE_CHECKING:
     from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
@@ -22,9 +23,9 @@ def add_batch() -> tuple[Response, int]:
         eta = datetime.fromisoformat(eta).date()
 
     cmd = CreateBatch(
-        request.json["ref"],
-        request.json["sku"],
-        request.json["qty"],
+        request.json[ColumnName.REF],
+        request.json[ColumnName.SKU],
+        request.json[ColumnName.QTY],
         eta,
     )
     bus.handle(cmd)
