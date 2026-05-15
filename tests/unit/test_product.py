@@ -172,7 +172,9 @@ def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, quantity
 
 
 @given(sku=sku_text, ref=ref_text, quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
-def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, line_quantity: int, days: int | None) -> None:
+def test_allocated_event_has_correct_fields(
+    sku: str, ref: str, quantity: int, line_quantity: int, days: int | None
+) -> None:
     assume(quantity >= line_quantity)
     batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
@@ -195,7 +197,9 @@ def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, l
     initial_quantity=st.integers(min_value=2, max_value=10_000),
     n_extra=st.integers(min_value=1, max_value=5),
 )
-def test_change_batch_quantity_deallocates_excess_orders(sku: str, ref: str, initial_quantity: int, n_extra: int) -> None:
+def test_change_batch_quantity_deallocates_excess_orders(
+    sku: str, ref: str, initial_quantity: int, n_extra: int
+) -> None:
     new_quantity = max(1, initial_quantity - n_extra)
     batch = Batch(ref, sku, initial_quantity, eta=None)
     product = Product(sku=sku, batches=[batch])
