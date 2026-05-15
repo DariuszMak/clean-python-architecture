@@ -8,9 +8,7 @@ from allocation import config
 TIMEOUT: int = 5
 
 
-def post_to_add_batch(
-    reference: Any, stock_keeping_unit: Any, quantity: Any, estimated_time_of_arrival: Any
-) -> None:
+def post_to_add_batch(reference: Any, stock_keeping_unit: Any, quantity: Any, estimated_time_of_arrival: Any) -> None:
     url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",

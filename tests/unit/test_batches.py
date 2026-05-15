@@ -172,9 +172,7 @@ def test_earlier_estimated_time_of_arrival_batch_is_less_than_later(
 
 
 @given(stock_keeping_unit=stock_keeping_unit_text, reference=reference_text, quantity=batch_quantity)
-def test_in_stock_batch_is_never_greater_than_shipment(
-    stock_keeping_unit: str, reference: str, quantity: int
-) -> None:
+def test_in_stock_batch_is_never_greater_than_shipment(stock_keeping_unit: str, reference: str, quantity: int) -> None:
     in_stock = Batch(reference + "S", stock_keeping_unit, quantity, estimated_time_of_arrival=None)
     shipment = Batch(
         reference + "P", stock_keeping_unit, quantity, estimated_time_of_arrival=datetime.now(tz=UTC).date()

@@ -48,8 +48,7 @@ def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_
     )
     [[batch_reference]] = session.execute(
         text(
-            "SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id"
-            " WHERE orderline_id=:orderlineid"
+            "SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderlineid"
         ),
         {"orderlineid": orderlineid},
     )
