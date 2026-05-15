@@ -112,7 +112,9 @@ def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
 
 
 @given(sku=sku_text, ref=ref_text, quantity=pos_qty, days=eta_days)
-def test_version_number_increments_on_successful_allocation(sku: str, ref: str, quantity: int, days: int | None) -> None:
+def test_version_number_increments_on_successful_allocation(
+    sku: str, ref: str, quantity: int, days: int | None
+) -> None:
     batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
     initial_version = product.version_number
