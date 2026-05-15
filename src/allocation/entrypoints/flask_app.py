@@ -24,7 +24,7 @@ def add_batch() -> tuple[Response, int]:
     cmd = CreateBatch(
         request.json["ref"],
         request.json["sku"],
-        request.json["qty"],
+        request.json["quantity"],
         eta,
     )
     bus.handle(cmd)
@@ -38,7 +38,7 @@ def allocate_endpoint() -> tuple[Response, int]:
         cmd = Allocate(
             request.json["orderid"],
             request.json["sku"],
-            request.json["qty"],
+            request.json["quantity"],
         )
         bus.handle(cmd)
 

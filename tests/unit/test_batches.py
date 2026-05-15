@@ -12,13 +12,13 @@ ref_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), mi
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
-def build_batch(ref: str, sku: str, qty: int, days_ahead: int | None) -> Batch:
+def build_batch(ref: str, sku: str, quantity: int, days_ahead: int | None) -> Batch:
     eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
-    return Batch(ref, sku, qty, eta)
+    return Batch(ref, sku, quantity, eta)
 
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
-    batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=datetime.now(tz=UTC).date())
+    batch = Batch("batch-001", "SMALL-TABLE", quantity=20, eta=datetime.now(tz=UTC).date())
     line = OrderLine("order-ref", "SMALL-TABLE", 2)
 
     batch.allocate(line)
@@ -86,59 +86,59 @@ def test_can_allocate_iff_sufficient_quantity(
     assert result == (batch_qty >= line_qty)
 
 
-@given(sku=sku_text, ref=ref_text, qty=batch_qty, days=eta_days)
-def test_allocation_is_idempotent_with_hypothesis(sku: str, ref: str, qty: int, days: int | None) -> None:
-    batch = build_batch(ref, sku, qty, days)
+@given(sku=sku_text, ref=ref_text, quantity=batch_qty, days=eta_days)
+def test_allocation_is_idempotent_with_hypothesis(sku: str, ref: str, quantity: int, days: int | None) -> None:
+    batch = build_batch(ref, sku, quantity, days)
     line = OrderLine("order-1", sku, 1)
 
     batch.allocate(line)
     batch.allocate(line)
 
-    assert batch.available_quantity == qty - 1
+    assert batch.available_quantity == quantity - 1
 
 
 @given(
     sku=sku_text,
     other_sku=sku_text,
     ref=ref_text,
-    qty=batch_qty,
+    quantity=batch_qty,
     line_qty=line_qty,
     days=eta_days,
 )
 def test_cannot_allocate_if_skus_differ(
-    sku: str, other_sku: str, ref: str, qty: int, line_qty: int, days: int | None
+    sku: str, other_sku: str, ref: str, quantity: int, line_qty: int, days: int | None
 ) -> None:
     assume(sku != other_sku)
-    batch = build_batch(ref, sku, qty, days)
+    batch = build_batch(ref, sku, quantity, days)
     line = OrderLine("order-1", other_sku, line_qty)
 
     assert batch.can_allocate(line) is False
 
 
-@given(sku=sku_text, ref=ref_text, qty=batch_qty, days=eta_days)
-def test_available_quantity_never_exceeds_purchased(sku: str, ref: str, qty: int, days: int | None) -> None:
-    batch = build_batch(ref, sku, qty, days)
+@given(sku=sku_text, ref=ref_text, quantity=batch_qty, days=eta_days)
+def test_available_quantity_never_exceeds_purchased(sku: str, ref: str, quantity: int, days: int | None) -> None:
+    batch = build_batch(ref, sku, quantity, days)
     assert batch.available_quantity <= batch._purchased_quantity
 
 
 @given(
     sku=sku_text,
     ref=ref_text,
-    qty=batch_qty,
+    quantity=batch_qty,
     days_a=st.integers(min_value=1, max_value=100),
     days_b=st.integers(min_value=101, max_value=200),
 )
-def test_earlier_eta_batch_is_less_than_later(sku: str, ref: str, qty: int, days_a: int, days_b: int) -> None:
+def test_earlier_eta_batch_is_less_than_later(sku: str, ref: str, quantity: int, days_a: int, days_b: int) -> None:
     today = datetime.now(tz=UTC).date()
-    earlier = Batch(ref + "A", sku, qty, today + timedelta(days=days_a))
-    later = Batch(ref + "B", sku, qty, today + timedelta(days=days_b))
+    earlier = Batch(ref + "A", sku, quantity, today + timedelta(days=days_a))
+    later = Batch(ref + "B", sku, quantity, today + timedelta(days=days_b))
 
     assert earlier < later
 
 
-@given(sku=sku_text, ref=ref_text, qty=batch_qty)
-def test_in_stock_batch_is_never_greater_than_shipment(sku: str, ref: str, qty: int) -> None:
-    in_stock = Batch(ref + "S", sku, qty, eta=None)
-    shipment = Batch(ref + "P", sku, qty, eta=datetime.now(tz=UTC).date())
+@given(sku=sku_text, ref=ref_text, quantity=batch_qty)
+def test_in_stock_batch_is_never_greater_than_shipment(sku: str, ref: str, quantity: int) -> None:
+    in_stock = Batch(ref + "S", sku, quantity, eta=None)
+    shipment = Batch(ref + "P", sku, quantity, eta=datetime.now(tz=UTC).date())
 
     assert not (in_stock > shipment)

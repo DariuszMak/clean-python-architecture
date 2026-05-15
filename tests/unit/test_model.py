@@ -7,12 +7,12 @@ tomorrow = today + timedelta(days=1)
 
 
 def test_batch_repr() -> None:
-    batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=None)
+    batch = Batch("batch-001", "SMALL-TABLE", quantity=20, eta=None)
     assert repr(batch) == "<Batch batch-001>"
 
 
 def test_batch_eq_with_non_batch() -> None:
-    batch = Batch("batch-001", "SMALL-TABLE", qty=20, eta=None)
+    batch = Batch("batch-001", "SMALL-TABLE", quantity=20, eta=None)
     assert batch != "not-a-batch"
     assert batch != 42
     assert batch is not None

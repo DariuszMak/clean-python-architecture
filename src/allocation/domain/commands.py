@@ -13,18 +13,18 @@ class Command:
 class Allocate(Command):
     orderid: str
     sku: str
-    qty: int
+    quantity: int
 
 
 @dataclass
 class CreateBatch(Command):
     ref: str
     sku: str
-    qty: int
+    quantity: int
     eta: date | None = None
 
 
 @dataclass
 class ChangeBatchQuantity(Command):
     ref: str
-    qty: int
+    quantity: int

@@ -51,12 +51,12 @@ def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
         if product is None:
             product = Product(cmd.sku, batches=[])
             uow.products.add(product)
-        product.batches.append(Batch(cmd.ref, cmd.sku, cmd.qty, cmd.eta))
+        product.batches.append(Batch(cmd.ref, cmd.sku, cmd.quantity, cmd.eta))
         uow.commit()
 
 
 def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
-    line = OrderLine(cmd.orderid, cmd.sku, cmd.qty)
+    line = OrderLine(cmd.orderid, cmd.sku, cmd.quantity)
     with uow:
         product = uow.products.get(sku=line.sku)
         if product is None:
@@ -72,7 +72,7 @@ def reallocate(event: events.Deallocated, uow: AbstractUnitOfWork) -> None:
 def change_batch_quantity(cmd: ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:
     with uow:
         product = uow.products.get_by_batchref(batchref=cmd.ref)
-        product.change_batch_quantity(ref=cmd.ref, qty=cmd.qty)
+        product.change_batch_quantity(ref=cmd.ref, quantity=cmd.quantity)
         uow.commit()
 
 

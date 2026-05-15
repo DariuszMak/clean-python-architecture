@@ -15,8 +15,8 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     orderid, sku = random_orderid(), random_sku()
     earlier_batch, later_batch = random_batchref("old"), random_batchref("newer")
-    post_to_add_batch(earlier_batch, sku, qty=10, eta="2011-01-02")
-    post_to_add_batch(later_batch, sku, qty=10, eta="2011-01-03")
+    post_to_add_batch(earlier_batch, sku, quantity=10, eta="2011-01-02")
+    post_to_add_batch(later_batch, sku, quantity=10, eta="2011-01-03")
     r = post_to_allocate(orderid, sku, 10)
     assert r.ok
     response = get_allocation(orderid)
@@ -24,7 +24,7 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     subscription = subscribe_to("line_allocated")
 
-    publish_message("change_batch_quantity", {"batchref": earlier_batch, "qty": 5})
+    publish_message("change_batch_quantity", {"batchref": earlier_batch, "quantity": 5})
 
     messages = []
     for attempt in Retrying(stop=stop_after_delay(3), reraise=True):

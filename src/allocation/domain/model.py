@@ -29,33 +29,33 @@ class Product:
                 events.Allocated(
                     orderid=line.orderid,
                     sku=line.sku,
-                    qty=line.qty,
+                    quantity=line.quantity,
                     batchref=batch.reference,
                 )
             )
             return batch.reference
 
-    def change_batch_quantity(self, ref: str, qty: int) -> None:
+    def change_batch_quantity(self, ref: str, quantity: int) -> None:
         batch = next(b for b in self.batches if b.reference == ref)
-        batch._purchased_quantity = qty
+        batch._purchased_quantity = quantity
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
-            self.events.append(events.Deallocated(line.orderid, line.sku, line.qty))
+            self.events.append(events.Deallocated(line.orderid, line.sku, line.quantity))
 
 
 @dataclass(unsafe_hash=True)
 class OrderLine:
     orderid: str
     sku: str
-    qty: int
+    quantity: int
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, qty: int, eta: date | None) -> None:
+    def __init__(self, ref: str, sku: str, quantity: int, eta: date | None) -> None:
         self.reference = ref
         self.sku = sku
         self.eta = eta
-        self._purchased_quantity = qty
+        self._purchased_quantity = quantity
         self._allocations: set[OrderLine] = set()
 
     def __repr__(self) -> str:
@@ -85,11 +85,11 @@ class Batch:
 
     @property
     def allocated_quantity(self) -> int:
-        return sum(line.qty for line in self._allocations)
+        return sum(line.quantity for line in self._allocations)
 
     @property
     def available_quantity(self) -> int:
         return self._purchased_quantity - self.allocated_quantity
 
     def can_allocate(self, line: OrderLine) -> bool:
-        return self.sku == line.sku and self.available_quantity >= line.qty
+        return self.sku == line.sku and self.available_quantity >= line.quantity

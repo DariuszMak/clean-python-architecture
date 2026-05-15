@@ -43,7 +43,7 @@ def test_add_batch_returns_201(
         json={
             "ref": "b1",
             "sku": "SMALL-TABLE",
-            "qty": 10,
+            "quantity": 10,
             "eta": None,
         },
     )
@@ -68,7 +68,7 @@ def test_add_batch_with_eta(
         json={
             "ref": "b2",
             "sku": "LAMP",
-            "qty": 5,
+            "quantity": 5,
             "eta": eta_str,
         },
     )
@@ -88,7 +88,7 @@ def test_allocate_returns_202(
         json={
             "orderid": "o1",
             "sku": "SMALL-TABLE",
-            "qty": 3,
+            "quantity": 3,
         },
     )
 
@@ -110,7 +110,7 @@ def test_allocate_returns_400_on_invalid_sku(
         json={
             "orderid": "o1",
             "sku": "GHOST",
-            "qty": 3,
+            "quantity": 3,
         },
     )
 
@@ -201,7 +201,7 @@ def test_handle_change_batch_quantity(
 
     msg = _make_redis_message({
         "batchref": "b1",
-        "qty": 25,
+        "quantity": 25,
     })
 
     consumer.handle_change_batch_quantity(
@@ -214,7 +214,7 @@ def test_handle_change_batch_quantity(
     cmd = FAKE_BUS.handle.call_args[0][0]
 
     assert cmd.ref == "b1"
-    assert cmd.qty == 25
+    assert cmd.quantity == 25
 
 
 def test_main_subscribes_and_handles_messages(
@@ -230,7 +230,7 @@ def test_main_subscribes_and_handles_messages(
 
     msg = _make_redis_message({
         "batchref": "b2",
-        "qty": 50,
+        "quantity": 50,
     })
 
     fake_pubsub.listen.return_value = iter([msg])

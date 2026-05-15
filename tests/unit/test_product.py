@@ -60,7 +60,7 @@ def test_outputs_allocated_event() -> None:
     line = OrderLine("oref", "RETRO-LAMPSHADE", 10)
     product = Product(sku="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
-    expected = events.Allocated(orderid="oref", sku="RETRO-LAMPSHADE", qty=10, batchref=batch.reference)
+    expected = events.Allocated(orderid="oref", sku="RETRO-LAMPSHADE", quantity=10, batchref=batch.reference)
     assert product.events[-1] == expected
 
 
@@ -111,9 +111,9 @@ def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
     assert any(isinstance(e, events.OutOfStock) for e in product.events)
 
 
-@given(sku=sku_text, ref=ref_text, qty=pos_qty, days=eta_days)
-def test_version_number_increments_on_successful_allocation(sku: str, ref: str, qty: int, days: int | None) -> None:
-    batch = Batch(ref, sku, qty, make_eta(days))
+@given(sku=sku_text, ref=ref_text, quantity=pos_qty, days=eta_days)
+def test_version_number_increments_on_successful_allocation(sku: str, ref: str, quantity: int, days: int | None) -> None:
+    batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
     initial_version = product.version_number
     line = OrderLine("order-1", sku, 1)
@@ -123,12 +123,12 @@ def test_version_number_increments_on_successful_allocation(sku: str, ref: str, 
     assert product.version_number == initial_version + 1
 
 
-@given(sku=sku_text, ref=ref_text, qty=pos_qty, days=eta_days)
-def test_version_number_does_not_increment_on_out_of_stock(sku: str, ref: str, qty: int, days: int | None) -> None:
-    batch = Batch(ref, sku, qty, make_eta(days))
+@given(sku=sku_text, ref=ref_text, quantity=pos_qty, days=eta_days)
+def test_version_number_does_not_increment_on_out_of_stock(sku: str, ref: str, quantity: int, days: int | None) -> None:
+    batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
     initial_version = product.version_number
-    line = OrderLine("order-1", sku, qty + 1)
+    line = OrderLine("order-1", sku, quantity + 1)
 
     product.allocate(line)
 
@@ -139,14 +139,14 @@ def test_version_number_does_not_increment_on_out_of_stock(sku: str, ref: str, q
     sku=sku_text,
     ref1=ref_text,
     ref2=ref_text,
-    qty=pos_qty,
+    quantity=pos_qty,
     days_early=st.integers(min_value=1, max_value=100),
     days_late=st.integers(min_value=101, max_value=200),
 )
-def test_prefers_earlier_batch(sku: str, ref1: str, ref2: str, qty: int, days_early: int, days_late: int) -> None:
+def test_prefers_earlier_batch(sku: str, ref1: str, ref2: str, quantity: int, days_early: int, days_late: int) -> None:
     assume(ref1 != ref2)
-    early_batch = Batch(ref1, sku, qty, today + timedelta(days=days_early))
-    late_batch = Batch(ref2, sku, qty, today + timedelta(days=days_late))
+    early_batch = Batch(ref1, sku, quantity, today + timedelta(days=days_early))
+    late_batch = Batch(ref2, sku, quantity, today + timedelta(days=days_late))
     product = Product(sku=sku, batches=[late_batch, early_batch])
     line = OrderLine("order-1", sku, 1)
 
@@ -155,12 +155,12 @@ def test_prefers_earlier_batch(sku: str, ref1: str, ref2: str, qty: int, days_ea
     assert result == ref1
 
 
-@given(sku=sku_text, ref1=ref_text, ref2=ref_text, qty=pos_qty, days=eta_days)
-def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, qty: int, days: int | None) -> None:
+@given(sku=sku_text, ref1=ref_text, ref2=ref_text, quantity=pos_qty, days=eta_days)
+def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, quantity: int, days: int | None) -> None:
     assume(ref1 != ref2)
     assume(days is not None)
-    in_stock = Batch(ref1, sku, qty, eta=None)
-    shipment = Batch(ref2, sku, qty, make_eta(days))
+    in_stock = Batch(ref1, sku, quantity, eta=None)
+    shipment = Batch(ref2, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[shipment, in_stock])
     line = OrderLine("order-1", sku, 1)
 
@@ -169,10 +169,10 @@ def test_prefers_in_stock_over_shipment(sku: str, ref1: str, ref2: str, qty: int
     assert result == ref1
 
 
-@given(sku=sku_text, ref=ref_text, qty=pos_qty, line_qty=pos_qty, days=eta_days)
-def test_allocated_event_has_correct_fields(sku: str, ref: str, qty: int, line_qty: int, days: int | None) -> None:
-    assume(qty >= line_qty)
-    batch = Batch(ref, sku, qty, make_eta(days))
+@given(sku=sku_text, ref=ref_text, quantity=pos_qty, line_qty=pos_qty, days=eta_days)
+def test_allocated_event_has_correct_fields(sku: str, ref: str, quantity: int, line_qty: int, days: int | None) -> None:
+    assume(quantity >= line_qty)
+    batch = Batch(ref, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
     line = OrderLine("order-1", sku, line_qty)
 
@@ -183,7 +183,7 @@ def test_allocated_event_has_correct_fields(sku: str, ref: str, qty: int, line_q
     ev = allocated_events[0]
     assert ev.orderid == "order-1"
     assert ev.sku == sku
-    assert ev.qty == line_qty
+    assert ev.quantity == line_qty
     assert ev.batchref == ref
 
 

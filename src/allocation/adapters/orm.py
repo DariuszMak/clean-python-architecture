@@ -16,7 +16,7 @@ order_lines = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("sku", String(255)),
-    Column("qty", Integer, nullable=False),
+    Column("quantity", Integer, nullable=False),
     Column("orderid", String(255)),
 )
 

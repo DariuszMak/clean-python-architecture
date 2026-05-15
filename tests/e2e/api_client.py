@@ -8,11 +8,11 @@ from allocation import config
 TIMEOUT: int = 5
 
 
-def post_to_add_batch(ref: Any, sku: Any, qty: Any, eta: Any) -> None:
+def post_to_add_batch(ref: Any, sku: Any, quantity: Any, eta: Any) -> None:
     url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",
-        json={"ref": ref, "sku": sku, "qty": qty, "eta": eta},
+        json={"ref": ref, "sku": sku, "quantity": quantity, "eta": eta},
         timeout=TIMEOUT,
     )
     assert r.status_code == 201
@@ -21,7 +21,7 @@ def post_to_add_batch(ref: Any, sku: Any, qty: Any, eta: Any) -> None:
 def post_to_allocate(
     orderid: Any,
     sku: Any,
-    qty: Any,
+    quantity: Any,
     expect_success: bool = True,
 ) -> Response:
     url: str = config.get_api_url()
@@ -30,7 +30,7 @@ def post_to_allocate(
         json={
             "orderid": orderid,
             "sku": sku,
-            "qty": qty,
+            "quantity": quantity,
         },
         timeout=TIMEOUT,
     )

@@ -19,7 +19,7 @@ def insert_batch(
     session: Session,
     ref: str,
     sku: str,
-    qty: int,
+    quantity: int,
     eta: Any,
     product_version: int = 1,
 ) -> None:
@@ -28,8 +28,8 @@ def insert_batch(
         {"sku": sku, "version": product_version},
     )
     session.execute(
-        text("INSERT INTO batches (reference, sku, _purchased_quantity, eta) VALUES (:ref, :sku, :qty, :eta)"),
-        {"ref": ref, "sku": sku, "qty": qty, "eta": eta},
+        text("INSERT INTO batches (reference, sku, _purchased_quantity, eta) VALUES (:ref, :sku, :quantity, :eta)"),
+        {"ref": ref, "sku": sku, "quantity": quantity, "eta": eta},
     )
 
 

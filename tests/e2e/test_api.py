@@ -17,7 +17,7 @@ def test_happy_path_returns_202_and_batch_is_allocated() -> None:
     post_to_add_batch(earlybatch, sku, 100, "2011-01-01")
     post_to_add_batch(otherbatch, othersku, 100, None)
 
-    r = post_to_allocate(orderid, sku, qty=3)
+    r = post_to_allocate(orderid, sku, quantity=3)
     assert r.status_code == 202
 
     r = get_allocation(orderid)
@@ -35,7 +35,7 @@ def test_unhappy_path_returns_400_and_error_message() -> None:
     r = post_to_allocate(
         orderid,
         unknown_sku,
-        qty=20,
+        quantity=20,
         expect_success=False,
     )
     assert r.status_code == 400
