@@ -60,7 +60,9 @@ def test_outputs_allocated_event() -> None:
     line = OrderLine("oreference", "RETRO-LAMPSHADE", 10)
     product = Product(sku="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
-    expected = events.Allocated(orderid="oreference", sku="RETRO-LAMPSHADE", quantity=10, batchreference=batch.referenceerence)
+    expected = events.Allocated(
+        orderid="oreference", sku="RETRO-LAMPSHADE", quantity=10, batchreference=batch.referenceerence
+    )
     assert product.events[-1] == expected
 
 
@@ -82,7 +84,9 @@ def test_increments_version_number() -> None:
     assert product.version_number == 8
 
 
-@given(sku=sku_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
+@given(
+    sku=sku_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days
+)
 def test_allocate_returns_batchreference_when_sufficient_stock(
     sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
@@ -96,7 +100,9 @@ def test_allocate_returns_batchreference_when_sufficient_stock(
     assert result == referenceerence
 
 
-@given(sku=sku_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days)
+@given(
+    sku=sku_text, referenceerence=reference_text, batch_quantity=pos_quantity, line_quantity=pos_quantity, days=eta_days
+)
 def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
     sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
@@ -126,7 +132,9 @@ def test_version_number_increments_on_successful_allocation(
 
 
 @given(sku=sku_text, referenceerence=reference_text, quantity=pos_quantity, days=eta_days)
-def test_version_number_does_not_increment_on_out_of_stock(sku: str, referenceerence: str, quantity: int, days: int | None) -> None:
+def test_version_number_does_not_increment_on_out_of_stock(
+    sku: str, referenceerence: str, quantity: int, days: int | None
+) -> None:
     batch = Batch(referenceerence, sku, quantity, make_eta(days))
     product = Product(sku=sku, batches=[batch])
     initial_version = product.version_number
@@ -145,7 +153,9 @@ def test_version_number_does_not_increment_on_out_of_stock(sku: str, referenceer
     days_early=st.integers(min_value=1, max_value=100),
     days_late=st.integers(min_value=101, max_value=200),
 )
-def test_preferenceers_earlier_batch(sku: str, reference1: str, reference2: str, quantity: int, days_early: int, days_late: int) -> None:
+def test_preferenceers_earlier_batch(
+    sku: str, reference1: str, reference2: str, quantity: int, days_early: int, days_late: int
+) -> None:
     assume(reference1 != reference2)
     early_batch = Batch(reference1, sku, quantity, today + timedelta(days=days_early))
     late_batch = Batch(reference2, sku, quantity, today + timedelta(days=days_late))
@@ -158,7 +168,9 @@ def test_preferenceers_earlier_batch(sku: str, reference1: str, reference2: str,
 
 
 @given(sku=sku_text, reference1=reference_text, reference2=reference_text, quantity=pos_quantity, days=eta_days)
-def test_preferenceers_in_stock_over_shipment(sku: str, reference1: str, reference2: str, quantity: int, days: int | None) -> None:
+def test_preferenceers_in_stock_over_shipment(
+    sku: str, reference1: str, reference2: str, quantity: int, days: int | None
+) -> None:
     assume(reference1 != reference2)
     assume(days is not None)
     in_stock = Batch(reference1, sku, quantity, eta=None)

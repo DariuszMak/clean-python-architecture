@@ -28,7 +28,9 @@ def insert_batch(
         {"sku": sku, "version": product_version},
     )
     session.execute(
-        text("INSERT INTO batches (referenceerence, sku, _purchased_quantity, eta) VALUES (:referenceerence, :sku, :quantity, :eta)"),
+        text(
+            "INSERT INTO batches (referenceerence, sku, _purchased_quantity, eta) VALUES (:referenceerence, :sku, :quantity, :eta)"
+        ),
         {"referenceerence": referenceerence, "sku": sku, "quantity": quantity, "eta": eta},
     )
 

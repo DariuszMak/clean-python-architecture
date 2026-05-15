@@ -99,7 +99,9 @@ def add_allocation_to_read_model(
 ) -> None:
     with uow:
         uow.session.execute(
-            text("INSERT INTO allocations_view (orderid, sku, batchreference) VALUES (:orderid, :sku, :batchreference)"),
+            text(
+                "INSERT INTO allocations_view (orderid, sku, batchreference) VALUES (:orderid, :sku, :batchreference)"
+            ),
             {"orderid": event.orderid, "sku": event.sku, "batchreference": event.batchreference},
         )
         uow.commit()

@@ -61,7 +61,13 @@ def test_allocation_is_idempotent() -> None:
     assert batch.available_quantity == 18
 
 
-@given(sku=sku_text, referenceerence=reference_text, batch_quantity=batch_quantity, line_quantity=line_quantity, days=eta_days)
+@given(
+    sku=sku_text,
+    referenceerence=reference_text,
+    batch_quantity=batch_quantity,
+    line_quantity=line_quantity,
+    days=eta_days,
+)
 def test_allocating_reduces_available_quantity(
     sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
@@ -74,7 +80,13 @@ def test_allocating_reduces_available_quantity(
     assert batch.available_quantity == batch_quantity - line_quantity
 
 
-@given(sku=sku_text, referenceerence=reference_text, batch_quantity=batch_quantity, line_quantity=line_quantity, days=eta_days)
+@given(
+    sku=sku_text,
+    referenceerence=reference_text,
+    batch_quantity=batch_quantity,
+    line_quantity=line_quantity,
+    days=eta_days,
+)
 def test_can_allocate_iff_sufficient_quantity(
     sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
@@ -87,7 +99,9 @@ def test_can_allocate_iff_sufficient_quantity(
 
 
 @given(sku=sku_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
-def test_allocation_is_idempotent_with_hypothesis(sku: str, referenceerence: str, quantity: int, days: int | None) -> None:
+def test_allocation_is_idempotent_with_hypothesis(
+    sku: str, referenceerence: str, quantity: int, days: int | None
+) -> None:
     batch = build_batch(referenceerence, sku, quantity, days)
     line = OrderLine("order-1", sku, 1)
 
@@ -116,7 +130,9 @@ def test_cannot_allocate_if_skus_differ(
 
 
 @given(sku=sku_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
-def test_available_quantity_never_exceeds_purchased(sku: str, referenceerence: str, quantity: int, days: int | None) -> None:
+def test_available_quantity_never_exceeds_purchased(
+    sku: str, referenceerence: str, quantity: int, days: int | None
+) -> None:
     batch = build_batch(referenceerence, sku, quantity, days)
     assert batch.available_quantity <= batch._purchased_quantity
 
@@ -128,7 +144,9 @@ def test_available_quantity_never_exceeds_purchased(sku: str, referenceerence: s
     days_a=st.integers(min_value=1, max_value=100),
     days_b=st.integers(min_value=101, max_value=200),
 )
-def test_earlier_eta_batch_is_less_than_later(sku: str, referenceerence: str, quantity: int, days_a: int, days_b: int) -> None:
+def test_earlier_eta_batch_is_less_than_later(
+    sku: str, referenceerence: str, quantity: int, days_a: int, days_b: int
+) -> None:
     today = datetime.now(tz=UTC).date()
     earlier = Batch(referenceerence + "A", sku, quantity, today + timedelta(days=days_a))
     later = Batch(referenceerence + "B", sku, quantity, today + timedelta(days=days_b))
