@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from sqlalchemy.sql.elements import TextClause
 
 
-class InvalidSkuError(Exception):
+class InvalidStockKeepingUnitError(Exception):
     pass
 
 
@@ -60,7 +60,7 @@ def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
     with uow:
         product = uow.products.get(stock_keeping_unit=line.stock_keeping_unit)
         if product is None:
-            raise InvalidSkuError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
+            raise InvalidStockKeepingUnitError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
         product.allocate(line)
         uow.commit()
 
