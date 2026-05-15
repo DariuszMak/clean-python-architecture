@@ -19,20 +19,20 @@ def test_batch_eq_with_non_batch() -> None:
 
 
 def test_batch_gt_self_has_no_eta() -> None:
-    no_eta = Batch("b1", "SKU", 10, eta=None)
-    with_eta = Batch("b2", "SKU", 10, eta=tomorrow)
+    no_eta = Batch("b1", "STOCKKEEPINGUNIT", 10, eta=None)
+    with_eta = Batch("b2", "STOCKKEEPINGUNIT", 10, eta=tomorrow)
     assert not (no_eta > with_eta)
     assert not (no_eta > no_eta)
 
 
 def test_batch_gt_other_has_no_eta() -> None:
-    with_eta = Batch("b1", "SKU", 10, eta=tomorrow)
-    no_eta = Batch("b2", "SKU", 10, eta=None)
+    with_eta = Batch("b1", "STOCKKEEPINGUNIT", 10, eta=tomorrow)
+    no_eta = Batch("b2", "STOCKKEEPINGUNIT", 10, eta=None)
     assert with_eta > no_eta
 
 
 def test_batch_gt_both_have_eta() -> None:
-    earlier = Batch("b1", "SKU", 10, eta=today)
-    later = Batch("b2", "SKU", 10, eta=tomorrow)
+    earlier = Batch("b1", "STOCKKEEPINGUNIT", 10, eta=today)
+    later = Batch("b2", "STOCKKEEPINGUNIT", 10, eta=tomorrow)
     assert later > earlier
     assert not (earlier > later)

@@ -122,10 +122,10 @@ class TestAllocate:
 
     def test_errors_for_invalid_stock_keeping_unit(self) -> None:
         bus = bootstrap_test_app()
-        bus.handle(CreateBatch("b1", "AREALSKU", 100, None))
+        bus.handle(CreateBatch("b1", "AREALSTOCKKEEPINGUNIT", 100, None))
 
-        with pytest.raises(InvalidStockKeepingUnitError, match="Invalid stock_keeping_unit NONEXISTENTSKU"):
-            bus.handle(Allocate("o1", "NONEXISTENTSKU", 10))
+        with pytest.raises(InvalidStockKeepingUnitError, match="Invalid stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"):
+            bus.handle(Allocate("o1", "NONEXISTENTSTOCKKEEPINGUNIT", 10))
 
     def test_commits(self) -> None:
         bus = bootstrap_test_app()
