@@ -1,3 +1,4 @@
+from tests.unit.test_handlers import FakeUnitOfWork
 from unittest import mock
 
 from allocation.bootstrap import bootstrap
@@ -29,7 +30,6 @@ def test_bootstrap_creates_default_uow_when_none_given() -> None:
 
 
 def test_bootstrap_creates_default_notifications_when_none_given() -> None:
-    from tests.unit.test_handlers import FakeUnitOfWork
 
     with mock.patch("allocation.bootstrap.EmailNotifications") as mock_notif:
         mock_notif_instance = mock.MagicMock()
