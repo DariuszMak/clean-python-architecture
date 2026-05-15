@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from allocation import config
-from allocation.adapters.orm import metadata, start_mappers
+from allocation.adapters.orm.orm import metadata, start_mappers
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
