@@ -22,7 +22,7 @@ def add_batch() -> tuple[Response, int]:
         eta = datetime.fromisoformat(eta).date()
 
     cmd = CreateBatch(
-        request.json["ref"],
+        request.json["referenceerence"],
         request.json["sku"],
         request.json["quantity"],
         eta,

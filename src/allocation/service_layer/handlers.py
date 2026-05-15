@@ -22,7 +22,7 @@ class InvalidSkuError(Exception):
 class ProductsRepository(Protocol):
     def get(self, sku: str) -> Product | None: ...
     def add(self, product: Product) -> None: ...
-    def get_by_batchref(self, batchref: str) -> Product: ...
+    def get_by_batchreference(self, batchreference: str) -> Product: ...
 
 
 class AbstractUnitOfWork(Protocol):
@@ -51,7 +51,7 @@ def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
         if product is None:
             product = Product(cmd.sku, batches=[])
             uow.products.add(product)
-        product.batches.append(Batch(cmd.ref, cmd.sku, cmd.quantity, cmd.eta))
+        product.batches.append(Batch(cmd.referenceerence, cmd.sku, cmd.quantity, cmd.eta))
         uow.commit()
 
 
@@ -71,8 +71,8 @@ def reallocate(event: events.Deallocated, uow: AbstractUnitOfWork) -> None:
 
 def change_batch_quantity(cmd: ChangeBatchQuantity, uow: AbstractUnitOfWork) -> None:
     with uow:
-        product = uow.products.get_by_batchref(batchref=cmd.ref)
-        product.change_batch_quantity(ref=cmd.ref, quantity=cmd.quantity)
+        product = uow.products.get_by_batchreference(batchreference=cmd.referenceerence)
+        product.change_batch_quantity(referenceerence=cmd.referenceerence, quantity=cmd.quantity)
         uow.commit()
 
 
@@ -99,8 +99,8 @@ def add_allocation_to_read_model(
 ) -> None:
     with uow:
         uow.session.execute(
-            text("INSERT INTO allocations_view (orderid, sku, batchref) VALUES (:orderid, :sku, :batchref)"),
-            {"orderid": event.orderid, "sku": event.sku, "batchref": event.batchref},
+            text("INSERT INTO allocations_view (orderid, sku, batchreference) VALUES (:orderid, :sku, :batchreference)"),
+            {"orderid": event.orderid, "sku": event.sku, "batchreference": event.batchreference},
         )
         uow.commit()
 

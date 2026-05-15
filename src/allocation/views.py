@@ -10,7 +10,7 @@ def allocations(orderid: str, uow: SqlAlchemyUnitOfWork) -> list[dict[str, str]]
     with uow:
         results = list(
             uow.session.execute(
-                text("SELECT sku, batchref FROM allocations_view WHERE orderid = :orderid"),
+                text("SELECT sku, batchreference FROM allocations_view WHERE orderid = :orderid"),
                 {"orderid": orderid},
             )
         )

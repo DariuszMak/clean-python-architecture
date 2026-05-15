@@ -1,7 +1,7 @@
 import pytest
 
 from tests.e2e.api_client import get_allocation, post_to_add_batch, post_to_allocate
-from tests.random_refs import random_batchref, random_orderid, random_sku
+from tests.random_references import random_batchreference, random_orderid, random_sku
 
 
 @pytest.mark.usefixtures("postgres_db")
@@ -9,9 +9,9 @@ from tests.random_refs import random_batchref, random_orderid, random_sku
 def test_happy_path_returns_202_and_batch_is_allocated() -> None:
     orderid = random_orderid()
     sku, othersku = random_sku(), random_sku("other")
-    earlybatch = random_batchref("1")
-    laterbatch = random_batchref("2")
-    otherbatch = random_batchref("3")
+    earlybatch = random_batchreference("1")
+    laterbatch = random_batchreference("2")
+    otherbatch = random_batchreference("3")
 
     post_to_add_batch(laterbatch, sku, 100, "2011-01-02")
     post_to_add_batch(earlybatch, sku, 100, "2011-01-01")
@@ -23,7 +23,7 @@ def test_happy_path_returns_202_and_batch_is_allocated() -> None:
     r = get_allocation(orderid)
     assert r.ok
     assert r.json() == [
-        {"sku": sku, "batchref": earlybatch},
+        {"sku": sku, "batchreference": earlybatch},
     ]
 
 

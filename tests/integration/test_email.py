@@ -9,7 +9,7 @@ from allocation.adapters import notifications
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import Allocate, CreateBatch
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from tests.random_refs import random_sku
+from tests.random_references import random_sku
 
 
 @pytest.fixture

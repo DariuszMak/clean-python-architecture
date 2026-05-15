@@ -41,7 +41,7 @@ def test_add_batch_returns_201(
     resp = client.post(
         "/add_batch",
         json={
-            "ref": "b1",
+            "referenceerence": "b1",
             "sku": "SMALL-TABLE",
             "quantity": 10,
             "eta": None,
@@ -66,7 +66,7 @@ def test_add_batch_with_eta(
     resp = client.post(
         "/add_batch",
         json={
-            "ref": "b2",
+            "referenceerence": "b2",
             "sku": "LAMP",
             "quantity": 5,
             "eta": eta_str,
@@ -133,7 +133,7 @@ def test_allocations_view_returns_200(
         return_value=[
             {
                 "sku": "SMALL-TABLE",
-                "batchref": "b1",
+                "batchreference": "b1",
             }
         ],
     ):
@@ -143,7 +143,7 @@ def test_allocations_view_returns_200(
     assert resp.get_json() == [
         {
             "sku": "SMALL-TABLE",
-            "batchref": "b1",
+            "batchreference": "b1",
         }
     ]
 
@@ -200,7 +200,7 @@ def test_handle_change_batch_quantity(
     FAKE_BUS.reset_mock()
 
     msg = _make_redis_message({
-        "batchref": "b1",
+        "batchreference": "b1",
         "quantity": 25,
     })
 
@@ -213,7 +213,7 @@ def test_handle_change_batch_quantity(
 
     cmd = FAKE_BUS.handle.call_args[0][0]
 
-    assert cmd.ref == "b1"
+    assert cmd.referenceerence == "b1"
     assert cmd.quantity == 25
 
 
@@ -229,7 +229,7 @@ def test_main_subscribes_and_handles_messages(
     fake_redis_instance.pubsub.return_value = fake_pubsub
 
     msg = _make_redis_message({
-        "batchref": "b2",
+        "batchreference": "b2",
         "quantity": 50,
     })
 

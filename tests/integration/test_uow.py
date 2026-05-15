@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from allocation.domain.model import OrderLine
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from tests.random_refs import random_batchref, random_orderid, random_sku
+from tests.random_references import random_batchreference, random_orderid, random_sku
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.usefixtures("mappers")
 
 def insert_batch(
     session: Session,
-    ref: str,
+    referenceerence: str,
     sku: str,
     quantity: int,
     eta: Any,
@@ -28,23 +28,23 @@ def insert_batch(
         {"sku": sku, "version": product_version},
     )
     session.execute(
-        text("INSERT INTO batches (reference, sku, _purchased_quantity, eta) VALUES (:ref, :sku, :quantity, :eta)"),
-        {"ref": ref, "sku": sku, "quantity": quantity, "eta": eta},
+        text("INSERT INTO batches (referenceerence, sku, _purchased_quantity, eta) VALUES (:referenceerence, :sku, :quantity, :eta)"),
+        {"referenceerence": referenceerence, "sku": sku, "quantity": quantity, "eta": eta},
     )
 
 
-def get_allocated_batch_ref(session: Session, orderid: str, sku: str) -> str:
+def get_allocated_batch_reference(session: Session, orderid: str, sku: str) -> str:
     [[orderlineid]] = session.execute(
         text("SELECT id FROM order_lines WHERE orderid=:orderid AND sku=:sku"),
         {"orderid": orderid, "sku": sku},
     )
-    [[batchref]] = session.execute(
+    [[batchreference]] = session.execute(
         text(
-            "SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderlineid"
+            "SELECT b.referenceerence FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderlineid"
         ),
         {"orderlineid": orderlineid},
     )
-    return str(batchref)
+    return str(batchreference)
 
 
 def test_uow_can_retrieve_a_batch_and_allocate_to_it(
@@ -61,8 +61,8 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
         product.allocate(line)
         uow.commit()
 
-    batchref = get_allocated_batch_ref(session, "o1", "HIPSTER-WORKBENCH")
-    assert batchref == "batch1"
+    batchreference = get_allocated_batch_reference(session, "o1", "HIPSTER-WORKBENCH")
+    assert batchreference == "batch1"
 
 
 def test_rolls_back_uncommitted_work_by_default(
@@ -116,7 +116,7 @@ def try_to_allocate(
 def test_concurrent_updates_to_version_are_not_allowed(
     postgres_session_factory: sessionmaker[Session],
 ) -> None:
-    sku, batch = random_sku(), random_batchref()
+    sku, batch = random_sku(), random_batchreference()
     session = postgres_session_factory()
     insert_batch(session, batch, sku, 100, eta=None, product_version=1)
     session.commit()

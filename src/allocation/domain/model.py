@@ -30,13 +30,13 @@ class Product:
                     orderid=line.orderid,
                     sku=line.sku,
                     quantity=line.quantity,
-                    batchref=batch.reference,
+                    batchreference=batch.referenceerence,
                 )
             )
-            return batch.reference
+            return batch.referenceerence
 
-    def change_batch_quantity(self, ref: str, quantity: int) -> None:
-        batch = next(b for b in self.batches if b.reference == ref)
+    def change_batch_quantity(self, referenceerence: str, quantity: int) -> None:
+        batch = next(b for b in self.batches if b.referenceerence == referenceerence)
         batch._purchased_quantity = quantity
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
@@ -51,23 +51,23 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, quantity: int, eta: date | None) -> None:
-        self.reference = ref
+    def __init__(self, referenceerence: str, sku: str, quantity: int, eta: date | None) -> None:
+        self.referenceerence = referenceerence
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = quantity
         self._allocations: set[OrderLine] = set()
 
     def __repr__(self) -> str:
-        return f"<Batch {self.reference}>"
+        return f"<Batch {self.referenceerence}>"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Batch):
             return False
-        return other.reference == self.reference
+        return other.referenceerence == self.referenceerence
 
     def __hash__(self) -> int:
-        return hash(self.reference)
+        return hash(self.referenceerence)
 
     def __gt__(self, other: Batch) -> bool:
         if self.eta is None:

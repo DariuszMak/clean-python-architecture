@@ -13,8 +13,8 @@ class BareRepository(AbstractRepository):  # type: ignore[misc]
     def _get(self, sku: str) -> Any:
         return super()._get(sku)
 
-    def _get_by_batchref(self, batchref: str) -> Any:
-        return super()._get_by_batchref(batchref)
+    def _get_by_batchreference(self, batchreference: str) -> Any:
+        return super()._get_by_batchreference(batchreference)
 
 
 def test_abstract_repository_add_raises() -> None:
@@ -29,10 +29,10 @@ def test_abstract_repository_get_raises() -> None:
         repo._get("any-sku")
 
 
-def test_abstract_repository_get_by_batchref_raises() -> None:
+def test_abstract_repository_get_by_batchreference_raises() -> None:
     repo = BareRepository()
     with pytest.raises(NotImplementedError):
-        repo._get_by_batchref("any-ref")
+        repo._get_by_batchreference("any-referenceerence")
 
 
 class BareUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]

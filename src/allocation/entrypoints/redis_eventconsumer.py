@@ -37,7 +37,7 @@ def handle_change_batch_quantity(m: RedisMessage, bus: Any) -> None:
     logger.info("handling %s", m)
     data: dict[str, Any] = json.loads(m["data"])
     cmd: ChangeBatchQuantity = ChangeBatchQuantity(
-        ref=data["batchref"],
+        referenceerence=data["batchreference"],
         quantity=data["quantity"],
     )
     bus.handle(cmd)

@@ -43,8 +43,8 @@ def test_allocations_view(sqlite_bus: MessageBus) -> None:
         "order1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
     ) == [
-        {"sku": "sku1", "batchref": "sku1batch"},
-        {"sku": "sku2", "batchref": "sku2batch"},
+        {"sku": "sku1", "batchreference": "sku1batch"},
+        {"sku": "sku2", "batchreference": "sku2batch"},
     ]
 
 
@@ -58,5 +58,5 @@ def test_deallocation(sqlite_bus: MessageBus) -> None:
         "o1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
     ) == [
-        {"sku": "sku1", "batchref": "b2"},
+        {"sku": "sku1", "batchreference": "b2"},
     ]

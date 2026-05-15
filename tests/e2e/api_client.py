@@ -8,11 +8,11 @@ from allocation import config
 TIMEOUT: int = 5
 
 
-def post_to_add_batch(ref: Any, sku: Any, quantity: Any, eta: Any) -> None:
+def post_to_add_batch(referenceerence: Any, sku: Any, quantity: Any, eta: Any) -> None:
     url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",
-        json={"ref": ref, "sku": sku, "quantity": quantity, "eta": eta},
+        json={"referenceerence": referenceerence, "sku": sku, "quantity": quantity, "eta": eta},
         timeout=TIMEOUT,
     )
     assert r.status_code == 201

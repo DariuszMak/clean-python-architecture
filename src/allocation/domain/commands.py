@@ -18,7 +18,7 @@ class Allocate(Command):
 
 @dataclass
 class CreateBatch(Command):
-    ref: str
+    referenceerence: str
     sku: str
     quantity: int
     eta: date | None = None
@@ -26,5 +26,5 @@ class CreateBatch(Command):
 
 @dataclass
 class ChangeBatchQuantity(Command):
-    ref: str
+    referenceerence: str
     quantity: int
