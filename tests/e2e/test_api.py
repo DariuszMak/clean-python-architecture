@@ -1,45 +1,45 @@
 import pytest
 
 from tests.e2e.api_client import get_allocation, post_to_add_batch, post_to_allocate
-from tests.random_references import random_batchreference, random_orderid, random_sku
+from tests.random_references import random_batchreference, random_orderid, random_stock_keeping_unit
 
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
 def test_happy_path_returns_202_and_batch_is_allocated() -> None:
     orderid = random_orderid()
-    sku, othersku = random_sku(), random_sku("other")
+    stock_keeping_unit, otherstock_keeping_unit = random_stock_keeping_unit(), random_stock_keeping_unit("other")
     earlybatch = random_batchreference("1")
     laterbatch = random_batchreference("2")
     otherbatch = random_batchreference("3")
 
-    post_to_add_batch(laterbatch, sku, 100, "2011-01-02")
-    post_to_add_batch(earlybatch, sku, 100, "2011-01-01")
-    post_to_add_batch(otherbatch, othersku, 100, None)
+    post_to_add_batch(laterbatch, stock_keeping_unit, 100, "2011-01-02")
+    post_to_add_batch(earlybatch, stock_keeping_unit, 100, "2011-01-01")
+    post_to_add_batch(otherbatch, otherstock_keeping_unit, 100, None)
 
-    r = post_to_allocate(orderid, sku, quantity=3)
+    r = post_to_allocate(orderid, stock_keeping_unit, quantity=3)
     assert r.status_code == 202
 
     r = get_allocation(orderid)
     assert r.ok
     assert r.json() == [
-        {"sku": sku, "batchreference": earlybatch},
+        {"stock_keeping_unit": stock_keeping_unit, "batchreference": earlybatch},
     ]
 
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
 def test_unhappy_path_returns_400_and_error_message() -> None:
-    unknown_sku, orderid = random_sku(), random_orderid()
+    unknown_stock_keeping_unit, orderid = random_stock_keeping_unit(), random_orderid()
 
     r = post_to_allocate(
         orderid,
-        unknown_sku,
+        unknown_stock_keeping_unit,
         quantity=20,
         expect_success=False,
     )
     assert r.status_code == 400
-    assert r.json()["message"] == f"Invalid sku {unknown_sku}"
+    assert r.json()["message"] == f"Invalid stock_keeping_unit {unknown_stock_keeping_unit}"
 
     r = get_allocation(orderid)
     assert r.status_code == 404

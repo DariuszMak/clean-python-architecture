@@ -15,7 +15,7 @@ order_lines = Table(
     "order_lines",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("sku", String(255)),
+    Column("stock_keeping_unit", String(255)),
     Column("quantity", Integer, nullable=False),
     Column("orderid", String(255)),
 )
@@ -23,7 +23,7 @@ order_lines = Table(
 products = Table(
     "products",
     metadata,
-    Column("sku", String(255), primary_key=True),
+    Column("stock_keeping_unit", String(255), primary_key=True),
     Column("version_number", Integer, nullable=False, server_default="0"),
 )
 
@@ -32,7 +32,7 @@ batches = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("referenceerence", String(255)),
-    Column("sku", ForeignKey("products.sku")),
+    Column("stock_keeping_unit", ForeignKey("products.stock_keeping_unit")),
     Column("_purchased_quantity", Integer, nullable=False),
     Column("eta", Date, nullable=True),
 )
@@ -49,7 +49,7 @@ allocations_view = Table(
     "allocations_view",
     metadata,
     Column("orderid", String(255)),
-    Column("sku", String(255)),
+    Column("stock_keeping_unit", String(255)),
     Column("batchreference", String(255)),
 )
 

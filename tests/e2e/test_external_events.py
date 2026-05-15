@@ -5,7 +5,7 @@ from tenacity import Retrying, stop_after_delay
 
 from tests.e2e.api_client import get_allocation, post_to_add_batch, post_to_allocate
 from tests.e2e.redis_client import publish_message, subscribe_to
-from tests.random_references import random_batchreference, random_orderid, random_sku
+from tests.random_references import random_batchreference, random_orderid, random_stock_keeping_unit
 
 
 @pytest.mark.usefixtures("postgres_db")
@@ -13,11 +13,11 @@ from tests.random_references import random_batchreference, random_orderid, rando
 @pytest.mark.usefixtures("restart_redis_pubsub")
 def test_change_batch_quantity_leading_to_reallocation() -> None:
 
-    orderid, sku = random_orderid(), random_sku()
+    orderid, stock_keeping_unit = random_orderid(), random_stock_keeping_unit()
     earlier_batch, later_batch = random_batchreference("old"), random_batchreference("newer")
-    post_to_add_batch(earlier_batch, sku, quantity=10, eta="2011-01-02")
-    post_to_add_batch(later_batch, sku, quantity=10, eta="2011-01-03")
-    r = post_to_allocate(orderid, sku, 10)
+    post_to_add_batch(earlier_batch, stock_keeping_unit, quantity=10, eta="2011-01-02")
+    post_to_add_batch(later_batch, stock_keeping_unit, quantity=10, eta="2011-01-03")
+    r = post_to_allocate(orderid, stock_keeping_unit, 10)
     assert r.ok
     response = get_allocation(orderid)
     assert response.json()[0]["batchreference"] == earlier_batch

@@ -7,14 +7,14 @@ from allocation.domain.model import Batch, OrderLine
 
 batch_quantity = st.integers(min_value=1, max_value=10_000)
 line_quantity = st.integers(min_value=1, max_value=10_000)
-sku_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
+stock_keeping_unit_text = st.text(alphabet=st.characters(whitelist_categories=["Lu"]), min_size=1, max_size=20)
 reference_text = st.text(alphabet=st.characters(whitelist_categories=["Lu", "Nd"]), min_size=1, max_size=20)
 eta_days = st.one_of(st.none(), st.integers(min_value=0, max_value=365))
 
 
-def build_batch(referenceerence: str, sku: str, quantity: int, days_ahead: int | None) -> Batch:
+def build_batch(referenceerence: str, stock_keeping_unit: str, quantity: int, days_ahead: int | None) -> Batch:
     eta = (datetime.now(tz=UTC).date() + timedelta(days=days_ahead)) if days_ahead is not None else None
-    return Batch(referenceerence, sku, quantity, eta)
+    return Batch(referenceerence, stock_keeping_unit, quantity, eta)
 
 
 def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
@@ -26,10 +26,10 @@ def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     assert batch.available_quantity == 18
 
 
-def make_batch_and_line(sku: str, batch_quantity: int, line_quantity: int) -> tuple[Batch, OrderLine]:
+def make_batch_and_line(stock_keeping_unit: str, batch_quantity: int, line_quantity: int) -> tuple[Batch, OrderLine]:
     return (
-        Batch("batch-001", sku, batch_quantity, eta=datetime.now(tz=UTC).date()),
-        OrderLine("order-123", sku, line_quantity),
+        Batch("batch-001", stock_keeping_unit, batch_quantity, eta=datetime.now(tz=UTC).date()),
+        OrderLine("order-123", stock_keeping_unit, line_quantity),
     )
 
 
@@ -48,10 +48,10 @@ def test_can_allocate_if_available_equal_to_required() -> None:
     assert batch.can_allocate(line)
 
 
-def test_cannot_allocate_if_skus_do_not_match() -> None:
+def test_cannot_allocate_if_stock_keeping_units_do_not_match() -> None:
     batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta=None)
-    different_sku_line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10)
-    assert batch.can_allocate(different_sku_line) is False
+    different_stock_keeping_unit_line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10)
+    assert batch.can_allocate(different_stock_keeping_unit_line) is False
 
 
 def test_allocation_is_idempotent() -> None:
@@ -62,18 +62,18 @@ def test_allocation_is_idempotent() -> None:
 
 
 @given(
-    sku=sku_text,
+    stock_keeping_unit=stock_keeping_unit_text,
     referenceerence=reference_text,
     batch_quantity=batch_quantity,
     line_quantity=line_quantity,
     days=eta_days,
 )
 def test_allocating_reduces_available_quantity(
-    sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(batch_quantity >= line_quantity)
-    batch = build_batch(referenceerence, sku, batch_quantity, days)
-    line = OrderLine("order-1", sku, line_quantity)
+    batch = build_batch(referenceerence, stock_keeping_unit, batch_quantity, days)
+    line = OrderLine("order-1", stock_keeping_unit, line_quantity)
 
     batch.allocate(line)
 
@@ -81,29 +81,29 @@ def test_allocating_reduces_available_quantity(
 
 
 @given(
-    sku=sku_text,
+    stock_keeping_unit=stock_keeping_unit_text,
     referenceerence=reference_text,
     batch_quantity=batch_quantity,
     line_quantity=line_quantity,
     days=eta_days,
 )
 def test_can_allocate_iff_sufficient_quantity(
-    sku: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    batch = build_batch(referenceerence, sku, batch_quantity, days)
-    line = OrderLine("order-1", sku, line_quantity)
+    batch = build_batch(referenceerence, stock_keeping_unit, batch_quantity, days)
+    line = OrderLine("order-1", stock_keeping_unit, line_quantity)
 
     result = batch.can_allocate(line)
 
     assert result == (batch_quantity >= line_quantity)
 
 
-@given(sku=sku_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
+@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
 def test_allocation_is_idempotent_with_hypothesis(
-    sku: str, referenceerence: str, quantity: int, days: int | None
+    stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:
-    batch = build_batch(referenceerence, sku, quantity, days)
-    line = OrderLine("order-1", sku, 1)
+    batch = build_batch(referenceerence, stock_keeping_unit, quantity, days)
+    line = OrderLine("order-1", stock_keeping_unit, 1)
 
     batch.allocate(line)
     batch.allocate(line)
@@ -112,51 +112,51 @@ def test_allocation_is_idempotent_with_hypothesis(
 
 
 @given(
-    sku=sku_text,
-    other_sku=sku_text,
+    stock_keeping_unit=stock_keeping_unit_text,
+    other_stock_keeping_unit=stock_keeping_unit_text,
     referenceerence=reference_text,
     quantity=batch_quantity,
     line_quantity=line_quantity,
     days=eta_days,
 )
-def test_cannot_allocate_if_skus_differ(
-    sku: str, other_sku: str, referenceerence: str, quantity: int, line_quantity: int, days: int | None
+def test_cannot_allocate_if_stock_keeping_units_differ(
+    stock_keeping_unit: str, other_stock_keeping_unit: str, referenceerence: str, quantity: int, line_quantity: int, days: int | None
 ) -> None:
-    assume(sku != other_sku)
-    batch = build_batch(referenceerence, sku, quantity, days)
-    line = OrderLine("order-1", other_sku, line_quantity)
+    assume(stock_keeping_unit != other_stock_keeping_unit)
+    batch = build_batch(referenceerence, stock_keeping_unit, quantity, days)
+    line = OrderLine("order-1", other_stock_keeping_unit, line_quantity)
 
     assert batch.can_allocate(line) is False
 
 
-@given(sku=sku_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
+@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity, days=eta_days)
 def test_available_quantity_never_exceeds_purchased(
-    sku: str, referenceerence: str, quantity: int, days: int | None
+    stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
 ) -> None:
-    batch = build_batch(referenceerence, sku, quantity, days)
+    batch = build_batch(referenceerence, stock_keeping_unit, quantity, days)
     assert batch.available_quantity <= batch._purchased_quantity
 
 
 @given(
-    sku=sku_text,
+    stock_keeping_unit=stock_keeping_unit_text,
     referenceerence=reference_text,
     quantity=batch_quantity,
     days_a=st.integers(min_value=1, max_value=100),
     days_b=st.integers(min_value=101, max_value=200),
 )
 def test_earlier_eta_batch_is_less_than_later(
-    sku: str, referenceerence: str, quantity: int, days_a: int, days_b: int
+    stock_keeping_unit: str, referenceerence: str, quantity: int, days_a: int, days_b: int
 ) -> None:
     today = datetime.now(tz=UTC).date()
-    earlier = Batch(referenceerence + "A", sku, quantity, today + timedelta(days=days_a))
-    later = Batch(referenceerence + "B", sku, quantity, today + timedelta(days=days_b))
+    earlier = Batch(referenceerence + "A", stock_keeping_unit, quantity, today + timedelta(days=days_a))
+    later = Batch(referenceerence + "B", stock_keeping_unit, quantity, today + timedelta(days=days_b))
 
     assert earlier < later
 
 
-@given(sku=sku_text, referenceerence=reference_text, quantity=batch_quantity)
-def test_in_stock_batch_is_never_greater_than_shipment(sku: str, referenceerence: str, quantity: int) -> None:
-    in_stock = Batch(referenceerence + "S", sku, quantity, eta=None)
-    shipment = Batch(referenceerence + "P", sku, quantity, eta=datetime.now(tz=UTC).date())
+@given(stock_keeping_unit=stock_keeping_unit_text, referenceerence=reference_text, quantity=batch_quantity)
+def test_in_stock_batch_is_never_greater_than_shipment(stock_keeping_unit: str, referenceerence: str, quantity: int) -> None:
+    in_stock = Batch(referenceerence + "S", stock_keeping_unit, quantity, eta=None)
+    shipment = Batch(referenceerence + "P", stock_keeping_unit, quantity, eta=datetime.now(tz=UTC).date())
 
     assert not (in_stock > shipment)

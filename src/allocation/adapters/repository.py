@@ -16,8 +16,8 @@ class AbstractRepository(abc.ABC):
         self._add(product)
         self.seen.add(product)
 
-    def get(self, sku: str) -> Product | None:
-        product = self._get(sku)
+    def get(self, stock_keeping_unit: str) -> Product | None:
+        product = self._get(stock_keeping_unit)
         if product:
             self.seen.add(product)
         return product
@@ -33,7 +33,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get(self, sku: str) -> Product | None:
+    def _get(self, stock_keeping_unit: str) -> Product | None:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -49,8 +49,8 @@ class SqlAlchemyRepository(AbstractRepository):
     def _add(self, product: Product) -> None:
         self.session.add(product)
 
-    def _get(self, sku: str) -> Product | None:
-        return self.session.query(Product).filter_by(sku=sku).first()
+    def _get(self, stock_keeping_unit: str) -> Product | None:
+        return self.session.query(Product).filter_by(stock_keeping_unit=stock_keeping_unit).first()
 
     def _get_by_batchreference(self, batchreference: str) -> Product | None:
         return self.session.query(Product).join(Batch).filter(batches.c.referenceerence == batchreference).first()

@@ -20,7 +20,7 @@ class InvalidSkuError(Exception):
 
 
 class ProductsRepository(Protocol):
-    def get(self, sku: str) -> Product | None: ...
+    def get(self, stock_keeping_unit: str) -> Product | None: ...
     def add(self, product: Product) -> None: ...
     def get_by_batchreference(self, batchreference: str) -> Product: ...
 
@@ -47,20 +47,20 @@ class AbstractNotifications(Protocol):
 
 def add_batch(cmd: CreateBatch, uow: AbstractUnitOfWork) -> None:
     with uow:
-        product = uow.products.get(sku=cmd.sku)
+        product = uow.products.get(stock_keeping_unit=cmd.stock_keeping_unit)
         if product is None:
-            product = Product(cmd.sku, batches=[])
+            product = Product(cmd.stock_keeping_unit, batches=[])
             uow.products.add(product)
-        product.batches.append(Batch(cmd.referenceerence, cmd.sku, cmd.quantity, cmd.eta))
+        product.batches.append(Batch(cmd.referenceerence, cmd.stock_keeping_unit, cmd.quantity, cmd.eta))
         uow.commit()
 
 
 def allocate(cmd: Allocate, uow: AbstractUnitOfWork) -> None:
-    line = OrderLine(cmd.orderid, cmd.sku, cmd.quantity)
+    line = OrderLine(cmd.orderid, cmd.stock_keeping_unit, cmd.quantity)
     with uow:
-        product = uow.products.get(sku=line.sku)
+        product = uow.products.get(stock_keeping_unit=line.stock_keeping_unit)
         if product is None:
-            raise InvalidSkuError(f"Invalid sku {line.sku}")
+            raise InvalidSkuError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
         product.allocate(line)
         uow.commit()
 
@@ -82,7 +82,7 @@ def send_out_of_stock_notification(
 ) -> None:
     notifications.send(
         "stock@made.com",
-        f"Out of stock for {event.sku}",
+        f"Out of stock for {event.stock_keeping_unit}",
     )
 
 
@@ -100,9 +100,9 @@ def add_allocation_to_read_model(
     with uow:
         uow.session.execute(
             text(
-                "INSERT INTO allocations_view (orderid, sku, batchreference) VALUES (:orderid, :sku, :batchreference)"
+                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batchreference) VALUES (:orderid, :stock_keeping_unit, :batchreference)"
             ),
-            {"orderid": event.orderid, "sku": event.sku, "batchreference": event.batchreference},
+            {"orderid": event.orderid, "stock_keeping_unit": event.stock_keeping_unit, "batchreference": event.batchreference},
         )
         uow.commit()
 
@@ -113,8 +113,8 @@ def remove_allocation_from_read_model(
 ) -> None:
     with uow:
         uow.session.execute(
-            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND sku = :sku"),
-            {"orderid": event.orderid, "sku": event.sku},
+            text("DELETE FROM allocations_view  WHERE orderid = :orderid AND stock_keeping_unit = :stock_keeping_unit"),
+            {"orderid": event.orderid, "stock_keeping_unit": event.stock_keeping_unit},
         )
         uow.commit()
 

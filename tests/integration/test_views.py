@@ -30,33 +30,33 @@ def sqlite_bus(sqlite_session_factory: sessionmaker[Session]) -> Iterator[Messag
 
 
 def test_allocations_view(sqlite_bus: MessageBus) -> None:
-    sqlite_bus.handle(CreateBatch("sku1batch", "sku1", 50, None))
-    sqlite_bus.handle(CreateBatch("sku2batch", "sku2", 50, today))
-    sqlite_bus.handle(Allocate("order1", "sku1", 20))
-    sqlite_bus.handle(Allocate("order1", "sku2", 20))
+    sqlite_bus.handle(CreateBatch("stock_keeping_unit1batch", "stock_keeping_unit1", 50, None))
+    sqlite_bus.handle(CreateBatch("stock_keeping_unit2batch", "stock_keeping_unit2", 50, today))
+    sqlite_bus.handle(Allocate("order1", "stock_keeping_unit1", 20))
+    sqlite_bus.handle(Allocate("order1", "stock_keeping_unit2", 20))
 
-    sqlite_bus.handle(CreateBatch("sku1batch-later", "sku1", 50, today))
-    sqlite_bus.handle(Allocate("otherorder", "sku1", 30))
-    sqlite_bus.handle(Allocate("otherorder", "sku2", 10))
+    sqlite_bus.handle(CreateBatch("stock_keeping_unit1batch-later", "stock_keeping_unit1", 50, today))
+    sqlite_bus.handle(Allocate("otherorder", "stock_keeping_unit1", 30))
+    sqlite_bus.handle(Allocate("otherorder", "stock_keeping_unit2", 10))
 
     assert allocations(
         "order1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
     ) == [
-        {"sku": "sku1", "batchreference": "sku1batch"},
-        {"sku": "sku2", "batchreference": "sku2batch"},
+        {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "stock_keeping_unit1batch"},
+        {"stock_keeping_unit": "stock_keeping_unit2", "batchreference": "stock_keeping_unit2batch"},
     ]
 
 
 def test_deallocation(sqlite_bus: MessageBus) -> None:
-    sqlite_bus.handle(CreateBatch("b1", "sku1", 50, None))
-    sqlite_bus.handle(CreateBatch("b2", "sku1", 50, today))
-    sqlite_bus.handle(Allocate("o1", "sku1", 40))
+    sqlite_bus.handle(CreateBatch("b1", "stock_keeping_unit1", 50, None))
+    sqlite_bus.handle(CreateBatch("b2", "stock_keeping_unit1", 50, today))
+    sqlite_bus.handle(Allocate("o1", "stock_keeping_unit1", 40))
     sqlite_bus.handle(ChangeBatchQuantity("b1", 10))
 
     assert allocations(
         "o1",
         cast("SqlAlchemyUnitOfWork", sqlite_bus.uow),
     ) == [
-        {"sku": "sku1", "batchreference": "b2"},
+        {"stock_keeping_unit": "stock_keeping_unit1", "batchreference": "b2"},
     ]

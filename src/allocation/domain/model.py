@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 class Product:
-    def __init__(self, sku: str, batches: list[Batch], version_number: int = 0) -> None:
-        self.sku = sku
+    def __init__(self, stock_keeping_unit: str, batches: list[Batch], version_number: int = 0) -> None:
+        self.stock_keeping_unit = stock_keeping_unit
         self.batches = batches
         self.version_number = version_number
         self.events: list[object] = []
@@ -20,7 +20,7 @@ class Product:
         try:
             batch = next(b for b in sorted(self.batches) if b.can_allocate(line))
         except StopIteration:
-            self.events.append(events.OutOfStock(line.sku))
+            self.events.append(events.OutOfStock(line.stock_keeping_unit))
             return None
         else:
             batch.allocate(line)
@@ -28,7 +28,7 @@ class Product:
             self.events.append(
                 events.Allocated(
                     orderid=line.orderid,
-                    sku=line.sku,
+                    stock_keeping_unit=line.stock_keeping_unit,
                     quantity=line.quantity,
                     batchreference=batch.referenceerence,
                 )
@@ -40,20 +40,20 @@ class Product:
         batch._purchased_quantity = quantity
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
-            self.events.append(events.Deallocated(line.orderid, line.sku, line.quantity))
+            self.events.append(events.Deallocated(line.orderid, line.stock_keeping_unit, line.quantity))
 
 
 @dataclass(unsafe_hash=True)
 class OrderLine:
     orderid: str
-    sku: str
+    stock_keeping_unit: str
     quantity: int
 
 
 class Batch:
-    def __init__(self, referenceerence: str, sku: str, quantity: int, eta: date | None) -> None:
+    def __init__(self, referenceerence: str, stock_keeping_unit: str, quantity: int, eta: date | None) -> None:
         self.referenceerence = referenceerence
-        self.sku = sku
+        self.stock_keeping_unit = stock_keeping_unit
         self.eta = eta
         self._purchased_quantity = quantity
         self._allocations: set[OrderLine] = set()
@@ -92,4 +92,4 @@ class Batch:
         return self._purchased_quantity - self.allocated_quantity
 
     def can_allocate(self, line: OrderLine) -> bool:
-        return self.sku == line.sku and self.available_quantity >= line.quantity
+        return self.stock_keeping_unit == line.stock_keeping_unit and self.available_quantity >= line.quantity

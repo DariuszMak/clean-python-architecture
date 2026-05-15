@@ -12,14 +12,14 @@ class Command:
 @dataclass
 class Allocate(Command):
     orderid: str
-    sku: str
+    stock_keeping_unit: str
     quantity: int
 
 
 @dataclass
 class CreateBatch(Command):
     referenceerence: str
-    sku: str
+    stock_keeping_unit: str
     quantity: int
     eta: date | None = None
 

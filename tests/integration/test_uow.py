@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from allocation.domain.model import OrderLine
 from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from tests.random_references import random_batchreference, random_orderid, random_sku
+from tests.random_references import random_batchreference, random_orderid, random_stock_keeping_unit
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker
@@ -18,27 +18,27 @@ pytestmark = pytest.mark.usefixtures("mappers")
 def insert_batch(
     session: Session,
     referenceerence: str,
-    sku: str,
+    stock_keeping_unit: str,
     quantity: int,
     eta: Any,
     product_version: int = 1,
 ) -> None:
     session.execute(
-        text("INSERT INTO products (sku, version_number) VALUES (:sku, :version)"),
-        {"sku": sku, "version": product_version},
+        text("INSERT INTO products (stock_keeping_unit, version_number) VALUES (:stock_keeping_unit, :version)"),
+        {"stock_keeping_unit": stock_keeping_unit, "version": product_version},
     )
     session.execute(
         text(
-            "INSERT INTO batches (referenceerence, sku, _purchased_quantity, eta) VALUES (:referenceerence, :sku, :quantity, :eta)"
+            "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, eta) VALUES (:referenceerence, :stock_keeping_unit, :quantity, :eta)"
         ),
-        {"referenceerence": referenceerence, "sku": sku, "quantity": quantity, "eta": eta},
+        {"referenceerence": referenceerence, "stock_keeping_unit": stock_keeping_unit, "quantity": quantity, "eta": eta},
     )
 
 
-def get_allocated_batch_reference(session: Session, orderid: str, sku: str) -> str:
+def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_unit: str) -> str:
     [[orderlineid]] = session.execute(
-        text("SELECT id FROM order_lines WHERE orderid=:orderid AND sku=:sku"),
-        {"orderid": orderid, "sku": sku},
+        text("SELECT id FROM order_lines WHERE orderid=:orderid AND stock_keeping_unit=:stock_keeping_unit"),
+        {"orderid": orderid, "stock_keeping_unit": stock_keeping_unit},
     )
     [[batchreference]] = session.execute(
         text(
@@ -58,7 +58,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
 
     uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
     with uow:
-        product = uow.products.get(sku="HIPSTER-WORKBENCH")
+        product = uow.products.get(stock_keeping_unit="HIPSTER-WORKBENCH")
         line = OrderLine("o1", "HIPSTER-WORKBENCH", 10)
         product.allocate(line)
         uow.commit()
@@ -100,14 +100,14 @@ def test_rolls_back_on_error(
 
 def try_to_allocate(
     orderid: str,
-    sku: str,
+    stock_keeping_unit: str,
     exceptions: list[Exception],
     session_factory: sessionmaker[Session],
 ) -> None:
-    line = OrderLine(orderid, sku, 10)
+    line = OrderLine(orderid, stock_keeping_unit, 10)
     try:
         with SqlAlchemyUnitOfWork(session_factory) as uow:
-            product = uow.products.get(sku=sku)
+            product = uow.products.get(stock_keeping_unit=stock_keeping_unit)
             product.allocate(line)
             time.sleep(0.2)
             uow.commit()
@@ -118,19 +118,19 @@ def try_to_allocate(
 def test_concurrent_updates_to_version_are_not_allowed(
     postgres_session_factory: sessionmaker[Session],
 ) -> None:
-    sku, batch = random_sku(), random_batchreference()
+    stock_keeping_unit, batch = random_stock_keeping_unit(), random_batchreference()
     session = postgres_session_factory()
-    insert_batch(session, batch, sku, 100, eta=None, product_version=1)
+    insert_batch(session, batch, stock_keeping_unit, 100, eta=None, product_version=1)
     session.commit()
 
     order1, order2 = random_orderid("1"), random_orderid("2")
     exceptions: list[Exception] = []
 
     def try_to_allocate_order1() -> None:
-        return try_to_allocate(order1, sku, exceptions, postgres_session_factory)
+        return try_to_allocate(order1, stock_keeping_unit, exceptions, postgres_session_factory)
 
     def try_to_allocate_order2() -> None:
-        return try_to_allocate(order2, sku, exceptions, postgres_session_factory)
+        return try_to_allocate(order2, stock_keeping_unit, exceptions, postgres_session_factory)
 
     thread1 = threading.Thread(target=try_to_allocate_order1)
     thread2 = threading.Thread(target=try_to_allocate_order2)
@@ -140,8 +140,8 @@ def test_concurrent_updates_to_version_are_not_allowed(
     thread2.join()
 
     [[version]] = session.execute(
-        text("SELECT version_number FROM products WHERE sku=:sku"),
-        {"sku": sku},
+        text("SELECT version_number FROM products WHERE stock_keeping_unit=:stock_keeping_unit"),
+        {"stock_keeping_unit": stock_keeping_unit},
     )
     assert version == 2
     [exception] = exceptions
@@ -153,9 +153,9 @@ def test_concurrent_updates_to_version_are_not_allowed(
                 "SELECT orderid FROM allocations"
                 " JOIN batches ON allocations.batch_id = batches.id"
                 " JOIN order_lines ON allocations.orderline_id = order_lines.id"
-                " WHERE order_lines.sku=:sku"
+                " WHERE order_lines.stock_keeping_unit=:stock_keeping_unit"
             ),
-            {"sku": sku},
+            {"stock_keeping_unit": stock_keeping_unit},
         )
     )
     assert len(orders) == 1

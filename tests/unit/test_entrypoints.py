@@ -42,7 +42,7 @@ def test_add_batch_returns_201(
         "/add_batch",
         json={
             "referenceerence": "b1",
-            "sku": "SMALL-TABLE",
+            "stock_keeping_unit": "SMALL-TABLE",
             "quantity": 10,
             "eta": None,
         },
@@ -67,7 +67,7 @@ def test_add_batch_with_eta(
         "/add_batch",
         json={
             "referenceerence": "b2",
-            "sku": "LAMP",
+            "stock_keeping_unit": "LAMP",
             "quantity": 5,
             "eta": eta_str,
         },
@@ -87,7 +87,7 @@ def test_allocate_returns_202(
         "/allocate",
         json={
             "orderid": "o1",
-            "sku": "SMALL-TABLE",
+            "stock_keeping_unit": "SMALL-TABLE",
             "quantity": 3,
         },
     )
@@ -96,26 +96,26 @@ def test_allocate_returns_202(
     assert resp.get_json() == {"status": "OK"}
 
 
-def test_allocate_returns_400_on_invalid_sku(
+def test_allocate_returns_400_on_invalid_stock_keeping_unit(
     flask_client: tuple[FlaskClient, Any],
 ) -> None:
     client, _ = flask_client
 
     FAKE_BUS.reset_mock()
 
-    FAKE_BUS.handle.side_effect = InvalidSkuError("Invalid sku GHOST")
+    FAKE_BUS.handle.side_effect = InvalidSkuError("Invalid stock_keeping_unit GHOST")
 
     resp = client.post(
         "/allocate",
         json={
             "orderid": "o1",
-            "sku": "GHOST",
+            "stock_keeping_unit": "GHOST",
             "quantity": 3,
         },
     )
 
     assert resp.status_code == 400
-    assert resp.get_json() == {"message": "Invalid sku GHOST"}
+    assert resp.get_json() == {"message": "Invalid stock_keeping_unit GHOST"}
 
     FAKE_BUS.handle.side_effect = None
 
@@ -132,7 +132,7 @@ def test_allocations_view_returns_200(
         "allocations",
         return_value=[
             {
-                "sku": "SMALL-TABLE",
+                "stock_keeping_unit": "SMALL-TABLE",
                 "batchreference": "b1",
             }
         ],
@@ -142,7 +142,7 @@ def test_allocations_view_returns_200(
     assert resp.status_code == 200
     assert resp.get_json() == [
         {
-            "sku": "SMALL-TABLE",
+            "stock_keeping_unit": "SMALL-TABLE",
             "batchreference": "b1",
         }
     ]
