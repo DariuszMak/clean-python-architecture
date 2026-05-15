@@ -41,8 +41,8 @@ allocations = Table(
     "allocations",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("orderline__id", ForeignKey("order_lines.id")),
-    Column("batch__id", ForeignKey("batches.id")),
+    Column("orderline_id", ForeignKey("order_lines.id")),
+    Column("batch_id", ForeignKey("batches.id")),
 )
 
 allocations_view = Table(

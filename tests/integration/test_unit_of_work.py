@@ -48,7 +48,7 @@ def get_allocated_batch_reference(session: Session, order_id: str, stock_keeping
     )
     [[batch_reference]] = session.execute(
         text(
-            "SELECT b.reference FROM allocations JOIN batches AS b ON batch__id = b.id WHERE orderline__id=:orderline_id"
+            "SELECT b.reference FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderline_id"
         ),
         {"orderline_id": orderline_id},
     )
@@ -157,8 +157,8 @@ def test_concurrent_updates_to_version_are_not_allowed(
         session.execute(
             text(
                 "SELECT order_id FROM allocations"
-                " JOIN batches ON allocations.batch__id = batches.id"
-                " JOIN order_lines ON allocations.orderline__id = order_lines.id"
+                " JOIN batches ON allocations.batch_id = batches.id"
+                " JOIN order_lines ON allocations.orderline_id = order_lines.id"
                 " WHERE order_lines.stock_keeping_unit=:stock_keeping_unit"
             ),
             {"stock_keeping_unit": stock_keeping_unit},
