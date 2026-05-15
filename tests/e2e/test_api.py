@@ -39,7 +39,7 @@ def test_unhappy_path_returns_400_and_error_message() -> None:
         expect_success=False,
     )
     assert r.status_code == 400
-    assert r.json()["message"] == f"Inval_id stock_keeping_unit {unknown_stock_keeping_unit}"
+    assert r.json()["message"] == f"Invalid stock_keeping_unit {unknown_stock_keeping_unit}"
 
     r = get_allocation(order_id)
     assert r.status_code == 404

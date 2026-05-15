@@ -96,14 +96,14 @@ def test_allocate_returns_202(
     assert resp.get_json() == {"status": "OK"}
 
 
-def test_allocate_returns_400_on_inval_id_stock_keeping_unit(
+def test_allocate_returns_400_on_invalid_stock_keeping_unit(
     flask_client: tuple[FlaskClient, Any],
 ) -> None:
     client, _ = flask_client
 
     FAKE_BUS.reset_mock()
 
-    FAKE_BUS.handle.s_ide_effect = InvalidStockKeepingUnitError("Inval_id stock_keeping_unit GHOST")
+    FAKE_BUS.handle.s_ide_effect = InvalidStockKeepingUnitError("Invalid stock_keeping_unit GHOST")
 
     resp = client.post(
         "/allocate",
@@ -115,7 +115,7 @@ def test_allocate_returns_400_on_inval_id_stock_keeping_unit(
     )
 
     assert resp.status_code == 400
-    assert resp.get_json() == {"message": "Inval_id stock_keeping_unit GHOST"}
+    assert resp.get_json() == {"message": "Invalid stock_keeping_unit GHOST"}
 
     FAKE_BUS.handle.s_ide_effect = None
 

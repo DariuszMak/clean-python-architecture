@@ -62,7 +62,7 @@ def allocate(cmd: Allocate, unit_of_work: AbstractUnitOfWork) -> None:
     with unit_of_work:
         product = unit_of_work.products.get(stock_keeping_unit=line.stock_keeping_unit)
         if product is None:
-            raise InvalidStockKeepingUnitError(f"Inval_id stock_keeping_unit {line.stock_keeping_unit}")
+            raise InvalidStockKeepingUnitError(f"Invalid stock_keeping_unit {line.stock_keeping_unit}")
         product.allocate(line)
         unit_of_work.commit()
 

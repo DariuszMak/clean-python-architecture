@@ -120,12 +120,12 @@ class TestAllocate:
         [batch] = bus.unit_of_work.products.get("COMPLICATED-LAMP").batches
         assert batch.available_quantity == 90
 
-    def test_errors_for_inval_id_stock_keeping_unit(self) -> None:
+    def test_errors_for_invalid_stock_keeping_unit(self) -> None:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "AREALSTOCKKEEPINGUNIT", 100, None))
 
         with pytest.raises(
-            InvalidStockKeepingUnitError, match="Inval_id stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
+            InvalidStockKeepingUnitError, match="Invalid stock_keeping_unit NONEXISTENTSTOCKKEEPINGUNIT"
         ):
             bus.handle(Allocate("o1", "NONEXISTENTSTOCKKEEPINGUNIT", 10))
 
@@ -298,7 +298,7 @@ def test_allocate_raises_for_unknown_stock_keeping_unit(
 ) -> None:
     bus = bootstrap_test_app()
 
-    with pytest.raises(InvalidStockKeepingUnitError, match=f"Inval_id stock_keeping_unit {stock_keeping_unit}"):
+    with pytest.raises(InvalidStockKeepingUnitError, match=f"Invalid stock_keeping_unit {stock_keeping_unit}"):
         bus.handle(Allocate(order_id, stock_keeping_unit, quantity))
 
 
