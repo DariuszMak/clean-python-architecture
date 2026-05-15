@@ -1,5 +1,6 @@
 from enum import StrEnum
 
+
 class TableName(StrEnum):
     ORDER_LINES = "order_lines"
     PRODUCTS = "products"
@@ -29,4 +30,3 @@ class RelationshipName(StrEnum):
 
 class EventName(StrEnum):
     LOAD = "load"
-
