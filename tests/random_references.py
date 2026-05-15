@@ -1,8 +1,8 @@
-import uu_id
+import uuid
 
 
 def random_suffix() -> str:
-    return uu_id.uu_id4().hex[:6]
+    return uuid.uuid4().hex[:6]
 
 
 def random_stock_keeping_unit(name: str = "") -> str:
