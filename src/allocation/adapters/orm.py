@@ -5,6 +5,7 @@ from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Tabl
 from sqlalchemy.orm import registry, relationship
 
 from allocation.domain.model import Batch, OrderLine, Product
+from src.allocation.helpers.strenums import TableName
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ metadata = MetaData()
 mapper_registry = registry()
 
 order_lines = Table(
-    "order_lines",
+    TableName.ORDER_LINES,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("sku", String(255)),
@@ -21,14 +22,14 @@ order_lines = Table(
 )
 
 products = Table(
-    "products",
+    TableName.PRODUCTS,
     metadata,
     Column("sku", String(255), primary_key=True),
     Column("version_number", Integer, nullable=False, server_default="0"),
 )
 
 batches = Table(
-    "batches",
+    TableName.BATCHES,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("reference", String(255)),
@@ -38,7 +39,7 @@ batches = Table(
 )
 
 allocations = Table(
-    "allocations",
+    TableName.ALLOCATIONS,
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("orderline_id", ForeignKey("order_lines.id")),
@@ -46,7 +47,7 @@ allocations = Table(
 )
 
 allocations_view = Table(
-    "allocations_view",
+    TableName.ALLOCATIONS_VIEW,
     metadata,
     Column("orderid", String(255)),
     Column("sku", String(255)),
