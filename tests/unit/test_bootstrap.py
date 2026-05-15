@@ -1,8 +1,8 @@
-from tests.unit.test_handlers import FakeUnitOfWork
 from unittest import mock
 
 from allocation.bootstrap import bootstrap
 from allocation.service_layer.messagebus import MessageBus
+from tests.unit.test_handlers import FakeUnitOfWork
 
 
 def test_bootstrap_creates_default_uow_when_none_given() -> None:
