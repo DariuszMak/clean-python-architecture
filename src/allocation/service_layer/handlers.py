@@ -102,7 +102,8 @@ def add_allocation_to_read_model(
     with unit_of_work:
         unit_of_work.session.execute(
             text(
-                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batchreference) VALUES (:orderid, :stock_keeping_unit, :batchreference)"
+                "INSERT INTO allocations_view (orderid, stock_keeping_unit, batchreference)"
+                " VALUES (:orderid, :stock_keeping_unit, :batchreference)"
             ),
             {
                 "orderid": event.orderid,

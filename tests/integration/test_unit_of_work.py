@@ -29,7 +29,8 @@ def insert_batch(
     )
     session.execute(
         text(
-            "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, estimated_time_of_arrival) VALUES (:referenceerence, :stock_keeping_unit, :quantity, :estimated_time_of_arrival)"
+            "INSERT INTO batches (referenceerence, stock_keeping_unit, _purchased_quantity, estimated_time_of_arrival)"
+            " VALUES (:referenceerence, :stock_keeping_unit, :quantity, :estimated_time_of_arrival)"
         ),
         {
             "referenceerence": referenceerence,
@@ -47,7 +48,8 @@ def get_allocated_batch_reference(session: Session, orderid: str, stock_keeping_
     )
     [[batchreference]] = session.execute(
         text(
-            "SELECT b.referenceerence FROM allocations JOIN batches AS b ON batch_id = b.id WHERE orderline_id=:orderlineid"
+            "SELECT b.referenceerence FROM allocations JOIN batches AS b ON batch_id = b.id"
+            " WHERE orderline_id=:orderlineid"
         ),
         {"orderlineid": orderlineid},
     )
