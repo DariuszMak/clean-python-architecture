@@ -32,7 +32,7 @@ def test_abstract_repository_get_raises() -> None:
 def test_abstract_repository_get_by_batch_reference_raises() -> None:
     repo = BareRepository()
     with pytest.raises(NotImplementedError):
-        repo._get_by_batch_reference("any-referenceerence")
+        repo._get_by_batch_reference("any-reference")
 
 
 class BareUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]

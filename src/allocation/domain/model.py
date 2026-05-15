@@ -30,13 +30,13 @@ class Product:
                     orderid=line.orderid,
                     stock_keeping_unit=line.stock_keeping_unit,
                     quantity=line.quantity,
-                    batch_reference=batch.referenceerence,
+                    batch_reference=batch.reference,
                 )
             )
-            return batch.referenceerence
+            return batch.reference
 
-    def change_batch_quantity(self, referenceerence: str, quantity: int) -> None:
-        batch = next(b for b in self.batches if b.referenceerence == referenceerence)
+    def change_batch_quantity(self, reference: str, quantity: int) -> None:
+        batch = next(b for b in self.batches if b.reference == reference)
         batch._purchased_quantity = quantity
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
@@ -52,24 +52,24 @@ class OrderLine:
 
 class Batch:
     def __init__(
-        self, referenceerence: str, stock_keeping_unit: str, quantity: int, estimated_time_of_arrival: date | None
+        self, reference: str, stock_keeping_unit: str, quantity: int, estimated_time_of_arrival: date | None
     ) -> None:
-        self.referenceerence = referenceerence
+        self.reference = reference
         self.stock_keeping_unit = stock_keeping_unit
         self.estimated_time_of_arrival = estimated_time_of_arrival
         self._purchased_quantity = quantity
         self._allocations: set[OrderLine] = set()
 
     def __repr__(self) -> str:
-        return f"<Batch {self.referenceerence}>"
+        return f"<Batch {self.reference}>"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Batch):
             return False
-        return other.referenceerence == self.referenceerence
+        return other.reference == self.reference
 
     def __hash__(self) -> int:
-        return hash(self.referenceerence)
+        return hash(self.reference)
 
     def __gt__(self, other: Batch) -> bool:
         if self.estimated_time_of_arrival is None:

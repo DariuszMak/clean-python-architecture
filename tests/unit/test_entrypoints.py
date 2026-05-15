@@ -41,7 +41,7 @@ def test_add_batch_returns_201(
     resp = client.post(
         "/add_batch",
         json={
-            "referenceerence": "b1",
+            "reference": "b1",
             "stock_keeping_unit": "SMALL-TABLE",
             "quantity": 10,
             "estimated_time_of_arrival": None,
@@ -66,7 +66,7 @@ def test_add_batch_with_estimated_time_of_arrival(
     resp = client.post(
         "/add_batch",
         json={
-            "referenceerence": "b2",
+            "reference": "b2",
             "stock_keeping_unit": "LAMP",
             "quantity": 5,
             "estimated_time_of_arrival": estimated_time_of_arrival_str,
@@ -213,7 +213,7 @@ def test_handle_change_batch_quantity(
 
     cmd = FAKE_BUS.handle.call_args[0][0]
 
-    assert cmd.referenceerence == "b1"
+    assert cmd.reference == "b1"
     assert cmd.quantity == 25
 
 

@@ -58,7 +58,7 @@ class FakeRepository(AbstractRepository):  # type: ignore[misc]
 
     def _get_by_batch_reference(self, batch_reference: str) -> Any:
         return next(
-            (p for p in self._products for b in p.batches if b.referenceerence == batch_reference),
+            (p for p in self._products for b in p.batches if b.reference == batch_reference),
             None,
         )
 
@@ -109,7 +109,7 @@ class TestAddBatch:
         bus = bootstrap_test_app()
         bus.handle(CreateBatch("b1", "GARISH-RUG", 100, None))
         bus.handle(CreateBatch("b2", "GARISH-RUG", 99, None))
-        assert "b2" in [b.referenceerence for b in bus.unit_of_work.products.get("GARISH-RUG").batches]
+        assert "b2" in [b.reference for b in bus.unit_of_work.products.get("GARISH-RUG").batches]
 
 
 class TestAllocate:
@@ -188,13 +188,13 @@ class TestChangeBatchQuantity:
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_create_batch_creates_product_if_not_exists(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     quantity: int,
     days: int | None,
@@ -203,19 +203,19 @@ def test_create_batch_creates_product_if_not_exists(
 
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
     assert bus.unit_of_work.products.get(stock_keeping_unit) is not None
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_create_batch_commits(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     quantity: int,
     days: int | None,
@@ -224,13 +224,13 @@ def test_create_batch_commits(
 
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
 
     assert bus.unit_of_work.committed
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
@@ -238,7 +238,7 @@ def test_create_batch_commits(
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_reduces_available_quantity(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
@@ -251,7 +251,7 @@ def test_allocate_reduces_available_quantity(
 
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
     [batch] = bus.unit_of_work.products.get(stock_keeping_unit).batches
@@ -260,7 +260,7 @@ def test_allocate_reduces_available_quantity(
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
@@ -268,7 +268,7 @@ def test_allocate_reduces_available_quantity(
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_commits_on_success(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
@@ -281,7 +281,7 @@ def test_allocate_commits_on_success(
 
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, batch_quantity, estimated_time_of_arrival_date))
 
     bus.unit_of_work.committed = False
 
@@ -303,14 +303,14 @@ def test_allocate_raises_for_unknown_stock_keeping_unit(
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     quantity=pos_quantity,
     new_quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_change_batch_quantity_updates_available(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     quantity: int,
     new_quantity: int,
@@ -320,8 +320,8 @@ def test_change_batch_quantity_updates_available(
 
     estimated_time_of_arrival_date = datetime.now(tz=UTC).date() + timedelta(days=days) if days is not None else None
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
-    bus.handle(ChangeBatchQuantity(referenceerence, new_quantity))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, quantity, estimated_time_of_arrival_date))
+    bus.handle(ChangeBatchQuantity(reference, new_quantity))
 
     [batch] = bus.unit_of_work.products.get(stock_keeping_unit).batches
 
@@ -329,14 +329,14 @@ def test_change_batch_quantity_updates_available(
 
 
 @given(
-    referenceerence=reference_text,
+    reference=reference_text,
     stock_keeping_unit=stock_keeping_unit_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
     orderid=order_text,
 )
 def test_out_of_stock_sends_email(
-    referenceerence: str,
+    reference: str,
     stock_keeping_unit: str,
     batch_quantity: int,
     line_quantity: int,
@@ -353,7 +353,7 @@ def test_out_of_stock_sends_email(
         publish=lambda *_: None,
     )
 
-    bus.handle(CreateBatch(referenceerence, stock_keeping_unit, batch_quantity, None))
+    bus.handle(CreateBatch(reference, stock_keeping_unit, batch_quantity, None))
     bus.handle(Allocate(orderid, stock_keeping_unit, line_quantity))
 
     assert f"Out of stock for {stock_keeping_unit}" in fake_notifs.sent.get("stock@made.com", [])
@@ -399,6 +399,6 @@ def test_reallocate_moves_order_to_later_batch_when_earlier_shrinks(
 
     product = bus.unit_of_work.products.get(stock_keeping_unit)
 
-    b2 = next(b for b in product.batches if b.referenceerence == reference2)
+    b2 = next(b for b in product.batches if b.reference == reference2)
 
     assert b2.available_quantity == quantity - line_quantity

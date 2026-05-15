@@ -52,7 +52,7 @@ def add_batch(cmd: CreateBatch, unit_of_work: AbstractUnitOfWork) -> None:
             product = Product(cmd.stock_keeping_unit, batches=[])
             unit_of_work.products.add(product)
         product.batches.append(
-            Batch(cmd.referenceerence, cmd.stock_keeping_unit, cmd.quantity, cmd.estimated_time_of_arrival)
+            Batch(cmd.reference, cmd.stock_keeping_unit, cmd.quantity, cmd.estimated_time_of_arrival)
         )
         unit_of_work.commit()
 
@@ -73,8 +73,8 @@ def reallocate(event: events.Deallocated, unit_of_work: AbstractUnitOfWork) -> N
 
 def change_batch_quantity(cmd: ChangeBatchQuantity, unit_of_work: AbstractUnitOfWork) -> None:
     with unit_of_work:
-        product = unit_of_work.products.get_by_batch_reference(batch_reference=cmd.referenceerence)
-        product.change_batch_quantity(referenceerence=cmd.referenceerence, quantity=cmd.quantity)
+        product = unit_of_work.products.get_by_batch_reference(batch_reference=cmd.reference)
+        product.change_batch_quantity(reference=cmd.reference, quantity=cmd.quantity)
         unit_of_work.commit()
 
 

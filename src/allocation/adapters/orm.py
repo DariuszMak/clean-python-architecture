@@ -31,7 +31,7 @@ batches = Table(
     "batches",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("referenceerence", String(255)),
+    Column("reference", String(255)),
     Column("stock_keeping_unit", ForeignKey("products.stock_keeping_unit")),
     Column("_purchased_quantity", Integer, nullable=False),
     Column("estimated_time_of_arrival", Date, nullable=True),

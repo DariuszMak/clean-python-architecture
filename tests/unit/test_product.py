@@ -47,12 +47,12 @@ def test_preferenceers_earlier_batches() -> None:
 
 
 def test_returns_allocated_batch_reference() -> None:
-    in_stock_batch = Batch("in-stock-batch-referenceerence", "HIGHBROW-POSTER", 100, estimated_time_of_arrival=None)
-    shipment_batch = Batch("shipment-batch-referenceerence", "HIGHBROW-POSTER", 100, estimated_time_of_arrival=tomorrow)
+    in_stock_batch = Batch("in-stock-batch-reference", "HIGHBROW-POSTER", 100, estimated_time_of_arrival=None)
+    shipment_batch = Batch("shipment-batch-reference", "HIGHBROW-POSTER", 100, estimated_time_of_arrival=tomorrow)
     line = OrderLine("oreference", "HIGHBROW-POSTER", 10)
     product = Product(stock_keeping_unit="HIGHBROW-POSTER", batches=[in_stock_batch, shipment_batch])
     allocation = product.allocate(line)
-    assert allocation == in_stock_batch.referenceerence
+    assert allocation == in_stock_batch.reference
 
 
 def test_outputs_allocated_event() -> None:
@@ -61,7 +61,7 @@ def test_outputs_allocated_event() -> None:
     product = Product(stock_keeping_unit="RETRO-LAMPSHADE", batches=[batch])
     product.allocate(line)
     expected = events.Allocated(
-        orderid="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batch_reference=batch.referenceerence
+        orderid="oreference", stock_keeping_unit="RETRO-LAMPSHADE", quantity=10, batch_reference=batch.reference
     )
     assert product.events[-1] == expected
 
@@ -88,36 +88,36 @@ def test_increments_version_number() -> None:
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_returns_batch_reference_when_sufficient_stock(
-    stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str, reference: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(batch_quantity >= line_quantity)
-    batch = Batch(referenceerence, stock_keeping_unit, batch_quantity, make_estimated_time_of_arrival(days))
+    batch = Batch(reference, stock_keeping_unit, batch_quantity, make_estimated_time_of_arrival(days))
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
     line = OrderLine("order-1", stock_keeping_unit, line_quantity)
 
     result = product.allocate(line)
 
-    assert result == referenceerence
+    assert result == reference
 
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     batch_quantity=pos_quantity,
     line_quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
-    stock_keeping_unit: str, referenceerence: str, batch_quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str, reference: str, batch_quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(batch_quantity < line_quantity)
-    batch = Batch(referenceerence, stock_keeping_unit, batch_quantity, make_estimated_time_of_arrival(days))
+    batch = Batch(reference, stock_keeping_unit, batch_quantity, make_estimated_time_of_arrival(days))
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
     line = OrderLine("order-1", stock_keeping_unit, line_quantity)
 
@@ -129,14 +129,14 @@ def test_allocate_returns_none_and_emits_out_of_stock_when_insufficient(
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_version_number_increments_on_successful_allocation(
-    stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
+    stock_keeping_unit: str, reference: str, quantity: int, days: int | None
 ) -> None:
-    batch = Batch(referenceerence, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
+    batch = Batch(reference, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
     initial_version = product.version_number
     line = OrderLine("order-1", stock_keeping_unit, 1)
@@ -148,14 +148,14 @@ def test_version_number_increments_on_successful_allocation(
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_version_number_does_not_increment_on_out_of_stock(
-    stock_keeping_unit: str, referenceerence: str, quantity: int, days: int | None
+    stock_keeping_unit: str, reference: str, quantity: int, days: int | None
 ) -> None:
-    batch = Batch(referenceerence, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
+    batch = Batch(reference, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
     initial_version = product.version_number
     line = OrderLine("order-1", stock_keeping_unit, quantity + 1)
@@ -211,16 +211,16 @@ def test_preferenceers_in_stock_over_shipment(
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     quantity=pos_quantity,
     line_quantity=pos_quantity,
     days=estimated_time_of_arrival_days,
 )
 def test_allocated_event_has_correct_fields(
-    stock_keeping_unit: str, referenceerence: str, quantity: int, line_quantity: int, days: int | None
+    stock_keeping_unit: str, reference: str, quantity: int, line_quantity: int, days: int | None
 ) -> None:
     assume(quantity >= line_quantity)
-    batch = Batch(referenceerence, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
+    batch = Batch(reference, stock_keeping_unit, quantity, make_estimated_time_of_arrival(days))
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
     line = OrderLine("order-1", stock_keeping_unit, line_quantity)
 
@@ -232,27 +232,27 @@ def test_allocated_event_has_correct_fields(
     assert ev.orderid == "order-1"
     assert ev.stock_keeping_unit == stock_keeping_unit
     assert ev.quantity == line_quantity
-    assert ev.batch_reference == referenceerence
+    assert ev.batch_reference == reference
 
 
 @given(
     stock_keeping_unit=stock_keeping_unit_text,
-    referenceerence=reference_text,
+    reference=reference_text,
     initial_quantity=st.integers(min_value=2, max_value=10_000),
     n_extra=st.integers(min_value=1, max_value=5),
 )
 def test_change_batch_quantity_deallocates_excess_orders(
-    stock_keeping_unit: str, referenceerence: str, initial_quantity: int, n_extra: int
+    stock_keeping_unit: str, reference: str, initial_quantity: int, n_extra: int
 ) -> None:
     new_quantity = max(1, initial_quantity - n_extra)
-    batch = Batch(referenceerence, stock_keeping_unit, initial_quantity, estimated_time_of_arrival=None)
+    batch = Batch(reference, stock_keeping_unit, initial_quantity, estimated_time_of_arrival=None)
     product = Product(stock_keeping_unit=stock_keeping_unit, batches=[batch])
 
     for i in range(n_extra):
         line = OrderLine(f"order-{i}", stock_keeping_unit, 1)
         product.allocate(line)
 
-    product.change_batch_quantity(referenceerence, new_quantity)
+    product.change_batch_quantity(reference, new_quantity)
 
     assert batch.available_quantity >= 0
 

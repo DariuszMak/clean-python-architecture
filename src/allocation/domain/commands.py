@@ -18,7 +18,7 @@ class Allocate(Command):
 
 @dataclass
 class CreateBatch(Command):
-    referenceerence: str
+    reference: str
     stock_keeping_unit: str
     quantity: int
     estimated_time_of_arrival: date | None = None
@@ -26,5 +26,5 @@ class CreateBatch(Command):
 
 @dataclass
 class ChangeBatchQuantity(Command):
-    referenceerence: str
+    reference: str
     quantity: int

@@ -9,13 +9,13 @@ TIMEOUT: int = 5
 
 
 def post_to_add_batch(
-    referenceerence: Any, stock_keeping_unit: Any, quantity: Any, estimated_time_of_arrival: Any
+    reference: Any, stock_keeping_unit: Any, quantity: Any, estimated_time_of_arrival: Any
 ) -> None:
     url: str = config.get_api_url()
     r = requests.post(
         f"{url}/add_batch",
         json={
-            "referenceerence": referenceerence,
+            "reference": reference,
             "stock_keeping_unit": stock_keeping_unit,
             "quantity": quantity,
             "estimated_time_of_arrival": estimated_time_of_arrival,

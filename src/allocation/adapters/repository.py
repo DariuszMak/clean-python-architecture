@@ -53,4 +53,4 @@ class SqlAlchemyRepository(AbstractRepository):
         return self.session.query(Product).filter_by(stock_keeping_unit=stock_keeping_unit).first()
 
     def _get_by_batch_reference(self, batch_reference: str) -> Product | None:
-        return self.session.query(Product).join(Batch).filter(batches.c.referenceerence == batch_reference).first()
+        return self.session.query(Product).join(Batch).filter(batches.c.reference == batch_reference).first()

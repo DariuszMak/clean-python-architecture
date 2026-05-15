@@ -15,13 +15,13 @@ def test_get_by_batch_reference(sqlite_session_factory: sessionmaker[Session]) -
     session = sqlite_session_factory()
     repo = SqlAlchemyRepository(session)
     b1 = Batch(
-        referenceerence="b1", stock_keeping_unit="stock_keeping_unit1", quantity=100, estimated_time_of_arrival=None
+        reference="b1", stock_keeping_unit="stock_keeping_unit1", quantity=100, estimated_time_of_arrival=None
     )
     b2 = Batch(
-        referenceerence="b2", stock_keeping_unit="stock_keeping_unit1", quantity=100, estimated_time_of_arrival=None
+        reference="b2", stock_keeping_unit="stock_keeping_unit1", quantity=100, estimated_time_of_arrival=None
     )
     b3 = Batch(
-        referenceerence="b3", stock_keeping_unit="stock_keeping_unit2", quantity=100, estimated_time_of_arrival=None
+        reference="b3", stock_keeping_unit="stock_keeping_unit2", quantity=100, estimated_time_of_arrival=None
     )
     p1 = Product(stock_keeping_unit="stock_keeping_unit1", batches=[b1, b2])
     p2 = Product(stock_keeping_unit="stock_keeping_unit2", batches=[b3])

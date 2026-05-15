@@ -22,7 +22,7 @@ def add_batch() -> tuple[Response, int]:
         estimated_time_of_arrival = datetime.fromisoformat(estimated_time_of_arrival).date()
 
     cmd = CreateBatch(
-        request.json["referenceerence"],
+        request.json["reference"],
         request.json["stock_keeping_unit"],
         request.json["quantity"],
         estimated_time_of_arrival,
