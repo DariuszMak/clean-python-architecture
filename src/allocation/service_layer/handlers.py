@@ -120,7 +120,9 @@ def remove_allocation_from_read_model(
 ) -> None:
     with unit_of_work:
         unit_of_work.session.execute(
-            text("DELETE FROM allocations_view  WHERE order_id = :order_id AND stock_keeping_unit = :stock_keeping_unit"),
+            text(
+                "DELETE FROM allocations_view  WHERE order_id = :order_id AND stock_keeping_unit = :stock_keeping_unit"
+            ),
             {"order_id": event.order_id, "stock_keeping_unit": event.stock_keeping_unit},
         )
         unit_of_work.commit()
