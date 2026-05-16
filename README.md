@@ -128,7 +128,7 @@ Start-Process .\htmlcov\index.html ;
 
 ########## SONARQUBE
 
-docker compose up -d sonarqube sonardb
+docker compose up -d sonarqube sonardb ; 
 
 do {
     Start-Sleep -Seconds 5
