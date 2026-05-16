@@ -128,12 +128,8 @@ Start-Process .\htmlcov\index.html ;
 
 ########## SONARQUBE
 
-# Start SonarQube + DB
 docker compose up -d sonarqube sonardb
 
-Write-Host "Waiting for SonarQube to start..."
-
-# Wait until SonarQube API responds
 do {
     Start-Sleep -Seconds 5
 
@@ -148,9 +144,6 @@ do {
 
 } until ($status.status -eq "UP")
 
-Write-Host "SonarQube is UP"
-
-# Default credentials
 $oldPassword = "admin"
 $newPassword = "Admin1@Admin1@"
 
@@ -163,7 +156,6 @@ $headers = @{
     Authorization = "Basic $encoded"
 }
 
-# Change admin password
 Invoke-RestMethod `
     -Uri "http://127.0.0.1:9000/api/users/change_password" `
     -Method Post `
@@ -174,9 +166,6 @@ Invoke-RestMethod `
         password = $newPassword
     }
 
-Write-Host "Password changed"
-
-# Authenticate with new password
 $newPair = "admin:$newPassword"
 $newEncoded = [Convert]::ToBase64String(
     [Text.Encoding]::ASCII.GetBytes($newPair)
@@ -200,16 +189,11 @@ $tokenResponse = Invoke-RestMethod `
 
 $token = $tokenResponse.token
 
-Write-Host "Generated token:"
-Write-Host $token
-
-# Create .sonar.env dynamically
 @"
 SONAR_HOST_URL=http://sonarqube:9000
 SONAR_TOKEN=$token
 "@ | Out-File -Encoding utf8 ".sonar.env"
 
-# Run scanner
 $scannerOutput = docker run --rm `
     --network sonar-network `
     --env-file .sonar.env `
@@ -227,9 +211,6 @@ foreach ($url in $reportUrls) {
     $localUrl = $url `
         -replace "http://sonarqube:9000", "http://127.0.0.1:9000" `
         -replace "http://host.docker.internal:9000", "http://127.0.0.1:9000"
-
-    Write-Host "Opening:"
-    Write-Host $localUrl
 
     Start-Process $localUrl
 }
