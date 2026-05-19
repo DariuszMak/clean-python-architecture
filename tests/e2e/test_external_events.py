@@ -33,6 +33,4 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
                 data = json.loads(message["data"])
                 if data["order_id"] == order_id and data["batch_reference"] == later_batch:
                     return
-            raise AssertionError(
-                f"Did not receive reallocation message for order {order_id} to batch {later_batch}"
-            )
+            raise AssertionError(f"Did not receive reallocation message for order {order_id} to batch {later_batch}")
