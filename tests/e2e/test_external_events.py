@@ -10,7 +10,6 @@ from tests.random_references import random_batch_reference, random_order_id, ran
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
-@pytest.mark.usefixtures("restart_redis_pubsub")
 def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     order_id, stock_keeping_unit = random_order_id(), random_stock_keeping_unit()
@@ -27,12 +26,13 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     publish_message("change_batch_quantity", {"batch_reference": earlier_batch, "quantity": 5})
 
-    messages = []
     for attempt in Retrying(stop=stop_after_delay(10), reraise=True):
         with attempt:
             message = subscription.get_message(timeout=1)
             if message:
-                messages.append(message)
-            data = json.loads(messages[-1]["data"])
-            assert data["order_id"] == order_id
-            assert data["batch_reference"] == later_batch
+                data = json.loads(message["data"])
+                if data["order_id"] == order_id and data["batch_reference"] == later_batch:
+                    return
+            raise AssertionError(
+                f"Did not receive reallocation message for order {order_id} to batch {later_batch}"
+            )
