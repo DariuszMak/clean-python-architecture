@@ -2,11 +2,14 @@ __pycache__
 *.py[cod]
 *$py.class
 
+# PyInstaller
+build
+dist
+releases
+
 # Distribution / packaging
 .Python build
 develop-eggs
-build
-dist
 downloads
 eggs
 .eggs
@@ -16,24 +19,35 @@ parts
 sdist
 var
 wheels
+share/python-wheels
 *.egg-info
 .installed.cfg
 *.egg
 *.manifest
 *.spec
+*.bak
+
+# mypy
+.mypy_cache
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre
+
+# pytype static type analyzer
+.pytype
 
 # Log files
-pip-log.txt
-pip-delete-this-directory.txt
 *.log
 
 # Unit test / coverage reports
 htmlcov
+.nox
 .tox
 .coverage
 .coverage.*
 .cache
-.mypy_cache
 .pytest_cache
 nosetests.xml
 coverage.xml
@@ -45,6 +59,7 @@ coverage.xml
 *.pot
 
 # PyBuilder
+.pybuilder
 target
 
 # Jupyter Notebook
@@ -66,8 +81,18 @@ __pypackages__
 env
 venv
 ENV
+Pipfile
 
-# If you are using PyCharm #
+# UV
+uv.lock
+
+# SSL Certs
+.ca
+
+# Task
+.task
+
+# PyCharm
 .idea
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -100,16 +125,13 @@ Control.ca-bundle
 Control.system-ca-bundle
 GitHub.sublime-settings
 
-# Visual Studio Code #
+# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .history
-
-# UV
-uv.lock
 
 # Ruff
 ruff-report.json
