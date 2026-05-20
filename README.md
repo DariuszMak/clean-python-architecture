@@ -20,6 +20,18 @@
 - [Task](https://taskfile.dev/docs/installation) runner
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
+### Fast Windows dev
+
+```commandline
+task full-dev-windows ; 
+```
+
+### Full analysis
+
+```commandline
+task full-static-analyzis ; 
+```
+
 ## Fast native Windows development
 
 ```commandline
