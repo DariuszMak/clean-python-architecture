@@ -14,6 +14,12 @@
   <img src="images/structure_module_clustered.svg" alt="Library dependencies perspective" width="600">
 </p>
 
+## Requirements
+
+- [UV](https://github.com/astral-sh/uv) package manager
+- [Task](https://taskfile.dev/docs/installation) runner
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
 ## Fast native Windows development
 
 ```commandline
