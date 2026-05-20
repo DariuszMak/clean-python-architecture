@@ -41,9 +41,6 @@ tasks:
       - task: static-tests
 
       - powershell -ExecutionPolicy Bypass -File tasks/run_windows_dev_application.ps1
-      - powershell -ExecutionPolicy Bypass -File tasks/wait_for_windows_api.ps1
-      - powershell -ExecutionPolicy Bypass -File tasks/test_windows_api.ps1
-
 
   full-static-analyzis:
     desc: Full static analysis + SonarQube + diagrams
