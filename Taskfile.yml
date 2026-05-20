@@ -1,0 +1,57 @@
+version: '3'
+
+env:
+  UV_ENV_FILE: .dev.env
+
+tasks:
+
+  cleanup:
+    desc: Full project cleanup (docker, git, ports, caches)
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/cleanup.ps1
+
+  dev-env:
+    desc: Setup uv environment (Python, sync, lock)
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/dev_uv_environment.ps1
+      - powershell -ExecutionPolicy Bypass -File .venv/Scripts/Activate.ps1
+
+  static-tests:
+    desc: Static analysis + unit tests
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/static_analysis_and_tests.ps1
+
+  sonarqube:
+    desc: Run SonarQube analysis pipeline
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/sonarqube.ps1
+
+  generate-diagrams:
+    desc: Generate project diagrams
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/generate_diagrams.ps1
+
+
+  full-dev-windows:
+    desc: Fast native Windows development flow
+    deps:
+      - cleanup
+    cmds:
+      - task: dev-env
+      - task: static-tests
+      - task: kibana-elastic
+
+      - powershell -ExecutionPolicy Bypass -File tasks/run_windows_dev_application.ps1
+      - powershell -ExecutionPolicy Bypass -File tasks/wait_for_windows_api.ps1
+      - powershell -ExecutionPolicy Bypass -File tasks/test_windows_api.ps1
+
+
+  full-static-analyzis:
+    desc: Full static analysis + SonarQube + diagrams
+    deps:
+      - cleanup
+    cmds:
+      - task: dev-env
+      - task: static-tests
+      - task: sonarqube
+      - task: generate-diagrams
