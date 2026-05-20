@@ -14,7 +14,6 @@
   <img src="images/structure_module_clustered.svg" alt="Library dependencies perspective" width="600">
 </p>
 
-
 ## Fast native Windows development
 
 ```commandline
