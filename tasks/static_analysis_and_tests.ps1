@@ -1,0 +1,1 @@
+.\scripts\format_and_lint.ps1 ; 
