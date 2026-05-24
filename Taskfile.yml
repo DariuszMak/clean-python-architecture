@@ -16,7 +16,7 @@ tasks:
       - powershell -ExecutionPolicy Bypass -File tasks/dev_uv_environment.ps1
       - powershell -ExecutionPolicy Bypass -File .venv/Scripts/Activate.ps1
 
-  static-analyzis:
+  local-static-tests:
     desc: Static analysis
     cmds:
       - powershell -ExecutionPolicy Bypass -File tasks/static_analysis_and_tests.ps1
@@ -38,7 +38,7 @@ tasks:
       - cleanup
     cmds:
       - task: dev-env
-      - task: static-analyzis
+      - task: local-static-tests
 
       - powershell -ExecutionPolicy Bypass -File tasks/run_windows_dev_application.ps1
 
@@ -48,6 +48,6 @@ tasks:
       - cleanup
     cmds:
       - task: dev-env
-      - task: static-analyzis
+      - task: local-static-tests
       - task: sonarqube
       - task: generate-diagrams
