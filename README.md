@@ -23,7 +23,7 @@
 ### Fast Windows dev
 
 ```commandline
-task full-dev-windows ; 
+task full-dev-native ; 
 ```
 
 ### Full analysis

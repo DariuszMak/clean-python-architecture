@@ -32,7 +32,7 @@ tasks:
       - powershell -ExecutionPolicy Bypass -File tasks/generate_diagrams.ps1
 
 
-  full-dev-windows:
+  full-dev-native:
     desc: Fast native Windows development flow
     deps:
       - cleanup
