@@ -39,7 +39,7 @@ tasks:
       - task: dev-env
       - task: local-static-tests
 
-      - powershell -ExecutionPolicy Bypass -File tasks/run_windows_dev_application.ps1
+      - powershell -ExecutionPolicy Bypass -File tasks/run_native_dev_application.ps1
 
   full-static-analyzis:
     desc: Full static analysis + SonarQube + diagrams
