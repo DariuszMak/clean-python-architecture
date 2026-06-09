@@ -5,10 +5,10 @@ import requests
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
 from allocation import config
-from allocation.adapters import notifications
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import Allocate, CreateBatch
-from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+from adapters import notifications
+from bootstrap import bootstrap
+from domain.commands import Allocate, CreateBatch
+from service_layer.unit_of_work import SqlAlchemyUnitOfWork
 from tests.random_references import random_stock_keeping_unit
 
 

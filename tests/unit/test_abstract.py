@@ -2,8 +2,8 @@ from typing import Any
 
 import pytest
 
-from allocation.adapters.repository import AbstractRepository
-from allocation.service_layer.unit_of_work import AbstractUnitOfWork
+from adapters.repository import AbstractRepository
+from service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class BareRepository(AbstractRepository):  # type: ignore[misc]

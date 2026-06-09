@@ -1,7 +1,7 @@
 from unittest import mock
 
-from allocation.bootstrap import bootstrap
-from allocation.service_layer.messagebus import MessageBus
+from bootstrap import bootstrap
+from service_layer.messagebus import MessageBus
 from tests.unit.test_handlers import FakeUnitOfWork
 
 
@@ -12,11 +12,11 @@ def test_bootstrap_creates_default_unit_of_work_when_none_given() -> None:
 
     with (
         mock.patch(
-            "allocation.service_layer.unit_of_work.DEFAULT_SESSION_FACTORY",
+            "service_layer.unit_of_work.DEFAULT_SESSION_FACTORY",
             fake_session_factory,
         ),
-        mock.patch("allocation.adapters.orm.start_mappers"),
-        mock.patch("allocation.adapters.notifications.EmailNotifications") as mock_notif,
+        mock.patch("adapters.orm.start_mappers"),
+        mock.patch("adapters.notifications.EmailNotifications") as mock_notif,
     ):
         mock_notif.return_value = mock.MagicMock()
         bus = bootstrap(
@@ -31,7 +31,7 @@ def test_bootstrap_creates_default_unit_of_work_when_none_given() -> None:
 
 def test_bootstrap_creates_default_notifications_when_none_given() -> None:
 
-    with mock.patch("allocation.bootstrap.EmailNotifications") as mock_notif:
+    with mock.patch("bootstrap.EmailNotifications") as mock_notif:
         mock_notif_instance = mock.MagicMock()
         mock_notif.return_value = mock_notif_instance
 

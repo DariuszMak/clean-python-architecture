@@ -3,8 +3,8 @@ from datetime import UTC, date, datetime, timedelta
 from hypothesis import assume, given
 from hypothesis import strategies as st
 
-from allocation.domain import events
-from allocation.domain.model import Batch, OrderLine, Product
+from domain import events
+from domain.model import Batch, OrderLine, Product
 
 today = datetime.now(tz=UTC).date()
 tomorrow = today + timedelta(days=1)

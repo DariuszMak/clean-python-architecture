@@ -5,15 +5,15 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
-from allocation.views import allocations
+from bootstrap import bootstrap
+from domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
+from service_layer.unit_of_work import SqlAlchemyUnitOfWork
+from views import allocations
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from allocation.service_layer.messagebus import MessageBus
+    from service_layer.messagebus import MessageBus
 
 today = datetime.now(tz=UTC).date()
 

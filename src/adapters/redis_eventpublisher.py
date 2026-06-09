@@ -9,7 +9,7 @@ import structlog
 from allocation import config
 
 if TYPE_CHECKING:
-    from allocation.domain import events
+    from domain import events
 
 logger = structlog.get_logger(__name__)
 

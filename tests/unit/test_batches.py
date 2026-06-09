@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from hypothesis import assume, given
 from hypothesis import strategies as st
 
-from allocation.domain.model import Batch, OrderLine
+from domain.model import Batch, OrderLine
 
 batch_quantity = st.integers(min_value=1, max_value=10_000)
 line_quantity = st.integers(min_value=1, max_value=10_000)
