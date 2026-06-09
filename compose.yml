@@ -21,7 +21,7 @@ services:
       - ./tests:/tests
     entrypoint:
       - python
-      - /src/entrypoints/
+      - /src/entrypoints/redis_eventconsumer.py
 
   api:
     image: allocation-image
