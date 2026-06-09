@@ -2,8 +2,9 @@ import json
 import logging
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, cast
-import structlog
+
 import redis
+import structlog
 
 from allocation import config
 

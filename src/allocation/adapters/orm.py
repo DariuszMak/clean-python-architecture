@@ -1,5 +1,5 @@
-import logging
 from typing import Any
+
 import structlog
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship

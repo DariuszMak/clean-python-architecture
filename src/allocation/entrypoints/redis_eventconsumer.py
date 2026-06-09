@@ -1,9 +1,9 @@
 import json
-import logging
 from typing import TYPE_CHECKING, Any
 
 import redis
 import structlog
+
 from allocation import config
 from allocation.bootstrap import bootstrap
 from allocation.domain.commands import ChangeBatchQuantity
