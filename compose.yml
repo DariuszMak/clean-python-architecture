@@ -20,10 +20,8 @@ services:
       - ./src:/src
       - ./tests:/tests
     entrypoint:
-      - uv
-      - run
       - python
-      - src/entrypoints/redis_eventconsumer.py
+      - /src/entrypoints/
 
   api:
     image: allocation-image
