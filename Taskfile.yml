@@ -20,6 +20,11 @@ tasks:
     cmds:
       - powershell -ExecutionPolicy Bypass -File tasks/static_analysis_and_tests.ps1
 
+  kibana-elastic:
+    desc: Start Elastic + Kibana stack
+    cmds:
+      - powershell -ExecutionPolicy Bypass -File tasks/kibana_elastic.ps1
+
   sonarqube:
     desc: Run SonarQube analysis pipeline
     cmds:
@@ -38,7 +43,7 @@ tasks:
     cmds:
       - task: dev-env
       - task: local-static-tests
-
+      - task: kibana-elastic
       - powershell -ExecutionPolicy Bypass -File tasks/run_native_dev_application.ps1
 
   full-static-analyzis:
