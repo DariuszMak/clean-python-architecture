@@ -97,7 +97,7 @@ def postgres_session(
 
 @pytest.fixture
 def restart_api() -> None:
-    (Path(__file__).parent / "../src/allocation/entrypoints/flask_app.py").touch()
+    (Path(__file__).parent / "../src/entrypoints/flask_app.py").touch()
     time.sleep(2)
     wait_for_webapp_to_come_up()
 
