@@ -45,7 +45,7 @@ estimated_time_of_arrival_days = st.one_of(
 )
 
 
-class FakeRepository(AbstractRepository):  # type: ignore[misc]
+class FakeRepository(AbstractRepository):
     def __init__(self, products: Iterable[Any]) -> None:
         super().__init__()
         self._products = set(products)
@@ -63,7 +63,7 @@ class FakeRepository(AbstractRepository):  # type: ignore[misc]
         )
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
+class FakeUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
         self.products: FakeRepository = FakeRepository([])
         self.committed: bool = False
@@ -75,7 +75,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
         pass
 
 
-class FakeNotifications(AbstractNotifications):  # type: ignore[misc]
+class FakeNotifications(AbstractNotifications):
     def __init__(self) -> None:
         self.sent: dict[str, list[str]] = defaultdict(list)
 
