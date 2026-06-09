@@ -2,7 +2,7 @@ import json
 import logging
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, cast
-
+import structlog
 import redis
 
 from allocation import config
@@ -10,7 +10,7 @@ from allocation import config
 if TYPE_CHECKING:
     from allocation.domain import events
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 r = redis.Redis(**cast("dict[str, Any]", config.get_redis_host_and_port()))
 

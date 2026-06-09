@@ -1,17 +1,20 @@
 import inspect
 from collections.abc import Callable
 from typing import Any
-
+import structlog
 from allocation.adapters.notifications import AbstractNotifications, EmailNotifications
 from allocation.adapters.orm import start_mappers
 from allocation.adapters.redis_eventpublisher import publish
 from allocation.service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 from allocation.service_layer.messagebus import MessageBus
 from allocation.service_layer.unit_of_work import AbstractUnitOfWork, SqlAlchemyUnitOfWork
+from src.helpers.logging_setup import logging_setup
 
 PublishCallable = Callable[..., Any]
 HandlerCallable = Callable[..., Any]
 InjectedHandler = Callable[[Any], Any]
+
+logging_setup()
 
 
 def bootstrap(

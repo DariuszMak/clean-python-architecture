@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from typing import Protocol
-
+import structlog
 from allocation.domain import events
 from allocation.domain.commands import Command
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 type Message = Command | events.Event
 
