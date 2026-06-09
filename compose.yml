@@ -10,6 +10,7 @@ services:
       - redis
       - mailhog
     environment:
+      - PYTHONPATH=src
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - REDIS_HOST=redis
