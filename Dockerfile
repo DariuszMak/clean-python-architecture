@@ -11,7 +11,7 @@ COPY pyproject.toml uv.lock* /src/
 COPY src/ /src/
 
 WORKDIR /src
-RUN uv pip install --system --group dev -e .
+RUN uv sync --dev --no-cache
 
 RUN apk del --no-cache .build-deps
 
