@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, cast
+from typing import Any
 
 from src.adapters.notifications import AbstractNotifications, EmailNotifications
 from src.adapters.orm import start_mappers
@@ -47,8 +47,10 @@ def bootstrap(
 
     bus_unit_of_work: AbstractUnitOfWork | None = unit_of_work
 
+    assert bus_unit_of_work is not None
+
     return MessageBus(
-        unit_of_work=cast("AbstractUnitOfWork", bus_unit_of_work),
+        unit_of_work=bus_unit_of_work,
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )
