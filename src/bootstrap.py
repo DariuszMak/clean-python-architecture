@@ -24,15 +24,8 @@ def bootstrap(
     publish: PublishCallable = publish,
 ) -> MessageBus:
 
-    if unit_of_work is None:
-        uow: AbstractUnitOfWork = SqlAlchemyUnitOfWork()
-    else:
-        uow = unit_of_work
-
-    if notifications is None:
-        notif: AbstractNotifications = EmailNotifications()
-    else:
-        notif = notifications
+    uow = unit_of_work or SqlAlchemyUnitOfWork()
+    notif = notifications or EmailNotifications()
 
     if start_orm:
         start_mappers()
@@ -52,7 +45,9 @@ def bootstrap(
         command_type: inject_dependencies(handler, dependencies) for command_type, handler in COMMAND_HANDLERS.items()
     }
 
-    bus_unit_of_work: AbstractUnitOfWork = unit_of_work
+    bus_unit_of_work: AbstractUnitOfWork | None = unit_of_work
+
+    assert bus_unit_of_work is not None
 
     return MessageBus(
         unit_of_work=bus_unit_of_work,
