@@ -2,7 +2,7 @@
 name = "eda-template-python"
 version = "0.1.0"
 description = "EDA template"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "flask>=3.1.3",
     "psycopg2-binary>=2.9.12",
@@ -32,7 +32,7 @@ dev = [
 ]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.13"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
@@ -70,8 +70,8 @@ exclude = [
 ]
 line-length = 120
 indent-width = 4
-# Assume Python 3.14
-target-version = "py314"
+# Assume Python 3.13
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
