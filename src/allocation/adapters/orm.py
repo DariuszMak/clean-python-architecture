@@ -4,7 +4,7 @@ import structlog
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
-from domain.model import Batch, OrderLine, Product
+from src.domain.model import Batch, OrderLine, Product
 
 logger = structlog.get_logger(__name__)
 

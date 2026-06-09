@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from sqlalchemy import text
 
-from domain.model import OrderLine
-from service_layer.unit_of_work import SqlAlchemyUnitOfWork
+from src.domain.model import OrderLine
+from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 from tests.random_references import random_batch_reference, random_order_id, random_stock_keeping_unit
 
 if TYPE_CHECKING:

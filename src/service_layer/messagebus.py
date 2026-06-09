@@ -5,8 +5,8 @@ from typing import Protocol
 
 import structlog
 
-from domain import events
-from domain.commands import Command
+from src.domain import events
+from src.domain.commands import Command
 
 logger = structlog.get_logger(__name__)
 

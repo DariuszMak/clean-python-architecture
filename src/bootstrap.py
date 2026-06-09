@@ -2,13 +2,13 @@ import inspect
 from collections.abc import Callable
 from typing import Any
 
-from adapters.notifications import AbstractNotifications, EmailNotifications
-from adapters.orm import start_mappers
-from adapters.redis_eventpublisher import publish
-from service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
-from service_layer.messagebus import MessageBus
-from service_layer.unit_of_work import AbstractUnitOfWork, SqlAlchemyUnitOfWork
+from src.adapters.notifications import AbstractNotifications, EmailNotifications
+from src.adapters.orm import start_mappers
+from src.adapters.redis_eventpublisher import publish
 from src.helpers.logging_setup import logging_setup
+from src.service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
+from src.service_layer.messagebus import MessageBus
+from src.service_layer.unit_of_work import AbstractUnitOfWork, SqlAlchemyUnitOfWork
 
 PublishCallable = Callable[..., Any]
 HandlerCallable = Callable[..., Any]

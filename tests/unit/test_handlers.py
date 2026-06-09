@@ -8,12 +8,12 @@ import pytest
 from hypothesis import assume, given
 from hypothesis import strategies as st
 
-from adapters.notifications import AbstractNotifications
-from adapters.repository import AbstractRepository
-from bootstrap import bootstrap
-from domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from service_layer.handlers import InvalidStockKeepingUnitError
-from service_layer.unit_of_work import AbstractUnitOfWork
+from src.adapters.notifications import AbstractNotifications
+from src.adapters.repository import AbstractRepository
+from src.bootstrap import bootstrap
+from src.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
+from src.service_layer.handlers import InvalidStockKeepingUnitError
+from src.service_layer.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

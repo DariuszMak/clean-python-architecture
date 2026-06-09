@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING, Any, Self
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from adapters.repository import SqlAlchemyRepository
+from src.adapters.repository import SqlAlchemyRepository
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-config = importlib.import_module("config")
-repository = importlib.import_module("adapters.repository")
+config = importlib.import_module("src.config")
+repository = importlib.import_module("src.adapters.repository")
 
 
 class AbstractUnitOfWork(abc.ABC):

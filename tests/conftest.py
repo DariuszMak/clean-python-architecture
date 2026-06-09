@@ -11,8 +11,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
-from adapters.orm import metadata, start_mappers
 from src import config
+from src.adapters.orm import metadata, start_mappers
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator

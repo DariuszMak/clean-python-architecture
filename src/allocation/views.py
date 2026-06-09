@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import text
 
 if TYPE_CHECKING:
-    from service_layer.unit_of_work import SqlAlchemyUnitOfWork
+    from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 
 def allocations(order_id: str, unit_of_work: SqlAlchemyUnitOfWork) -> list[dict[str, str]]:

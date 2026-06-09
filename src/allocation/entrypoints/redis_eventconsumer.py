@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any
 import redis
 import structlog
 
-from bootstrap import bootstrap
-from domain.commands import ChangeBatchQuantity
 from src import config
+from src.bootstrap import bootstrap
+from src.domain.commands import ChangeBatchQuantity
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
