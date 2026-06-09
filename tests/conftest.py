@@ -19,12 +19,11 @@ if TYPE_CHECKING:
 
     from sqlalchemy.engine import Engine
 
-    from config import RedisConfig
 
 pytest.register_assert_rewrite("tests.e2e.api_client")
 
 get_api_url: Callable[[], str] = config.get_api_url
-get_redis_host_and_port: Callable[[], RedisConfig] = config.get_redis_host_and_port
+get_redis_host_and_port: Callable[[], config.RedisConfig] = config.get_redis_host_and_port
 get_postgres_uri: Callable[[], str] = config.get_postgres_uri
 
 start_mappers_typed: Callable[[], None] = start_mappers
