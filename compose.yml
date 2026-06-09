@@ -10,7 +10,6 @@ services:
       - redis
       - mailhog
     environment:
-      - PYTHONPATH=src
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - REDIS_HOST=redis
@@ -19,9 +18,11 @@ services:
     volumes:
       - ./src:/src
       - ./tests:/tests
+    working_dir: /src
     entrypoint:
       - python
-      - /src/entrypoints/redis_eventconsumer.py
+      - -m
+      - entrypoints.redis_eventconsumer
 
   api:
     image: allocation-image
