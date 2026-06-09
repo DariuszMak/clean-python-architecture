@@ -3,7 +3,7 @@ from typing import Any
 
 import redis
 
-from allocation import config
+from src import config
 
 get_redis_host_and_port = config.get_redis_host_and_port
 

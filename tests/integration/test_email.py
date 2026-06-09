@@ -4,7 +4,7 @@ import pytest
 import requests
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation import config
+from src import config
 from adapters import notifications
 from bootstrap import bootstrap
 from domain.commands import Allocate, CreateBatch

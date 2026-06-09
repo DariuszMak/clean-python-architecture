@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 import redis
 import structlog
 
-from allocation import config
+from src import config
 
 if TYPE_CHECKING:
     from domain import events

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 import redis
 import structlog
 
-from allocation import config
+from src import config
 from bootstrap import bootstrap
 from domain.commands import ChangeBatchQuantity
 
