@@ -23,23 +23,18 @@ def bootstrap(
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = publish,
 ) -> MessageBus:
-
     if unit_of_work is None:
-        uow: AbstractUnitOfWork = SqlAlchemyUnitOfWork()
-    else:
-        uow = unit_of_work
+        unit_of_work = SqlAlchemyUnitOfWork()
 
     if notifications is None:
-        notif: AbstractNotifications = EmailNotifications()
-    else:
-        notif = notifications
+        notifications = EmailNotifications()
 
     if start_orm:
         start_mappers()
 
     dependencies: dict[str, Any] = {
-        "unit_of_work": uow,
-        "notifications": notif,
+        "unit_of_work": unit_of_work,
+        "notifications": notifications,
         "publish": publish,
     }
 
