@@ -1,12 +1,14 @@
 import logging
-from collections.abc import Generator
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from src.helpers import logging_setup
 import structlog
 
+from src.helpers import logging_setup
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from pathlib import Path
 
 
 @pytest.fixture(autouse=True)
