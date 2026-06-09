@@ -20,7 +20,7 @@ services:
       - ./tests:/tests
     entrypoint:
       - python
-      - /src/allocation/entrypoints/redis_eventconsumer.py
+      - /src/entrypoints/redis_eventconsumer.py
 
   api:
     image: allocation-image
@@ -34,7 +34,7 @@ services:
       - REDIS_HOST=redis
       - EMAIL_HOST=mailhog
       - PYTHONDONTWRITEBYTECODE=1
-      - FLASK_APP=allocation/entrypoints/flask_app.py
+      - FLASK_APP=entrypoints/flask_app.py
       - FLASK_DEBUG=1
       - PYTHONUNBUFFERED=1
     volumes:
