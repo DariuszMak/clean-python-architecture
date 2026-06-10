@@ -23,8 +23,11 @@ def bootstrap(
     notifications: AbstractNotifications | None = None,
     publish: PublishCallable = publish,
 ) -> MessageBus:
+    uow: AbstractUnitOfWork
     if unit_of_work is None:
-        unit_of_work = SqlAlchemyUnitOfWork()
+        uow = SqlAlchemyUnitOfWork()
+    else:
+        uow = unit_of_work
 
     if notifications is None:
         notifications = EmailNotifications()
@@ -33,7 +36,7 @@ def bootstrap(
         start_mappers()
 
     dependencies: dict[str, Any] = {
-        "unit_of_work": unit_of_work,
+        "unit_of_work": uow,
         "notifications": notifications,
         "publish": publish,
     }
@@ -47,10 +50,8 @@ def bootstrap(
         command_type: inject_dependencies(handler, dependencies) for command_type, handler in COMMAND_HANDLERS.items()
     }
 
-    bus_unit_of_work: AbstractUnitOfWork = unit_of_work
-
     return MessageBus(
-        unit_of_work=bus_unit_of_work,
+        unit_of_work=uow,
         event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )

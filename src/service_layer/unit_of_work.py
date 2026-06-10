@@ -33,11 +33,9 @@ class AbstractUnitOfWork(abc.ABC):
             while product.events:
                 yield product.events.pop(0)
 
-    @abc.abstractmethod
     def _commit(self) -> None:
         raise NotImplementedError
 
-    @abc.abstractmethod
     def rollback(self) -> None:
         raise NotImplementedError
 

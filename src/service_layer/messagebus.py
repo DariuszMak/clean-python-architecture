@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Protocol
 
 import structlog
@@ -14,7 +14,7 @@ type Message = Command | events.Event
 
 
 class AbstractUnitOfWork(Protocol):
-    def collect_new_events(self) -> list[events.Event]: ...
+    def collect_new_events(self) -> Iterable[events.Event]: ...
 
 
 EventHandler = Callable[[events.Event], None]
