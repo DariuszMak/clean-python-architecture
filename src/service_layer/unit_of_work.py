@@ -12,7 +12,7 @@ from src.adapters.repository import SqlAlchemyRepository
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-config = importlib.import_module("src.config")
+config = importlib.import_module("src.helpers.config")
 repository = importlib.import_module("src.adapters.repository")
 
 

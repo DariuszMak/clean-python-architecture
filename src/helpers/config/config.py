@@ -1,4 +1,6 @@
+import os
 from dataclasses import dataclass
+from typing import TypedDict
 
 from src.helpers.config.env_loader_mixin import EnvLoaderMixin
 
@@ -6,10 +8,6 @@ from src.helpers.config.env_loader_mixin import EnvLoaderMixin
 @dataclass(frozen=True)
 class Config(EnvLoaderMixin):
     log_file: str = "app.log"
-
-
-import os
-from typing import TypedDict
 
 
 class RedisConfig(TypedDict):
