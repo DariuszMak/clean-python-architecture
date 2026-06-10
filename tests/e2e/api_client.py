@@ -3,7 +3,7 @@ from typing import Any
 import requests
 from requests import Response
 
-from src import config
+from src.helpers.config import config
 
 TIMEOUT: int = 5
 

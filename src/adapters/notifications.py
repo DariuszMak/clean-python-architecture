@@ -1,7 +1,7 @@
 import abc
 import smtplib
 
-from src import config
+from src.helpers.config import config
 
 
 class AbstractNotifications(abc.ABC):
