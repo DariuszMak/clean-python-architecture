@@ -8,9 +8,9 @@ from unittest import mock
 
 import pytest
 
-import allocation.entrypoints.flask_app as flask_module
-import allocation.entrypoints.redis_eventconsumer as consumer
-from allocation.service_layer.handlers import InvalidStockKeepingUnitError
+import src.entrypoints.flask_app as flask_module
+import src.entrypoints.redis_eventconsumer as consumer
+from src.service_layer.handlers import InvalidStockKeepingUnitError
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 FAKE_BUS = mock.MagicMock()
-BOOTSTRAP_PATH = "allocation.bootstrap.bootstrap"
+BOOTSTRAP_PATH = "src.bootstrap.bootstrap"
 
 
 @pytest.fixture()

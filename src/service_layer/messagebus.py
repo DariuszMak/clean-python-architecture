@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from typing import Protocol
 
-from allocation.domain import events
-from allocation.domain.commands import Command
+import structlog
 
-logger = logging.getLogger(__name__)
+from src.domain import events
+from src.domain.commands import Command
+
+logger = structlog.get_logger(__name__)
 
 type Message = Command | events.Event
 

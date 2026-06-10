@@ -2,8 +2,10 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from src.helpers.logging_setup import logging_setup
+
 import structlog
+
+from src.helpers.logging_setup import logging_setup
 
 
 if TYPE_CHECKING:

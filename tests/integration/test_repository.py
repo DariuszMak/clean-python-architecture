@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from allocation.adapters.repository import SqlAlchemyRepository
-from allocation.domain.model import Batch, Product
+from src.adapters.repository import SqlAlchemyRepository
+from src.domain.model import Batch, Product
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker

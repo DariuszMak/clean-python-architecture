@@ -1,12 +1,12 @@
-import logging
 from typing import Any
 
+import structlog
 from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
-from allocation.domain.model import Batch, OrderLine, Product
+from src.domain.model import Batch, OrderLine, Product
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 metadata = MetaData()
 mapper_registry = registry()

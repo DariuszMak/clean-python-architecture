@@ -4,11 +4,11 @@ import pytest
 import requests
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 
-from allocation import config
-from allocation.adapters import notifications
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import Allocate, CreateBatch
-from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+from src import config
+from src.adapters import notifications
+from src.bootstrap import bootstrap
+from src.domain.commands import Allocate, CreateBatch
+from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 from tests.random_references import random_stock_keeping_unit
 
 

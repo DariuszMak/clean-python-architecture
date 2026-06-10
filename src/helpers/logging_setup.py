@@ -1,10 +1,9 @@
 import logging
 
-from src.helpers.config.config import Config
+
 import structlog
 
-
-
+from src.helpers.config.config import Config
 
 def logging_setup(
     level: int = logging.INFO,

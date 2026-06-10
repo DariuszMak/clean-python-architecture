@@ -2,11 +2,11 @@ from typing import Any
 
 import pytest
 
-from allocation.adapters.repository import AbstractRepository
-from allocation.service_layer.unit_of_work import AbstractUnitOfWork
+from src.adapters.repository import AbstractRepository
+from src.service_layer.unit_of_work import AbstractUnitOfWork
 
 
-class BareRepository(AbstractRepository):  # type: ignore[misc]
+class BareRepository(AbstractRepository):
     def _add(self, product: Any) -> Any:
         super()._add(product)
 
@@ -35,7 +35,7 @@ def test_abstract_repository_get_by_batch_reference_raises() -> None:
         repo._get_by_batch_reference("any-reference")
 
 
-class BareUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
+class BareUnitOfWork(AbstractUnitOfWork):
     def _commit(self) -> None:
         super()._commit()
 

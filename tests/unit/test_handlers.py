@@ -8,12 +8,12 @@ import pytest
 from hypothesis import assume, given
 from hypothesis import strategies as st
 
-from allocation.adapters.notifications import AbstractNotifications
-from allocation.adapters.repository import AbstractRepository
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
-from allocation.service_layer.handlers import InvalidStockKeepingUnitError
-from allocation.service_layer.unit_of_work import AbstractUnitOfWork
+from src.adapters.notifications import AbstractNotifications
+from src.adapters.repository import AbstractRepository
+from src.bootstrap import bootstrap
+from src.domain.commands import Allocate, ChangeBatchQuantity, CreateBatch
+from src.service_layer.handlers import InvalidStockKeepingUnitError
+from src.service_layer.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -45,7 +45,7 @@ estimated_time_of_arrival_days = st.one_of(
 )
 
 
-class FakeRepository(AbstractRepository):  # type: ignore[misc]
+class FakeRepository(AbstractRepository):
     def __init__(self, products: Iterable[Any]) -> None:
         super().__init__()
         self._products = set(products)
@@ -63,7 +63,7 @@ class FakeRepository(AbstractRepository):  # type: ignore[misc]
         )
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
+class FakeUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
         self.products: FakeRepository = FakeRepository([])
         self.committed: bool = False
@@ -75,7 +75,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):  # type: ignore[misc]
         pass
 
 
-class FakeNotifications(AbstractNotifications):  # type: ignore[misc]
+class FakeNotifications(AbstractNotifications):
     def __init__(self) -> None:
         self.sent: dict[str, list[str]] = defaultdict(list)
 

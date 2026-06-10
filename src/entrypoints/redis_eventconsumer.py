@@ -1,17 +1,17 @@
 import json
-import logging
 from typing import TYPE_CHECKING, Any
 
 import redis
+import structlog
 
-from allocation import config
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import ChangeBatchQuantity
+from src import config
+from src.bootstrap import bootstrap
+from src.domain.commands import ChangeBatchQuantity
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 RedisMessage = dict[str, Any]
 

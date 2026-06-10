@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from sqlalchemy import text
 
-from allocation.domain import events
-from allocation.domain.commands import Allocate, ChangeBatchQuantity, Command, CreateBatch
-from allocation.domain.model import Batch, OrderLine, Product
+from src.domain import events
+from src.domain.commands import Allocate, ChangeBatchQuantity, Command, CreateBatch
+from src.domain.model import Batch, OrderLine, Product
 
 if TYPE_CHECKING:
     from collections.abc import Callable

@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING, cast
 
 from flask import Flask, Response, jsonify, request
 
-from allocation.bootstrap import bootstrap
-from allocation.domain.commands import Allocate, CreateBatch
-from allocation.service_layer.handlers import InvalidStockKeepingUnitError
-from allocation.views import allocations
+from src.bootstrap import bootstrap
+from src.domain.commands import Allocate, CreateBatch
+from src.service_layer.handlers import InvalidStockKeepingUnitError
+from src.views import allocations
 
 if TYPE_CHECKING:
-    from allocation.service_layer.unit_of_work import SqlAlchemyUnitOfWork
+    from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = Flask(__name__)
 bus = bootstrap()
