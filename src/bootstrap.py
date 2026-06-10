@@ -24,10 +24,7 @@ def bootstrap(
     publish: PublishCallable = publish,
 ) -> MessageBus:
     uow: AbstractUnitOfWork
-    if unit_of_work is None:
-        uow = SqlAlchemyUnitOfWork()
-    else:
-        uow = unit_of_work
+    uow = SqlAlchemyUnitOfWork() if unit_of_work is None else unit_of_work
 
     if notifications is None:
         notifications = EmailNotifications()
