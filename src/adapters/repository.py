@@ -28,13 +28,19 @@ class AbstractRepository(abc.ABC):
             self.seen.add(product)
         return product
 
+    @abc.abstractmethod
     def _add(self, product: Product) -> None:
+        """Add a product to the repository."""
         raise NotImplementedError
 
+    @abc.abstractmethod
     def _get(self, stock_keeping_unit: str) -> Product | None:
+        """Get a product by stock keeping unit."""
         raise NotImplementedError
 
+    @abc.abstractmethod
     def _get_by_batch_reference(self, batch_reference: str) -> Product | None:
+        """Get a product by batch reference."""
         raise NotImplementedError
 
 
