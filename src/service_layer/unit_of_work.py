@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from src.adapters.repository import SqlAlchemyRepository
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from src.domain import events
 
 config = importlib.import_module("src.helpers.config.config")
 repository = importlib.import_module("src.adapters.repository")
@@ -28,10 +28,12 @@ class AbstractUnitOfWork(abc.ABC):
     def commit(self) -> None:
         self._commit()
 
-    def collect_new_events(self) -> Iterator[Any]:
+    def collect_new_events(self) -> list[events.Event]:
+        collected: list[events.Event] = []
         for product in self.products.seen:
             while product.events:
-                yield product.events.pop(0)
+                collected.append(product.events.pop(0))
+        return collected
 
     @abc.abstractmethod
     def _commit(self) -> None:

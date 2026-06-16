@@ -8,13 +8,13 @@ from src.service_layer.unit_of_work import AbstractUnitOfWork
 
 class BareRepository(AbstractRepository):
     def _add(self, product: Any) -> Any:
-        super()._add(product)
+        raise NotImplementedError
 
     def _get(self, stock_keeping_unit: str) -> Any:
-        return super()._get(stock_keeping_unit)
+        raise NotImplementedError
 
     def _get_by_batch_reference(self, batch_reference: str) -> Any:
-        return super()._get_by_batch_reference(batch_reference)
+        raise NotImplementedError
 
 
 def test_abstract_repository_add_raises() -> None:
@@ -37,10 +37,10 @@ def test_abstract_repository_get_by_batch_reference_raises() -> None:
 
 class BareUnitOfWork(AbstractUnitOfWork):
     def _commit(self) -> None:
-        super()._commit()
+        raise NotImplementedError
 
     def rollback(self) -> None:
-        super().rollback()
+        raise NotImplementedError
 
 
 def test_abstract_unit_of_work_commit_raises() -> None:
