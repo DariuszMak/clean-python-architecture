@@ -1,5 +1,14 @@
 # EDA template - Python
 
+<p align="center">
+  <img src="images/runtime/1.png" alt="Redis monitor" width="600">
+</p>
+
+<p align="center">
+  <img src="images/runtime/2.png" alt="E2E and integration tests" width="600">
+</p>
+
+
 ### Project structure diagrams
 
 ##### Modular perspective
