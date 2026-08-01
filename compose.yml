@@ -91,6 +91,7 @@ services:
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./:/usr/share/filebeat/app_logs:ro
     depends_on:
       - elasticsearch
       - kibana
@@ -137,11 +138,11 @@ services:
       - sonar-network
 
 volumes:
+  elasticsearch_data:
   sonarqube_data:
   sonarqube_logs:
   sonarqube_extensions:
   sonardb_data:
-  elasticsearch_data:
 
 networks:
   sonar-network:
