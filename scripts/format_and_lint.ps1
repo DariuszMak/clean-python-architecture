@@ -18,3 +18,8 @@ uv run mypy --strict src tests
 # uv run mypy --strict src tests
 
 uv run lint-imports --config pyproject.toml
+
+uv run semgrep --config=auto --config=p/security-audit --error src tests
+
+uv run coverage report
+uv run coverage xml
