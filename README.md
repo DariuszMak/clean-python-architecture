@@ -31,13 +31,13 @@
 
 ### Fast Windows dev
 
-```commandline
+```console
 task full-dev-native ; 
 ```
 
 ### Full analysis
 
-```commandline
+```console
 task full-static-analyzis ; 
 ```
 
