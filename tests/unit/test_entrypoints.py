@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
-import src.entrypoints.flask_app as fastapi_module
 from fastapi.testclient import TestClient
 
+import src.entrypoints.flask_app as fastapi_module
 import src.entrypoints.redis_eventconsumer as consumer
 from src.service_layer.handlers import InvalidStockKeepingUnitError
 
