@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import date
 from typing import TYPE_CHECKING, cast
 
-from flask import Flask, Response, jsonify, request
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from src.bootstrap import bootstrap
 from src.domain.commands import Allocate, CreateBatch
@@ -11,51 +13,71 @@ from src.views import allocations
 if TYPE_CHECKING:
     from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
-app = Flask(__name__)
+app = FastAPI()
 bus = bootstrap()
 
 
-@app.route("/add_batch", methods=["POST"])
-def add_batch() -> tuple[Response, int]:
-    estimated_time_of_arrival = request.json["estimated_time_of_arrival"]
-    if estimated_time_of_arrival is not None:
-        estimated_time_of_arrival = datetime.fromisoformat(estimated_time_of_arrival).date()
+class AddBatchRequest(BaseModel):
+    reference: str
+    stock_keeping_unit: str
+    quantity: int
+    estimated_time_of_arrival: date | None = None
 
+
+class AllocateRequest(BaseModel):
+    order_id: str
+    stock_keeping_unit: str
+    quantity: int
+
+
+@app.post("/add_batch", status_code=status.HTTP_201_CREATED)
+def add_batch(request_data: AddBatchRequest) -> dict[str, str]:
     cmd = CreateBatch(
-        request.json["reference"],
-        request.json["stock_keeping_unit"],
-        request.json["quantity"],
-        estimated_time_of_arrival,
+        request_data.reference,
+        request_data.stock_keeping_unit,
+        request_data.quantity,
+        request_data.estimated_time_of_arrival,
     )
     bus.handle(cmd)
 
-    return jsonify({"status": "OK"}), 201
+    return {"status": "OK"}
 
 
-@app.route("/allocate", methods=["POST"])
-def allocate_endpoint() -> tuple[Response, int]:
+@app.post("/allocate", status_code=status.HTTP_202_ACCEPTED)
+def allocate_endpoint(request_data: AllocateRequest) -> JSONResponse:
     try:
         cmd = Allocate(
-            request.json["order_id"],
-            request.json["stock_keeping_unit"],
-            request.json["quantity"],
+            request_data.order_id,
+            request_data.stock_keeping_unit,
+            request_data.quantity,
         )
         bus.handle(cmd)
-
     except InvalidStockKeepingUnitError as e:
-        return jsonify({"message": str(e)}), 400
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": str(e)},
+        )
 
-    return jsonify({"status": "OK"}), 202
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content={"status": "OK"},
+    )
 
 
-@app.route("/allocations/<order_id>", methods=["GET"])
-def allocations_view_endpoint(order_id: str) -> tuple[Response, int]:
+@app.get("/allocations/{order_id}")
+def allocations_view_endpoint(order_id: str) -> JSONResponse:
     result = allocations(
         order_id,
         cast("SqlAlchemyUnitOfWork", bus.unit_of_work),
     )
 
     if not result:
-        return jsonify({"message": "not found"}), 404
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "not found"},
+        )
 
-    return jsonify(result), 200
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=result,
+    )

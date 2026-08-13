@@ -7,34 +7,32 @@ from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
+from fastapi.testclient import TestClient
 
-import src.entrypoints.flask_app as flask_module
+import src.entrypoints.fastapi_app as fastapi_module
 import src.entrypoints.redis_eventconsumer as consumer
 from src.service_layer.handlers import InvalidStockKeepingUnitError
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from flask.testing import FlaskClient
-
 FAKE_BUS = mock.MagicMock()
 BOOTSTRAP_PATH = "src.bootstrap.bootstrap"
 
 
 @pytest.fixture()
-def flask_client() -> Generator[tuple[FlaskClient, Any]]:
+def api_client() -> Generator[tuple[TestClient, Any]]:
     with mock.patch(BOOTSTRAP_PATH, return_value=FAKE_BUS):
-        importlib.reload(flask_module)
-        flask_module.app.config["TESTING"] = True
+        importlib.reload(fastapi_module)
 
-        with flask_module.app.test_client() as client:
-            yield client, flask_module
+        with TestClient(fastapi_module.app) as client:
+            yield client, fastapi_module
 
 
 def test_add_batch_returns_201(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, _ = flask_client
+    client, _ = api_client
 
     FAKE_BUS.reset_mock()
 
@@ -49,15 +47,15 @@ def test_add_batch_returns_201(
     )
 
     assert resp.status_code == 201
-    assert resp.get_json() == {"status": "OK"}
+    assert resp.json() == {"status": "OK"}
 
     FAKE_BUS.handle.assert_called_once()
 
 
 def test_add_batch_with_estimated_time_of_arrival(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, _ = flask_client
+    client, _ = api_client
 
     FAKE_BUS.reset_mock()
 
@@ -77,9 +75,9 @@ def test_add_batch_with_estimated_time_of_arrival(
 
 
 def test_allocate_returns_202(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, _ = flask_client
+    client, _ = api_client
 
     FAKE_BUS.reset_mock()
 
@@ -93,13 +91,13 @@ def test_allocate_returns_202(
     )
 
     assert resp.status_code == 202
-    assert resp.get_json() == {"status": "OK"}
+    assert resp.json() == {"status": "OK"}
 
 
 def test_allocate_returns_400_on_invalid_stock_keeping_unit(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, _ = flask_client
+    client, _ = api_client
 
     FAKE_BUS.reset_mock()
 
@@ -115,20 +113,20 @@ def test_allocate_returns_400_on_invalid_stock_keeping_unit(
     )
 
     assert resp.status_code == 400
-    assert resp.get_json() == {"message": "Invalid stock_keeping_unit GHOST"}
+    assert resp.json() == {"message": "Invalid stock_keeping_unit GHOST"}
 
     FAKE_BUS.handle.side_effect = None
 
 
 def test_allocations_view_returns_200(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, flask_module = flask_client
+    client, fastapi_module = api_client
 
     FAKE_BUS.reset_mock()
 
     with mock.patch.object(
-        flask_module,
+        fastapi_module,
         "allocations",
         return_value=[
             {
@@ -140,7 +138,7 @@ def test_allocations_view_returns_200(
         resp = client.get("/allocations/o1")
 
     assert resp.status_code == 200
-    assert resp.get_json() == [
+    assert resp.json() == [
         {
             "stock_keeping_unit": "SMALL-TABLE",
             "batch_reference": "b1",
@@ -149,14 +147,14 @@ def test_allocations_view_returns_200(
 
 
 def test_allocations_view_returns_404_when_empty(
-    flask_client: tuple[FlaskClient, Any],
+    api_client: tuple[TestClient, Any],
 ) -> None:
-    client, flask_module = flask_client
+    client, fastapi_module = api_client
 
     FAKE_BUS.reset_mock()
 
     with mock.patch.object(
-        flask_module,
+        fastapi_module,
         "allocations",
         return_value=[],
     ):
