@@ -1,4 +1,4 @@
-from datetime import date  # noqa
+from datetime import date  # noqa: TC003
 from typing import TYPE_CHECKING, cast
 
 from fastapi import FastAPI, status
