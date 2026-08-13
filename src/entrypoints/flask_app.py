@@ -1,4 +1,4 @@
-from datetime import date # noqa
+from datetime import date  # noqa
 from typing import TYPE_CHECKING, cast
 
 from fastapi import FastAPI, status
@@ -11,7 +11,6 @@ from src.service_layer.handlers import InvalidStockKeepingUnitError
 from src.views import allocations
 
 if TYPE_CHECKING:
-
     from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = FastAPI()
