@@ -28,9 +28,12 @@ services:
   api:
     image: allocation-image
     depends_on:
+      - postgres
+      - redis
       - redis_pubsub
       - mailhog
     environment:
+      - PYTHONPATH=src:.
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - API_HOST=api
@@ -41,6 +44,7 @@ services:
     volumes:
       - ./src:/src
       - ./tests:/tests
+    working_dir: /
     entrypoint:
       - uvicorn
       - src.entrypoints.flask_app:app
