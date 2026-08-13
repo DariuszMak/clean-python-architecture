@@ -9,7 +9,7 @@ from unittest import mock
 import pytest
 from fastapi.testclient import TestClient
 
-import src.entrypoints.flask_app as fastapi_module
+import src.entrypoints.fastapi_app as fastapi_module
 import src.entrypoints.redis_eventconsumer as consumer
 from src.service_layer.handlers import InvalidStockKeepingUnitError
 
