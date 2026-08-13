@@ -1,5 +1,5 @@
-from datetime import date
-from typing import TYPE_CHECKING, Optional, cast
+from datetime import date # noqa
+from typing import TYPE_CHECKING, cast
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
@@ -11,6 +11,7 @@ from src.service_layer.handlers import InvalidStockKeepingUnitError
 from src.views import allocations
 
 if TYPE_CHECKING:
+
     from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 app = FastAPI()
@@ -21,7 +22,7 @@ class AddBatchRequest(BaseModel):
     reference: str
     stock_keeping_unit: str
     quantity: int
-    estimated_time_of_arrival: Optional[date] = None
+    estimated_time_of_arrival: date | None = None
 
 
 class AllocateRequest(BaseModel):
