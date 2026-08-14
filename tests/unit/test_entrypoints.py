@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
-from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient  # noqa: F401
 
 import src.entrypoints.fastapi_app as fastapi_module
 import src.entrypoints.redis_eventconsumer as consumer
