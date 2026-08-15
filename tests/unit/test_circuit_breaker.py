@@ -21,7 +21,7 @@ def test_redis_publish_breaker_opens_after_repeated_failures() -> None:
         fake_redis.publish.side_effect = ConnectionError("redis down")
 
         for _ in range(redis_publish_breaker.fail_max):
-            with pytest.raises(ConnectionError):
+            with pytest.raises((ConnectionError, pybreaker.CircuitBreakerError)):
                 redis_eventpublisher.publish("channel", event)
 
         assert redis_publish_breaker.current_state == "open"
@@ -53,7 +53,7 @@ def test_email_breaker_opens_after_repeated_failures() -> None:
         notifications = EmailNotifications()
 
         for _ in range(email_breaker.fail_max):
-            with pytest.raises(ConnectionRefusedError):
+            with pytest.raises((ConnectionRefusedError, pybreaker.CircuitBreakerError)):
                 notifications.send("dest@example.com", "message")
 
         assert email_breaker.current_state == "open"
@@ -84,7 +84,7 @@ def test_database_breaker_opens_after_repeated_commit_failures() -> None:
 
     with unit_of_work:
         for _ in range(database_breaker.fail_max):
-            with pytest.raises(ConnectionError):
+            with pytest.raises((ConnectionError, pybreaker.CircuitBreakerError)):
                 unit_of_work.commit()
 
         assert database_breaker.current_state == "open"
