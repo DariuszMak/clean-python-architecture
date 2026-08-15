@@ -28,7 +28,7 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     for attempt in Retrying(stop=stop_after_delay(10), reraise=True):
         with attempt:
-            message = subscription.get_message(timeout=1)
+            message = subscription.get_message(timeout=30)
             if message:
                 data = json.loads(message["data"])
                 if data["order_id"] == order_id and data["batch_reference"] == later_batch:

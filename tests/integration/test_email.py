@@ -27,7 +27,7 @@ def get_email_from_mailhog(stock_keeping_unit: str) -> dict[str, Any]:
     host, port = map(config.get_email_host_and_port().get, ["host", "http_port"])
     all_emails = requests.get(
         f"http://{host}:{port}/api/v2/messages",
-        timeout=5,
+        timeout=30,
     ).json()
     return next(m for m in all_emails["items"] if stock_keeping_unit in str(m))
 

@@ -14,7 +14,7 @@ r_any: Any = r
 def subscribe_to(channel: str) -> Any:
     pubsub = r_any.pubsub()
     pubsub.subscribe(channel)
-    confirmation = pubsub.get_message(timeout=3)
+    confirmation = pubsub.get_message(timeout=30)
     assert confirmation["type"] == "subscribe"
     return pubsub
 

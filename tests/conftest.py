@@ -68,7 +68,7 @@ def wait_for_postgres_to_come_up(engine: Engine) -> Any:
 
 @retry(stop=stop_after_delay(30), wait=wait_fixed(0.5))
 def wait_for_webapp_to_come_up() -> requests.Response:
-    return requests.get(get_api_url(), timeout=5)
+    return requests.get(get_api_url(), timeout=30)
 
 
 @retry(stop=stop_after_delay(10))

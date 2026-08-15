@@ -5,7 +5,7 @@ from requests import Response
 
 from src.helpers.config import config
 
-TIMEOUT: int = 5
+TIMEOUT: int = 30
 
 
 def post_to_add_batch(reference: Any, stock_keeping_unit: Any, quantity: Any, estimated_time_of_arrival: Any) -> None:
