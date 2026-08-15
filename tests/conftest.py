@@ -123,4 +123,3 @@ def restart_redis_pubsub() -> None:
         )
     else:
         raise FileNotFoundError("Could not find docker-compose in PATH")
-    
