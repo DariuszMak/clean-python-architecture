@@ -17,7 +17,7 @@ class CircuitBreakerListener(pybreaker.CircuitBreakerListener):
             new_state=new_state.name,
         )
 
-    def failure(self, cb: pybreaker.CircuitBreaker, exc: Exception) -> None:
+    def failure(self, cb: pybreaker.CircuitBreaker, exc: BaseException) -> None:
         logger.warning("Circuit breaker failure", breaker=cb.name, error=str(exc))
 
 
