@@ -1,6 +1,7 @@
 import abc
 import smtplib
 
+from src.helpers.circuit_breaker import email_breaker
 from src.helpers.config import config
 
 
@@ -21,7 +22,8 @@ class EmailNotifications(AbstractNotifications):
 
     def send(self, destination: str, message: str) -> None:
         msg: str = f"Subject: allocation service notification\n{message}"
-        self.server.sendmail(
+        email_breaker.call(
+            self.server.sendmail,
             from_addr="allocations@example.com",
             to_addrs=[destination],
             msg=msg,

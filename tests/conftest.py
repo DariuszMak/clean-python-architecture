@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from src.adapters.orm import metadata, start_mappers
+from src.helpers.circuit_breaker import reset_all_breakers
 from src.helpers.config import config
 
 if TYPE_CHECKING:
@@ -31,6 +32,11 @@ start_mappers_typed: Callable[[], None] = start_mappers
 wait_for_postgres_to_come_up_untyped: Callable[[Engine], Any] | None = None
 wait_for_webapp_to_come_up_untyped: Callable[[], requests.Response] | None = None
 wait_for_redis_to_come_up_untyped: Callable[[], bool] | None = None
+
+
+@pytest.fixture(autouse=True)
+def _reset_circuit_breakers() -> None:
+    reset_all_breakers()
 
 
 @pytest.fixture
@@ -117,3 +123,4 @@ def restart_redis_pubsub() -> None:
         )
     else:
         raise FileNotFoundError("Could not find docker-compose in PATH")
+    

@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.adapters.repository import SqlAlchemyRepository
+from src.helpers.circuit_breaker import database_breaker
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -65,7 +66,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session.close()
 
     def _commit(self) -> None:
-        self.session.commit()
+        database_breaker.call(self.session.commit)
 
     def rollback(self) -> None:
         self.session.rollback()
