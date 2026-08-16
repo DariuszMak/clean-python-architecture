@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from unittest import mock
 
 import pybreaker
@@ -8,40 +9,43 @@ import pytest
 
 from src.adapters.notifications import EmailNotifications
 from src.domain.events import Allocated
-from src.helpers.circuit_breaker import database_breaker, email_breaker, redis_publish_breaker
+from src.helpers.circuit_breaker import database_breaker, email_breaker, kafka_publish_breaker
 from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 
-def test_redis_publish_breaker_opens_after_repeated_failures() -> None:
-    import src.adapters.redis_eventpublisher as redis_eventpublisher
+def test_kafka_publish_breaker_opens_after_repeated_failures() -> None:
+    import src.adapters.kafka_eventpublisher as kafka_eventpublisher
 
     event = Allocated(order_id="o1", stock_keeping_unit="sku1", quantity=1, batch_reference="b1")
 
-    with mock.patch.object(redis_eventpublisher, "r") as fake_redis:
-        fake_redis.publish.side_effect = ConnectionError("redis down")
+    with mock.patch.object(kafka_eventpublisher, "_get_producer") as fake_get_producer:
+        fake_producer = mock.MagicMock()
+        fake_get_producer.return_value = fake_producer
+        fake_producer.send.side_effect = ConnectionError("kafka down")
 
-        for _ in range(redis_publish_breaker.fail_max):
+        for _ in range(kafka_publish_breaker.fail_max):
             with pytest.raises((ConnectionError, pybreaker.CircuitBreakerError)):
-                redis_eventpublisher.publish("channel", event)
+                kafka_eventpublisher.publish("channel", event)
 
-        assert redis_publish_breaker.current_state == "open"
+        assert kafka_publish_breaker.current_state == "open"
 
         with pytest.raises(pybreaker.CircuitBreakerError):
-            redis_eventpublisher.publish("channel", event)
+            kafka_eventpublisher.publish("channel", event)
 
 
-def test_redis_publish_breaker_stays_closed_on_success() -> None:
-    import src.adapters.redis_eventpublisher as redis_eventpublisher
+def test_kafka_publish_breaker_stays_closed_on_success() -> None:
+    import src.adapters.kafka_eventpublisher as kafka_eventpublisher
 
     event = Allocated(order_id="o1", stock_keeping_unit="sku1", quantity=1, batch_reference="b1")
 
-    with mock.patch.object(redis_eventpublisher, "r") as fake_redis:
-        fake_redis.publish.return_value = 1
+    with mock.patch.object(kafka_eventpublisher, "_get_producer") as fake_get_producer:
+        fake_producer = mock.MagicMock()
+        fake_get_producer.return_value = fake_producer
 
-        redis_eventpublisher.publish("channel", event)
+        kafka_eventpublisher.publish("channel", event)
 
-        assert redis_publish_breaker.current_state == "closed"
-        fake_redis.publish.assert_called_once_with("channel", json.dumps(event.__dict__))
+        assert kafka_publish_breaker.current_state == "closed"
+        fake_producer.send.assert_called_once_with("channel", asdict(event))
 
 
 def test_email_breaker_opens_after_repeated_failures() -> None:

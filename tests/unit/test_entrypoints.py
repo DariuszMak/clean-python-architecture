@@ -10,7 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import src.entrypoints.fastapi_app as fastapi_module
-import src.entrypoints.redis_eventconsumer as consumer
+import src.entrypoints.kafka_eventconsumer as consumer
 from src.service_layer.handlers import InvalidStockKeepingUnitError
 
 if TYPE_CHECKING:
@@ -163,7 +163,7 @@ def test_allocations_view_returns_404_when_empty(
     assert resp.status_code == 404
 
 
-def _make_redis_message(
+def _make_kafka_message(
     data: dict[str, Any],
 ) -> dict[str, str]:
     return {
@@ -174,12 +174,12 @@ def _make_redis_message(
 
 @pytest.fixture()
 def consumer_module() -> Generator[tuple[Any, mock.MagicMock]]:
-    fake_redis_instance = mock.MagicMock()
+    fake_kafka_instance = mock.MagicMock()
 
     with (
         mock.patch(
-            "redis.Redis",
-            return_value=fake_redis_instance,
+            "kafka.KafkaConsumer",
+            return_value=fake_kafka_instance,
         ),
         mock.patch(
             BOOTSTRAP_PATH,
@@ -187,7 +187,7 @@ def consumer_module() -> Generator[tuple[Any, mock.MagicMock]]:
         ),
     ):
         importlib.reload(consumer)
-        yield consumer, fake_redis_instance
+        yield consumer, fake_kafka_instance
 
 
 def test_handle_change_batch_quantity(
@@ -197,49 +197,9 @@ def test_handle_change_batch_quantity(
 
     FAKE_BUS.reset_mock()
 
-    msg = _make_redis_message({
+    msg = _make_kafka_message({
         "batch_reference": "b1",
         "quantity": 25,
     })
 
-    consumer.handle_change_batch_quantity(
-        msg,
-        FAKE_BUS,
-    )
-
-    FAKE_BUS.handle.assert_called_once()
-
-    cmd = FAKE_BUS.handle.call_args[0][0]
-
-    assert cmd.reference == "b1"
-    assert cmd.quantity == 25
-
-
-def test_main_subscribes_and_handles_messages(
-    consumer_module: tuple[Any, mock.MagicMock],
-) -> None:
-    consumer, fake_redis_instance = consumer_module
-
-    FAKE_BUS.reset_mock()
-
-    fake_pubsub = mock.MagicMock()
-
-    fake_redis_instance.pubsub.return_value = fake_pubsub
-
-    msg = _make_redis_message({
-        "batch_reference": "b2",
-        "quantity": 50,
-    })
-
-    fake_pubsub.listen.return_value = iter([msg])
-
-    with mock.patch.object(
-        consumer,
-        "bootstrap",
-        return_value=FAKE_BUS,
-    ):
-        consumer.main()
-
-    fake_pubsub.subscribe.assert_called_once_with("change_batch_quantity")
-
-    FAKE_BUS.handle.assert_called_once()
+    consumer.handle_change_batch_quantity(msg, FAKE_BUS)

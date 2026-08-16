@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
-import redis
 import requests
+from kafka import KafkaConsumer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay, wait_fixed
@@ -24,14 +24,14 @@ if TYPE_CHECKING:
 pytest.register_assert_rewrite("tests.e2e.api_client")
 
 get_api_url: Callable[[], str] = config.get_api_url
-get_redis_host_and_port: Callable[[], config.RedisConfig] = config.get_redis_host_and_port
+get_kafka_host_and_port: Callable[[], config.KafkaConfig] = config.get_kafka_host_and_port
 get_postgres_uri: Callable[[], str] = config.get_postgres_uri
 
 start_mappers_typed: Callable[[], None] = start_mappers
 
 wait_for_postgres_to_come_up_untyped: Callable[[Engine], Any] | None = None
 wait_for_webapp_to_come_up_untyped: Callable[[], requests.Response] | None = None
-wait_for_redis_to_come_up_untyped: Callable[[], bool] | None = None
+wait_for_kafka_to_come_up_untyped: Callable[[], bool] | None = None
 
 
 @pytest.fixture(autouse=True)
@@ -72,10 +72,12 @@ def wait_for_webapp_to_come_up() -> requests.Response:
 
 
 @retry(stop=stop_after_delay(10))
-def wait_for_redis_to_come_up() -> bool:
-    cfg = get_redis_host_and_port()
-    r = redis.Redis(host=cfg["host"], port=cfg["port"])
-    return bool(r.ping())
+def wait_for_kafka_to_come_up() -> bool:
+    cfg = get_kafka_host_and_port()
+    consumer = KafkaConsumer(bootstrap_servers=f"{cfg['host']}:{cfg['port']}")
+    consumer.topics()
+    consumer.close()
+    return True
 
 
 @pytest.fixture(scope="session")
@@ -108,8 +110,8 @@ def restart_api() -> None:
 
 
 @pytest.fixture
-def restart_redis_pubsub() -> None:
-    wait_for_redis_to_come_up()
+def restart_kafka_eventconsumer() -> None:
+    wait_for_kafka_to_come_up()
 
     if not shutil.which("docker-compose"):
         return
@@ -118,7 +120,7 @@ def restart_redis_pubsub() -> None:
 
     if docker_path:
         subprocess.run(  # noqa: S603
-            [docker_path, "restart", "-t", "0", "redis_pubsub"],
+            [docker_path, "restart", "-t", "0", "kafka_eventconsumer"],
             check=True,
         )
     else:

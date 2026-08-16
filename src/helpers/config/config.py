@@ -10,7 +10,7 @@ class Config(EnvLoaderMixin):
     log_file: str = "app.log"
 
 
-class RedisConfig(TypedDict):
+class KafkaConfig(TypedDict):
     host: str
     port: int
 
@@ -36,9 +36,9 @@ def get_api_url() -> str:
     return f"http://{host}:{port}"
 
 
-def get_redis_host_and_port() -> RedisConfig:
-    host = os.environ.get("REDIS_HOST", "localhost")
-    port = 6378 if host == "localhost" else 6379
+def get_kafka_host_and_port() -> KafkaConfig:
+    host = os.environ.get("KAFKA_HOST", "localhost")
+    port = 9092 if host == "localhost" else 9092
     return {"host": host, "port": port}
 
 
