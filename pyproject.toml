@@ -5,6 +5,7 @@ description = "EDA template"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.141.1",
+    "kafka-python-ng>=2.2.2",
     "psycopg2-binary>=2.9.12",
     "pybreaker>=1.4.1",
     "redis>=8.0.0",
