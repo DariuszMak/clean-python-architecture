@@ -10,6 +10,7 @@ from tests.random_references import random_batch_reference, random_order_id, ran
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
+@pytest.mark.usefixtures("restart_kafka_eventconsumer")
 def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     order_id, stock_keeping_unit = random_order_id(), random_stock_keeping_unit()

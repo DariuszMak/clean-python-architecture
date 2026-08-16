@@ -1,5 +1,7 @@
 import json
+import time
 import uuid
+from collections import deque
 from typing import Any
 
 from kafka import KafkaConsumer, KafkaProducer
@@ -15,13 +17,17 @@ class KafkaSubscription:
         self.consumer = KafkaConsumer(
             topic,
             bootstrap_servers=f"{cfg['host']}:{cfg['port']}",
-            auto_offset_reset="latest",
+            auto_offset_reset="earliest",
             group_id=f"test-group-{uuid.uuid4().hex}",
             consumer_timeout_ms=1000,
         )
+        # Force initial partition assignment call
+        self.consumer.poll(timeout_ms=1000)
+        self._buffer: deque[dict[str, Any]] = deque()
 
     def get_message(self, timeout: int = 30) -> dict[str, Any] | None:
-        import time
+        if self._buffer:
+            return self._buffer.popleft()
 
         start = time.time()
         while time.time() - start < timeout:
@@ -29,7 +35,11 @@ class KafkaSubscription:
             for _tp, msgs in records.items():
                 for msg in msgs:
                     val = msg.value.decode("utf-8") if isinstance(msg.value, bytes) else msg.value
-                    return {"data": val}
+                    self._buffer.append({"data": val})
+
+            if self._buffer:
+                return self._buffer.popleft()
+
         return None
 
 
