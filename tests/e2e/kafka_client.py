@@ -22,6 +22,7 @@ class KafkaSubscription:
 
     def get_message(self, timeout: int = 30) -> dict[str, Any] | None:
         import time
+
         start = time.time()
         while time.time() - start < timeout:
             records = self.consumer.poll(timeout_ms=1000)

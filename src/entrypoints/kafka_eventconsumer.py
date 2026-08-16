@@ -1,8 +1,8 @@
 import json
 from typing import TYPE_CHECKING, Any
 
-from kafka import KafkaConsumer
 import structlog
+from kafka import KafkaConsumer
 
 from src.bootstrap import bootstrap
 from src.domain.commands import ChangeBatchQuantity
@@ -43,7 +43,13 @@ def handle_change_batch_quantity(m: Any, bus: Any) -> None:
         data: dict[str, Any] = json.loads(raw_data) if isinstance(raw_data, str) else raw_data
     elif hasattr(m, "value"):
         val = m.value
-        data = json.loads(val.decode("utf-8")) if isinstance(val, bytes) else json.loads(val) if isinstance(val, str) else val
+        data = (
+            json.loads(val.decode("utf-8"))
+            if isinstance(val, bytes)
+            else json.loads(val)
+            if isinstance(val, str)
+            else val
+        )
     else:
         data = m
     cmd: ChangeBatchQuantity = ChangeBatchQuantity(
