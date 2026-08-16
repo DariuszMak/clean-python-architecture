@@ -13,32 +13,32 @@ from src.service_layer.unit_of_work import SqlAlchemyUnitOfWork
 
 
 def test_redis_publish_breaker_opens_after_repeated_failures() -> None:
-    import src.adapters.redis_eventpublisher as redis_eventpublisher
+    import src.adapters.kafka_eventpublisher as kafka_eventpublisher
 
     event = Allocated(order_id="o1", stock_keeping_unit="sku1", quantity=1, batch_reference="b1")
 
-    with mock.patch.object(redis_eventpublisher, "r") as fake_redis:
+    with mock.patch.object(kafka_eventpublisher, "r") as fake_redis:
         fake_redis.publish.side_effect = ConnectionError("redis down")
 
         for _ in range(redis_publish_breaker.fail_max):
             with pytest.raises((ConnectionError, pybreaker.CircuitBreakerError)):
-                redis_eventpublisher.publish("channel", event)
+                kafka_eventpublisher.publish("channel", event)
 
         assert redis_publish_breaker.current_state == "open"
 
         with pytest.raises(pybreaker.CircuitBreakerError):
-            redis_eventpublisher.publish("channel", event)
+            kafka_eventpublisher.publish("channel", event)
 
 
 def test_redis_publish_breaker_stays_closed_on_success() -> None:
-    import src.adapters.redis_eventpublisher as redis_eventpublisher
+    import src.adapters.kafka_eventpublisher as kafka_eventpublisher
 
     event = Allocated(order_id="o1", stock_keeping_unit="sku1", quantity=1, batch_reference="b1")
 
-    with mock.patch.object(redis_eventpublisher, "r") as fake_redis:
+    with mock.patch.object(kafka_eventpublisher, "r") as fake_redis:
         fake_redis.publish.return_value = 1
 
-        redis_eventpublisher.publish("channel", event)
+        kafka_eventpublisher.publish("channel", event)
 
         assert redis_publish_breaker.current_state == "closed"
         fake_redis.publish.assert_called_once_with("channel", json.dumps(event.__dict__))
