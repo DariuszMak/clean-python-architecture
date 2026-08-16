@@ -1,41 +1,34 @@
 import json
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-import redis
 import structlog
+from kafka import KafkaConsumer
 
 from src.bootstrap import bootstrap
 from src.domain.commands import ChangeBatchQuantity
 from src.helpers.config import config
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-
 logger = structlog.get_logger(__name__)
-
-RedisMessage = dict[str, Any]
-
-
-RedisHostPort = dict[str, Any]
-
-
-redis_settings: Mapping[str, Any] = config.get_redis_host_and_port()
-r: redis.Redis[Any] = redis.Redis(**redis_settings)
 
 
 def main() -> None:
-    logger.info("Redis pubsub starting")
+    logger.info("Kafka consumer starting")
     bus: Any = bootstrap()
-    pubsub: Any = r.pubsub(ignore_subscribe_messages=True)
-    pubsub.subscribe("change_batch_quantity")
+    bootstrap_servers = config.get_kafka_bootstrap_servers()
+    consumer = KafkaConsumer(
+        "change_batch_quantity",
+        bootstrap_servers=bootstrap_servers,
+        group_id="allocation_group",
+        auto_offset_reset="earliest",
+        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+    )
 
-    for m in pubsub.listen():
-        handle_change_batch_quantity(m, bus)
+    for message in consumer:
+        handle_change_batch_quantity(message.value, bus)
 
 
-def handle_change_batch_quantity(m: RedisMessage, bus: Any) -> None:
-    logger.info("handling %s", m)
-    data: dict[str, Any] = json.loads(m["data"])
+def handle_change_batch_quantity(data: dict[str, Any], bus: Any) -> None:
+    logger.info("handling %s", data)
     cmd: ChangeBatchQuantity = ChangeBatchQuantity(
         reference=data["batch_reference"],
         quantity=data["quantity"],
