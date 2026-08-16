@@ -4,6 +4,8 @@ from src.bootstrap import bootstrap
 from src.service_layer.messagebus import MessageBus
 from tests.unit.test_handlers import FakeUnitOfWork
 
+from src.bootstrap import bootstrap
+from src.domain import events
 
 def test_bootstrap_creates_default_unit_of_work_when_none_given() -> None:
     fake_session_factory = mock.MagicMock()
@@ -44,3 +46,9 @@ def test_bootstrap_creates_default_notifications_when_none_given() -> None:
 
     assert isinstance(bus, MessageBus)
     mock_notif.assert_called_once()
+
+
+def test_bootstrap_injects_kafka_publisher_by_default():
+    bus = bootstrap(start_orm=False)
+
+    assert bus.event_handlers[events.OutOfStock] is not None
