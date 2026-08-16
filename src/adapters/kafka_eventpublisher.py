@@ -3,8 +3,8 @@ import logging
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, cast
 
-from kafka import KafkaProducer
 import structlog
+from kafka import KafkaProducer
 
 from src.helpers.circuit_breaker import kafka_publish_breaker
 from src.helpers.config import config
