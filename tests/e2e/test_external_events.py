@@ -1,7 +1,7 @@
 import json
+import time
 
 import pytest
-from tenacity import Retrying, stop_after_delay
 
 from tests.e2e.api_client import get_allocation, post_to_add_batch, post_to_allocate
 from tests.e2e.kafka_client import publish_message, subscribe_to
@@ -27,11 +27,13 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
 
     publish_message("change_batch_quantity", {"batch_reference": earlier_batch, "quantity": 5})
 
-    for attempt in Retrying(stop=stop_after_delay(10), reraise=True):
-        with attempt:
-            message = subscription.get_message(timeout=30)
-            if message:
-                data = json.loads(message["data"]) if isinstance(message["data"], str) else message["data"]
-                if data["order_id"] == order_id and data["batch_reference"] == later_batch:
-                    return
-            raise AssertionError(f"Did not receive reallocation message for order {order_id} to batch {later_batch}")
+    start_time = time.time()
+    timeout = 15
+    while time.time() - start_time < timeout:
+        message = subscription.get_message(timeout=1)
+        if message:
+            data = json.loads(message["data"]) if isinstance(message["data"], str) else message["data"]
+            if data.get("order_id") == order_id and data.get("batch_reference") == later_batch:
+                return
+
+    raise AssertionError(f"Did not receive reallocation message for order {order_id} to batch {later_batch}")

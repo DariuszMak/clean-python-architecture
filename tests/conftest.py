@@ -113,15 +113,12 @@ def restart_api() -> None:
 def restart_kafka_eventconsumer() -> None:
     wait_for_kafka_to_come_up()
 
-    if not shutil.which("docker-compose"):
-        return
+    cmd = None
+    if shutil.which("docker"):
+        cmd = ["docker", "compose", "restart", "-t", "0", "kafka_eventconsumer"]
+    elif shutil.which("docker-compose"):
+        cmd = ["docker-compose", "restart", "-t", "0", "kafka_eventconsumer"]
 
-    docker_path = shutil.which("docker-compose")
-
-    if docker_path:
-        subprocess.run(  # noqa: S603
-            [docker_path, "restart", "-t", "0", "kafka_eventconsumer"],
-            check=True,
-        )
-    else:
-        raise FileNotFoundError("Could not find docker-compose in PATH")
+    if cmd:
+        subprocess.run(cmd, check=True)  # noqa: S603
+        time.sleep(2)
