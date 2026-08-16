@@ -3,8 +3,8 @@ import logging
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, cast
 
-import structlog
 from kafka import KafkaProducer
+import structlog
 
 from src.helpers.circuit_breaker import kafka_publish_breaker
 from src.helpers.config import config
@@ -19,7 +19,7 @@ def _get_producer() -> KafkaProducer:
     cfg = config.get_kafka_host_and_port()
     return KafkaProducer(
         bootstrap_servers=f"{cfg['host']}:{cfg['port']}",
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        value_serializer=lambda v: json.dumps(v, default=str).encode("utf-8"),
     )
 
 

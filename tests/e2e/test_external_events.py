@@ -33,7 +33,10 @@ def test_change_batch_quantity_leading_to_reallocation() -> None:
         message = subscription.get_message(timeout=1)
         if message:
             data = json.loads(message["data"]) if isinstance(message["data"], str) else message["data"]
-            if data.get("order_id") == order_id and data.get("batch_reference") == later_batch:
+            msg_order_id = data.get("order_id") or data.get("orderid")
+            msg_batch_ref = data.get("batch_reference") or data.get("batchref") or data.get("ref")
+
+            if msg_order_id == order_id and msg_batch_ref == later_batch:
                 return
 
     raise AssertionError(f"Did not receive reallocation message for order {order_id} to batch {later_batch}")

@@ -11,8 +11,14 @@ url = config.get_api_url()
     wait=wait_fixed(0.5),
     retry=retry_if_exception_type((requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout)),
 )
-def post_to_add_batch(ref: str, sku: str, quantity: int, estimated_time_of_arrival: str | None) -> requests.Response:
-    return requests.post(
+def post_to_add_batch(
+    ref: str,
+    sku: str,
+    quantity: int,
+    estimated_time_of_arrival: str | None,
+    expect_success: bool = True,
+) -> requests.Response:
+    r = requests.post(
         f"{url}/add_batch",
         json={
             "reference": ref,
@@ -22,6 +28,9 @@ def post_to_add_batch(ref: str, sku: str, quantity: int, estimated_time_of_arriv
         },
         timeout=10,
     )
+    if expect_success:
+        assert r.status_code == 201
+    return r
 
 
 @retry(
@@ -29,8 +38,13 @@ def post_to_add_batch(ref: str, sku: str, quantity: int, estimated_time_of_arriv
     wait=wait_fixed(0.5),
     retry=retry_if_exception_type((requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout)),
 )
-def post_to_allocate(order_id: str, sku: str, quantity: int) -> requests.Response:
-    return requests.post(
+def post_to_allocate(
+    order_id: str,
+    sku: str,
+    quantity: int,
+    expect_success: bool = True,
+) -> requests.Response:
+    r = requests.post(
         f"{url}/allocate",
         json={
             "order_id": order_id,
@@ -39,6 +53,9 @@ def post_to_allocate(order_id: str, sku: str, quantity: int) -> requests.Respons
         },
         timeout=10,
     )
+    if expect_success:
+        assert r.status_code == 202
+    return r
 
 
 @retry(
