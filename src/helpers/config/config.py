@@ -47,3 +47,7 @@ def get_email_host_and_port() -> EmailConfig:
     port = 11025 if host == "localhost" else 1025
     http_port = 18025 if host == "localhost" else 8025
     return {"host": host, "port": port, "http_port": http_port}
+
+
+def get_kafka_bootstrap_servers() -> str:
+    return os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")

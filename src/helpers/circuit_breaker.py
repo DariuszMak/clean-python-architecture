@@ -31,11 +31,13 @@ def make_circuit_breaker(name: str, fail_max: int = 5, reset_timeout: int = 60) 
 
 
 redis_publish_breaker: pybreaker.CircuitBreaker = make_circuit_breaker("redis_publish")
+kafka_publish_breaker: pybreaker.CircuitBreaker = make_circuit_breaker("kafka_publish")
 email_breaker: pybreaker.CircuitBreaker = make_circuit_breaker("email_notifications")
 database_breaker: pybreaker.CircuitBreaker = make_circuit_breaker("database")
 
 ALL_BREAKERS: tuple[pybreaker.CircuitBreaker, ...] = (
     redis_publish_breaker,
+    kafka_publish_breaker,
     email_breaker,
     database_breaker,
 )
