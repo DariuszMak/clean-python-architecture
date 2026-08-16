@@ -10,7 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import src.entrypoints.fastapi_app as fastapi_module
-import src.entrypoints.redis_eventconsumer as consumer
+import src.entrypoints.kafka_eventconsumer as consumer
 from src.service_layer.handlers import InvalidStockKeepingUnitError
 
 if TYPE_CHECKING:
