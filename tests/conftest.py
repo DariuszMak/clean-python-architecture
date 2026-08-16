@@ -6,10 +6,11 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 import requests
+from hypothesis import HealthCheck, settings
 from kafka import KafkaConsumer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
-from tenacity import retry, stop_after_delay, wait_fixed
+from tenacity import retry, retry_if_exception_type, stop_after_delay, wait_fixed
 
 from src.adapters.orm import metadata, start_mappers
 from src.helpers.circuit_breaker import reset_all_breakers
@@ -20,6 +21,9 @@ if TYPE_CHECKING:
 
     from sqlalchemy.engine import Engine
 
+# Disable Hypothesis deadline globally for test setup overhead
+settings.register_profile("ci", deadline=None, suppress_health_check=[HealthCheck.too_slow])
+settings.load_profile("ci")
 
 pytest.register_assert_rewrite("tests.e2e.api_client")
 
@@ -28,10 +32,6 @@ get_kafka_host_and_port: Callable[[], config.KafkaConfig] = config.get_kafka_hos
 get_postgres_uri: Callable[[], str] = config.get_postgres_uri
 
 start_mappers_typed: Callable[[], None] = start_mappers
-
-wait_for_postgres_to_come_up_untyped: Callable[[Engine], Any] | None = None
-wait_for_webapp_to_come_up_untyped: Callable[[], requests.Response] | None = None
-wait_for_kafka_to_come_up_untyped: Callable[[], bool] | None = None
 
 
 @pytest.fixture(autouse=True)
@@ -66,9 +66,13 @@ def wait_for_postgres_to_come_up(engine: Engine) -> Any:
     return engine.connect()
 
 
-@retry(stop=stop_after_delay(30), wait=wait_fixed(0.5))
+@retry(
+    stop=stop_after_delay(30),
+    wait=wait_fixed(0.5),
+    retry=retry_if_exception_type((requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout)),
+)
 def wait_for_webapp_to_come_up() -> requests.Response:
-    return requests.get(get_api_url(), timeout=30)
+    return requests.get(get_api_url(), timeout=5)
 
 
 @retry(stop=stop_after_delay(10))
