@@ -30,9 +30,10 @@ class KafkaSubscription:
             return self._buffer.popleft()
 
         start = time.time()
+
         while time.time() - start < timeout:
             records = self.consumer.poll(timeout_ms=1000)
-            for _tp, msgs in records.items():
+            for msgs in records.values():
                 for msg in msgs:
                     val = msg.value.decode("utf-8") if isinstance(msg.value, bytes) else msg.value
                     self._buffer.append({"data": val})

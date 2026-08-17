@@ -38,7 +38,7 @@ def get_api_url() -> str:
 
 def get_kafka_host_and_port() -> KafkaConfig:
     host = os.environ.get("KAFKA_HOST", "localhost")
-    port = 9092 if host == "localhost" else 9092
+    port = int(os.environ.get("KAFKA_PORT", 9092))
     return {"host": host, "port": port}
 
 
