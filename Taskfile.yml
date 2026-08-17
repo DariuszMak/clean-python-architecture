@@ -35,21 +35,15 @@ tasks:
     cmds:
       - powershell -ExecutionPolicy Bypass -File tasks/generate_diagrams.ps1
 
-  local-dev-native-run:
-    desc: Local dev Windows run
-    cmds:
-      - powershell -ExecutionPolicy Bypass -File tasks/run_native_dev_application.ps1
 
-      
   full-dev-native:
     desc: Fast native Windows development flow
     deps:
       - cleanup
     cmds:
       - task: dev-env
-      - task: local-static-tests
       - task: kibana-elastic
-      - task: local-dev-native-run
+      - task: local-static-tests
 
 
   full-static-analyzis:
