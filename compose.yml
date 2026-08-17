@@ -33,7 +33,7 @@ services:
       - kafka_eventconsumer
       - mailhog
     environment:
-      - PYTHONPATH=src:.
+      - PYTHONPATH=src
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - API_HOST=api
@@ -42,9 +42,8 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./src:/src
-      - ./tests:/tests
-    working_dir: /
+      - .:/app
+    working_dir: /app
     entrypoint:
       - uvicorn
       - src.entrypoints.fastapi_app:app
