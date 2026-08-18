@@ -1,6 +1,6 @@
 FROM python:3.14-alpine
 
-ENV PYTHONPATH=src
+ENV PYTHONPATH=.
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 

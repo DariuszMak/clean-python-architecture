@@ -10,7 +10,7 @@ services:
       - kafka
       - mailhog
     environment:
-      - PYTHONPATH=src
+      - PYTHONPATH=.
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - KAFKA_HOST=kafka
@@ -33,7 +33,7 @@ services:
       - kafka_eventconsumer
       - mailhog
     environment:
-      - PYTHONPATH=src
+      - PYTHONPATH=.
       - DB_HOST=postgres
       - DB_PASSWORD=abc123
       - API_HOST=api
