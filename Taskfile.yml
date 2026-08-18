@@ -32,6 +32,8 @@ tasks:
 
   generate-diagrams:
     desc: Generate project diagrams
+    deps:
+      - cleanup
     cmds:
       - powershell -ExecutionPolicy Bypass -File tasks/generate_diagrams.ps1
 
@@ -54,4 +56,3 @@ tasks:
       - task: dev-env
       - task: local-static-tests
       - task: sonarqube
-      - task: generate-diagrams
