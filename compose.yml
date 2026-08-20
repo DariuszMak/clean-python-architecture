@@ -6,9 +6,12 @@ services:
       dockerfile: Dockerfile
     image: allocation-image
     depends_on:
-      - postgres
-      - kafka
-      - mailhog
+      postgres:
+        condition: service_started
+      mailhog:
+        condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       - PYTHONPATH=.
       - DB_HOST=postgres
@@ -83,6 +86,11 @@ services:
       - KAFKA_LOG_DIRS=/var/lib/kafka/data
     volumes:
       - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
