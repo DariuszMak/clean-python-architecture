@@ -5,13 +5,11 @@ services:
       context: .
       dockerfile: Dockerfile
     image: allocation-image
+    restart: on-failure
     depends_on:
-      postgres:
-        condition: service_started
-      mailhog:
-        condition: service_started
-      kafka:
-        condition: service_healthy
+      - postgres
+      - kafka
+      - mailhog
     environment:
       - PYTHONPATH=.
       - DB_HOST=postgres
@@ -87,10 +85,11 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 9092 || exit 1"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
+      start_period: 10s
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
