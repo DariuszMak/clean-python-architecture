@@ -152,20 +152,20 @@ def test_allocations_for_different_stock_keeping_units_do_not_interfere() -> Non
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
-def test_adding_batch_to_existing_stock_keeping_unit_increases_available_stock() -> None:
+def test_adding_larger_batch_allows_order_that_first_batch_alone_could_not_cover() -> None:
     order_id = random_order_id()
     stock_keeping_unit = random_stock_keeping_unit()
-    batch1 = random_batch_reference("1")
-    batch2 = random_batch_reference("2")
+    too_small_batch = random_batch_reference("small")
+    sufficient_batch = random_batch_reference("sufficient")
 
-    post_to_add_batch(batch1, stock_keeping_unit, 5, None)
-    post_to_add_batch(batch2, stock_keeping_unit, 5, None)
+    post_to_add_batch(too_small_batch, stock_keeping_unit, 5, None)
+    post_to_add_batch(sufficient_batch, stock_keeping_unit, 20, None)
 
     r = post_to_allocate(order_id, stock_keeping_unit, quantity=8)
     assert r.status_code == 202
 
     r = get_allocation(order_id)
     assert r.ok
-    assert len(r.json()) == 1
-    assert r.json()[0]["stock_keeping_unit"] == stock_keeping_unit
-    assert r.json()[0]["batch_reference"] in {batch1, batch2}
+    assert r.json() == [
+        {"stock_keeping_unit": stock_keeping_unit, "batch_reference": sufficient_batch},
+    ]
