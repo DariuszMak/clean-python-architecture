@@ -26,6 +26,9 @@ services:
       - entrypoints.kafka_eventconsumer
 
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: allocation-image
     depends_on:
       - postgres
