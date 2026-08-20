@@ -6,3 +6,4 @@ docker-compose logs --tail=25 api kafka_eventconsumer ;
 
 Start-Process .\htmlcov\index.html ; 
 Start-Process "http://127.0.0.1:5005" ; 
+Start-Process "http://127.0.0.1:8081" ; 
